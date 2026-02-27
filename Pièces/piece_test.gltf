@@ -6,7 +6,7 @@
     "scene": 0,
     "scenes": [
         {
-            "name": "Défaut",
+            "name": "DÃ©faut",
             "nodes": [
                 0,
                 1
@@ -38,7 +38,7 @@
         },
         {
             "mesh": 0,
-            "name": "Pièce 5.2"
+            "name": "PiÃ¨ce 5.2"
         }
     ],
     "cameras": [
@@ -155,7 +155,7 @@
     ],
     "buffers": [
         {
-            "uri": "Pi�ce 5.2.bin",
+            "uri": "Pièce 5.2.bin",
             "byteLength": 59856
         }
     ]
