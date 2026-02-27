@@ -141,32 +141,22 @@ section.is-active::before{opacity:1}
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
-<!-- ✅ AJOUTER ICI -->
 <script>
-/* CONFIGURATION PROJETS */
+
 const projects = [
-  {
-    title: "Réducteur mécanique haute précision",
-    text: "Étude cinématique complète, jeux fonctionnels, engrenages optimisés."
-  },
-  {
-    title: "Système de convoyage automatisé",
-    text: "Assemblage multi-corps, simulation de mouvement, intégration moteur."
-  },
-  {
-    title: "Mécanisme de verrouillage industriel",
-    text: "Conception robuste, démontabilité optimisée, validation mécanique."
-  }
+  { title:"Réducteur mécanique haute précision", text:"Étude cinématique complète, jeux fonctionnels, engrenages optimisés."},
+  { title:"Système de convoyage automatisé", text:"Assemblage multi-corps, simulation de mouvement, intégration moteur."},
+  { title:"Mécanisme de verrouillage industriel", text:"Conception robuste, démontabilité optimisée, validation mécanique."}
 ]
 
 const container = document.getElementById("projectsContainer")
 
-projects.forEach((proj, i) => {
+projects.forEach((proj,i)=>{
 
   const row = document.createElement("div")
-  row.className = "project-row"
+  row.className="project-row"
 
-  row.innerHTML = `
+  row.innerHTML=`
     <div class="project-text">
       <h3>${proj.title}</h3>
       <p>${proj.text}</p>
@@ -177,98 +167,131 @@ projects.forEach((proj, i) => {
   `
 
   container.appendChild(row)
-
   loadProjectMedia(i)
 })
 
-function loadProjectMedia(index){
+async function loadProjectMedia(index){
 
   const media = document.getElementById(`media-${index}`)
+
   const gltfPath = `pieces/piece_${index+1}/piece_${index+1}.gltf`
-  const pngPath = `Images/piece_${index+1}.png`
-  const jpgPath = `Images/piece_${index+1}.jpg`
+  const pngPath  = `images/piece_${index+1}.png`
+  const jpgPath  = `images/piece_${index+1}.jpg`
+
+  if(await fileExists(gltfPath)){
+    loadGLTF(media, gltfPath)
+    return
+  }
+
+  if(await fileExists(pngPath)){
+    showImage(media, pngPath)
+    return
+  }
+
+  if(await fileExists(jpgPath)){
+    showImage(media, jpgPath)
+    return
+  }
+
+  showFallback(media)
+}
+
+async function fileExists(url){
+  try{
+    const r = await fetch(url,{method:"HEAD"})
+    return r.ok
+  }catch(e){
+    return false
+  }
+}
+
+function loadGLTF(media, gltfPath){
 
   const scene = new THREE.Scene()
   const camera = new THREE.PerspectiveCamera(45,1,.1,1000)
+
   const renderer = new THREE.WebGLRenderer({antialias:true,alpha:true})
   renderer.setSize(350,350)
   renderer.setPixelRatio(devicePixelRatio)
+
+  media.innerHTML=""
   media.appendChild(renderer.domElement)
 
   scene.add(new THREE.AmbientLight(0xffffff,.8))
-  const dir = new THREE.DirectionalLight(0xffffff,1)
+  const dir=new THREE.DirectionalLight(0xffffff,1)
   dir.position.set(5,5,5)
   scene.add(dir)
 
-  const loader = new THREE.GLTFLoader()
+  const loader=new THREE.GLTFLoader()
 
   loader.load(
     gltfPath,
     gltf=>{
+
       const model = gltf.scene
+
       const box = new THREE.Box3().setFromObject(model)
       const size = box.getSize(new THREE.Vector3()).length()
       const center = box.getCenter(new THREE.Vector3())
+
       model.position.sub(center)
+
       camera.position.set(0,0,size*1.4)
       camera.lookAt(0,0,0)
+
       scene.add(model)
 
       let r=0
-      ;(function animate(){
-        r+=.01
+      ;(function anim(){
+        r+=0.01
         scene.rotation.y=r
         renderer.render(scene,camera)
-        requestAnimationFrame(animate)
+        requestAnimationFrame(anim)
       })()
+
     },
-
     undefined,
-
-    ()=>{ tryImage(pngPath) }
+    ()=>{
+      showFallback(media)
+    }
   )
-
-  function tryImage(path){
-    const img = new Image()
-    img.src = path
-
-    img.onload = ()=>{
-      media.innerHTML=""
-      img.style.width="100%"
-      img.style.height="100%"
-      img.style.objectFit="cover"
-      media.appendChild(img)
-    }
-
-    img.onerror = ()=>{
-      if(path.includes(".png")){
-        tryImage(jpgPath)
-      } else {
-        showFallback()
-      }
-    }
-  }
-
-  function showFallback(){
-    media.innerHTML = `
-      <div style="
-        width:100%;
-        height:100%;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        background:#f1f5f9;
-        border:2px dashed #94a3b8;
-        border-radius:24px;
-        font-weight:600;
-        color:#475569;
-        text-align:center;
-        padding:20px;">
-        Le projet rencontre un problème d’affichage.
-      </div>
-    `
-  }
 }
+
+function showImage(media,path){
+
+  const img=new Image()
+  img.src=path
+  img.style.width="100%"
+  img.style.height="100%"
+  img.style.objectFit="cover"
+
+  media.innerHTML=""
+  media.appendChild(img)
+}
+
+function showFallback(media){
+
+  media.innerHTML=`
+    <div style="
+      width:100%;
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(145deg,#dbeafe,#bfdbfe);
+      border-radius:24px;
+      color:#1e3a8a;
+      font-weight:700;
+      font-size:18px;
+      text-align:center;
+      padding:24px;
+      box-shadow:inset 0 0 0 2px rgba(30,64,175,.25);
+    ">
+      Contenu non disponible
+    </div>
+  `
+}
+
 </script>
 
 <script>
@@ -297,6 +320,8 @@ requestAnimationFrame(anim)
 for(let i=1;i<=10;i++)galleryGrid.innerHTML+=`<div class="card"><h3>Projet ${i}</h3><p>Étude mécanique détaillée, simulation, optimisation produit.</p></div>`
 
 const io=new IntersectionObserver(e=>e.forEach(x=>x.isIntersecting&&x.target.classList.add('visible')),{threshold:.35})
+document.querySelectorAll('.project-row')
+  .forEach(r=>io.observe(r))
 
 const sections=document.querySelectorAll("section")
 const sio=new IntersectionObserver(e=>e.forEach(x=>x.isIntersecting&&(sections.forEach(s=>s.classList.remove("is-active")),x.target.classList.add("is-active"))),{threshold:.6})
@@ -316,7 +341,7 @@ dir.position.set(5,5,5)
 scene.add(dir)
 
 const loader = new THREE.GLTFLoader()
-
+  
 loader.load(
   'pieces/piece_test.gltf',
   function(gltf){
@@ -350,5 +375,6 @@ addEventListener('resize',()=>{camera.aspect=viewer3d.clientWidth/viewer3d.clien
 </body>
 
 </html>
+
 
 
