@@ -184,9 +184,9 @@ projects.forEach((proj, i) => {
 function loadProjectMedia(index){
 
   const media = document.getElementById(`media-${index}`)
-  const gltfPath = `pieces/piece_${index+1}.gltf`
-  const pngPath = `pieces/piece_${index+1}.png`
-  const jpgPath = `pieces/piece_${index+1}.jpg`
+  const gltfPath = `pieces/piece_${index+1}/piece_${index+1}.gltf`
+  const pngPath = `Images/piece_${index+1}.png`
+  const jpgPath = `Images/piece_${index+1}.jpg`
 
   const scene = new THREE.Scene()
   const camera = new THREE.PerspectiveCamera(45,1,.1,1000)
@@ -350,4 +350,5 @@ addEventListener('resize',()=>{camera.aspect=viewer3d.clientWidth/viewer3d.clien
 </body>
 
 </html>
+
 
