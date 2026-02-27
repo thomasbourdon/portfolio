@@ -7,64 +7,271 @@
 
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;font-family:Inter,system-ui,sans-serif;background:#fff;color:#0a0f1f;scroll-behavior:smooth}
-:root{--primary:#2563eb;--accent:#06b6d4;--dark:#0f172a;--radius:22px}
-section{min-height:100vh;padding:120px 10vw;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;transition:all 1s cubic-bezier(.22,1,.36,1)}
-section.is-active{transform:scale(1);opacity:1}
+html{scroll-behavior:smooth}
+html,body{width:100%;height:100%;font-family:Inter,system-ui,sans-serif;background:#ffffff;color:#0a0f1f;overflow-x:hidden}
 
-h1{font-size:clamp(52px,7vw,110px);font-weight:900;letter-spacing:-2px}
-h2{font-size:clamp(34px,4vw,60px);font-weight:800;margin-bottom:40px}
-p{font-size:19px;line-height:1.7;opacity:.85}
+:root{
+--primary:#2563eb;
+--accent:#06b6d4;
+--dark:#0f172a;
+--radius:22px;
+--glass:rgba(255,255,255,.6);
+}
 
-#hero{background:radial-gradient(circle at 30% 40%,#dbeafe 0%,#fff 60%);flex-direction:column;text-align:center;perspective:2000px}
-.hero-inner{transition:transform .25s cubic-bezier(.22,1,.36,1)}
-.hero-title{background:linear-gradient(90deg,var(--primary),var(--accent),var(--primary));background-size:200%;-webkit-background-clip:text;color:transparent;animation:shine 6s linear infinite}
-@keyframes shine{from{background-position:0%}to{background-position:200%}}
-.hero-sub{margin-top:30px;max-width:800px;font-size:22px}
-.hero-cta{margin-top:70px;padding:18px 50px;border-radius:50px;background:linear-gradient(90deg,var(--primary),var(--accent));color:white;font-weight:600;cursor:pointer;transition:.4s}
-.hero-cta:hover{transform:translateY(-6px) scale(1.08);box-shadow:0 30px 80px rgba(37,99,235,.45)}
-.hero-product{position:absolute;width:380px;height:380px;border-radius:40px;background:linear-gradient(145deg,#e0f2fe,#c7d2fe);box-shadow:0 60px 100px rgba(0,0,0,.1);transform:translateZ(200px) rotateX(20deg) rotateY(-15deg);animation:float 6s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translateY(0) rotateX(20deg) rotateY(-15deg)}50%{transform:translateY(-25px) rotateX(25deg) rotateY(-10deg)}}
+section{
+min-height:100vh;
+padding:120px 10vw;
+display:flex;
+align-items:center;
+justify-content:center;
+position:relative;
+overflow:hidden;
+transition:background 1.2s cubic-bezier(.22,1,.36,1),transform 1s cubic-bezier(.22,1,.36,1),opacity 1s cubic-bezier(.22,1,.36,1);
+will-change:transform,opacity;
+}
 
-#power{gap:80px;flex-wrap:wrap}
+section.is-active{
+transform:scale(1);
+opacity:1;
+}
+
+h1{
+font-size:clamp(52px,7vw,110px);
+font-weight:900;
+letter-spacing:-2px;
+}
+
+h2{
+font-size:clamp(34px,4vw,60px);
+font-weight:800;
+margin-bottom:40px;
+}
+
+p{
+font-size:19px;
+line-height:1.7;
+opacity:.85;
+}
+
+/* HERO */
+
+#hero{
+background:
+radial-gradient(circle at 30% 40%,#dbeafe 0%,#ffffff 60%),
+radial-gradient(circle at 80% 10%,rgba(6,182,212,.25),transparent 50%);
+flex-direction:column;
+text-align:center;
+perspective:2000px;
+}
+
+.hero-inner{
+transition:transform .25s cubic-bezier(.22,1,.36,1);
+will-change:transform;
+}
+
+.hero-title{
+background:linear-gradient(90deg,var(--primary),var(--accent),var(--primary));
+background-size:200%;
+-webkit-background-clip:text;
+color:transparent;
+animation:shine 6s linear infinite;
+}
+
+@keyframes shine{
+from{background-position:0%}
+to{background-position:200%}
+}
+
+.hero-sub{
+margin-top:30px;
+max-width:800px;
+font-size:22px;
+}
+
+.hero-cta{
+margin-top:70px;
+padding:20px 60px;
+border-radius:60px;
+background:linear-gradient(90deg,var(--primary),var(--accent));
+color:white;
+font-weight:600;
+cursor:pointer;
+transition:.5s cubic-bezier(.22,1,.36,1);
+box-shadow:0 20px 40px rgba(37,99,235,.25);
+}
+
+.hero-cta:hover{
+transform:translateY(-8px) scale(1.07);
+box-shadow:0 40px 80px rgba(37,99,235,.45);
+}
+
+.hero-product{
+position:absolute;
+width:420px;
+height:420px;
+border-radius:50px;
+background:linear-gradient(145deg,#e0f2fe,#c7d2fe);
+box-shadow:0 80px 120px rgba(0,0,0,.1);
+transform:translateZ(200px) rotateX(20deg) rotateY(-15deg);
+animation:float 6s ease-in-out infinite;
+}
+
+@keyframes float{
+0%,100%{transform:translateZ(200px) rotateX(20deg) rotateY(-15deg) translateY(0)}
+50%{transform:translateZ(200px) rotateX(20deg) rotateY(-15deg) translateY(-25px)}
+}
+
+/* POWER */
+
+#power{gap:100px;flex-wrap:wrap}
 .power-left{flex:1;min-width:320px}
 .power-right{flex:1;min-width:320px;height:500px;perspective:1200px;position:relative}
-.power-block{position:absolute;width:220px;height:220px;border-radius:var(--radius);background:linear-gradient(145deg,var(--primary),var(--accent));box-shadow:0 40px 80px rgba(37,99,235,.25);transition:1s}
 
-#recent-projects{background:linear-gradient(180deg,#f8fafc,#fff);flex-direction:column;gap:160px}
-.project-row{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center;opacity:0;transform:translateY(140px);transition:1.2s}
-.project-row.visible{opacity:1;transform:translateY(0)}
-.project-text h3{font-size:38px;margin-bottom:22px}
-.project-card{height:380px;border-radius:34px;background:linear-gradient(145deg,#ffffffcc,#f1f5ffcc);backdrop-filter:blur(18px);box-shadow:0 60px 160px rgba(0,0,0,.15);position:relative;perspective:1400px;transition:1s}
-.project-card:hover{transform:rotateY(-18deg) rotateX(10deg) scale(1.08);box-shadow:0 100px 260px rgba(37,99,235,.45)}
-.exploded span{position:absolute;width:90px;height:90px;border-radius:22px;background:linear-gradient(145deg,#dbeafe,#e0e7ff);box-shadow:0 30px 60px rgba(0,0,0,.18);transition:1s}
-.exploded span:nth-child(1){top:45%;left:45%}
-.exploded span:nth-child(2){top:45%;left:55%}
-.exploded span:nth-child(3){top:55%;left:45%}
-.exploded span:nth-child(4){top:55%;left:55%}
-.project-card:hover span:nth-child(1){transform:translate(-110px,-90px) rotate(35deg)}
-.project-card:hover span:nth-child(2){transform:translate(120px,-80px) rotate(-30deg)}
-.project-card:hover span:nth-child(3){transform:translate(-90px,120px) rotate(-25deg)}
-.project-card:hover span:nth-child(4){transform:translate(110px,130px) rotate(30deg)}
+.power-block{
+position:absolute;
+width:220px;
+height:220px;
+border-radius:var(--radius);
+background:linear-gradient(145deg,var(--primary),var(--accent));
+box-shadow:0 60px 120px rgba(37,99,235,.35);
+transition:all 1s cubic-bezier(.22,1,.36,1);
+}
 
-#advanced-projects{background:linear-gradient(120deg,#eef2ff,#fff);flex-direction:column;gap:100px}
-.advanced-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:60px;width:100%}
-.advanced-card{padding:50px;border-radius:30px;background:linear-gradient(145deg,#ffffff,#e0e7ff);box-shadow:0 40px 120px rgba(0,0,0,.1);transition:.6s;position:relative;overflow:hidden}
-.advanced-card::before{content:"";position:absolute;width:200%;height:200%;background:radial-gradient(circle,var(--accent),transparent 60%);top:-50%;left:-50%;opacity:.15;transition:.8s}
-.advanced-card:hover::before{transform:rotate(180deg)}
-.advanced-card:hover{transform:translateY(-15px) scale(1.05)}
-.advanced-card h3{margin-bottom:20px;font-size:28px}
+/* RECENT PROJECTS */
 
-#assembly{background:linear-gradient(120deg,#f1f5ff,#fff);flex-direction:column;gap:60px}
-.viewer{width:100%;max-width:900px;height:520px;border-radius:30px;overflow:hidden;background:#eef2ff;box-shadow:0 60px 120px rgba(0,0,0,.12)}
-.fake-assembly{position:relative;width:100%;height:400px}
-.part{position:absolute;width:160px;height:160px;border-radius:30px;background:linear-gradient(145deg,#dbeafe,#e0e7ff);box-shadow:0 40px 80px rgba(0,0,0,.1)}
+#recent-projects{
+background:linear-gradient(180deg,#f8fafc,#ffffff);
+flex-direction:column;
+gap:200px;
+}
 
-#focus{flex-direction:column}
-.focus-grid{display:flex;gap:100px;flex-wrap:wrap}
-.focus-item h3{font-size:64px;color:var(--primary)}
+.project-row{
+width:100%;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:120px;
+align-items:center;
+opacity:0;
+transform:translateY(160px) rotateX(20deg);
+transition:1.4s cubic-bezier(.22,1,.36,1);
+}
 
-footer{background:var(--dark);color:white;padding:80px 10vw}
+.project-row.visible{
+opacity:1;
+transform:translateY(0) rotateX(0);
+}
+
+.project-row:nth-child(even) .project-card{order:-1}
+
+.project-text h3{
+font-size:42px;
+margin-bottom:25px;
+}
+
+.project-card{
+height:420px;
+border-radius:36px;
+background:var(--glass);
+backdrop-filter:blur(25px);
+box-shadow:0 80px 200px rgba(0,0,0,.12);
+position:relative;
+perspective:1400px;
+transition:1.2s cubic-bezier(.22,1,.36,1);
+}
+
+.project-card::after{
+content:"";
+position:absolute;
+inset:-1px;
+border-radius:inherit;
+background:linear-gradient(120deg,var(--primary),var(--accent));
+opacity:.25;
+filter:blur(60px);
+z-index:-1;
+}
+
+.project-card:hover{
+transform:rotateY(-20deg) rotateX(12deg) scale(1.1);
+box-shadow:0 120px 300px rgba(37,99,235,.55);
+}
+
+/* ADDITIONAL PROJECTS */
+
+.extra-projects{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+gap:60px;
+width:100%;
+margin-top:120px;
+}
+
+.extra-card{
+padding:50px;
+border-radius:30px;
+background:linear-gradient(145deg,#ffffff,#eef2ff);
+box-shadow:0 40px 120px rgba(0,0,0,.08);
+transition:.6s cubic-bezier(.22,1,.36,1);
+}
+
+.extra-card:hover{
+transform:translateY(-15px) scale(1.05);
+box-shadow:0 60px 160px rgba(37,99,235,.25);
+}
+
+/* GALLERY */
+
+.gallery-grid{
+width:100%;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+gap:60px;
+}
+
+.card{
+background:#ffffff;
+padding:50px;
+border-radius:var(--radius);
+box-shadow:0 40px 100px rgba(0,0,0,.08);
+transition:.5s cubic-bezier(.22,1,.36,1);
+}
+
+.card:hover{
+transform:translateY(-15px) scale(1.04);
+box-shadow:0 60px 140px rgba(37,99,235,.2);
+}
+
+/* FOCUS */
+
+.focus-grid{
+display:flex;
+gap:120px;
+flex-wrap:wrap;
+}
+
+.focus-item h3{
+font-size:72px;
+color:var(--primary);
+text-shadow:0 10px 30px rgba(37,99,235,.4);
+}
+
+footer{
+background:var(--dark);
+color:white;
+padding:100px 10vw;
+text-align:center;
+}
+
+section::before{
+content:"";
+position:absolute;
+inset:0;
+background:linear-gradient(to bottom,rgba(0,0,0,.04),transparent 40%);
+opacity:0;
+transition:opacity 1s cubic-bezier(.22,1,.36,1);
+pointer-events:none;
+}
+
+section.is-active::before{opacity:1}
 </style>
 </head>
 
@@ -99,7 +306,7 @@ footer{background:var(--dark);color:white;padding:80px 10vw}
 <h3>Réducteur mécanique haute précision</h3>
 <p>Étude cinématique complète, jeux fonctionnels, engrenages optimisés.</p>
 </div>
-<div class="project-card"><div class="exploded"><span></span><span></span><span></span><span></span></div></div>
+<div class="project-card"></div>
 </div>
 
 <div class="project-row">
@@ -107,7 +314,7 @@ footer{background:var(--dark);color:white;padding:80px 10vw}
 <h3>Système de convoyage automatisé</h3>
 <p>Assemblage multi-corps, simulation de mouvement, intégration moteur.</p>
 </div>
-<div class="project-card"><div class="exploded"><span></span><span></span><span></span><span></span></div></div>
+<div class="project-card"></div>
 </div>
 
 <div class="project-row">
@@ -115,84 +322,21 @@ footer{background:var(--dark);color:white;padding:80px 10vw}
 <h3>Mécanisme de verrouillage industriel</h3>
 <p>Conception robuste, démontabilité optimisée, validation mécanique.</p>
 </div>
-<div class="project-card"><div class="exploded"><span></span><span></span><span></span><span></span></div></div>
+<div class="project-card"></div>
 </div>
-</section>
 
-<!-- NOUVELLE SECTION DYNAMIQUE -->
+<div class="extra-projects">
+<div class="extra-card"><h3>Bras robotisé 6 axes</h3><p>Simulation dynamique complète et trajectoires optimisées.</p></div>
+<div class="extra-card"><h3>Boîtier injection plastique</h3><p>Optimisation moule, analyse flux matière.</p></div>
+<div class="extra-card"><h3>Transmission planétaire</h3><p>Étude couple, rendement, contraintes internes.</p></div>
+</div>
 
-<section id="advanced-projects">
-<h2>Projets avancés & Concepts innovants</h2>
-<div class="advanced-grid">
-<div class="advanced-card">
-<h3>Robot Delta Haute Vitesse</h3>
-<p>Optimisation dynamique, étude d’inertie, simulation cinématique 6 axes.</p>
-</div>
-<div class="advanced-card">
-<h3>Bras articulé modulaire</h3>
-<p>Conception paramétrique, intégration servomoteurs, calcul de contraintes.</p>
-</div>
-<div class="advanced-card">
-<h3>Module d’automatisation industriel</h3>
-<p>Système multi-sous-ensembles, maintenance facilitée, architecture scalable.</p>
-</div>
-<div class="advanced-card">
-<h3>Station de tri intelligente</h3>
-<p>Vision industrielle, convoyage intelligent, architecture modulaire.</p>
-</div>
-</div>
-</section>
-
-<section id="assembly">
-<h2>Assemblage mécanique</h2>
-<div class="fake-assembly">
-<div class="part"></div><div class="part"></div><div class="part"></div>
-<div class="part"></div><div class="part"></div><div class="part"></div>
-</div>
-<div class="viewer" id="viewer3d"></div>
-</section>
-
-<section id="focus">
-<h2>Chiffres clés</h2>
-<div class="focus-grid">
-<div class="focus-item"><h3 id="c1">0</h3><p>Assemblages</p></div>
-<div class="focus-item"><h3 id="c2">0</h3><p>Projets</p></div>
-<div class="focus-item"><h3 id="c3">0</h3><p>Simulations</p></div>
-</div>
 </section>
 
 <footer><p>© 2026 – Mechanical Engineering Showcase</p></footer>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-
 <script>
-const heroInner=document.querySelector('.hero-inner')
-let mx=0,my=0,tx=0,ty=0
-addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth-.5)*20;my=(e.clientY/innerHeight-.5)*20},{passive:true})
-;(function loop(){tx+=(mx-tx)*.08;ty+=(my-ty)*.08;heroInner.style.transform=`rotateY(${tx}deg) rotateX(${-ty}deg)`;requestAnimationFrame(loop)})()
-
 document.querySelectorAll('.power-block').forEach((b,i)=>b.style.left=`${i*120}px`)
-
-const io=new IntersectionObserver(e=>e.forEach(x=>x.isIntersecting&&x.target.classList.add('visible')),{threshold:.35})
-document.querySelectorAll('.project-row').forEach(r=>io.observe(r))
-
-const scene=new THREE.Scene()
-const camera=new THREE.PerspectiveCamera(45,viewer3d.clientWidth/viewer3d.clientHeight,.1,1000)
-camera.position.set(0,1.5,4)
-const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true})
-renderer.setSize(viewer3d.clientWidth,viewer3d.clientHeight)
-renderer.setPixelRatio(devicePixelRatio)
-renderer.outputColorSpace=THREE.SRGBColorSpace
-viewer3d.appendChild(renderer.domElement)
-scene.add(new THREE.AmbientLight(0xffffff,.6))
-const dir=new THREE.DirectionalLight(0xffffff,1)
-dir.position.set(5,5,5)
-scene.add(dir)
-
-let rot=0
-;(function render(){rot+=.003;scene.rotation.y=rot;renderer.render(scene,camera);requestAnimationFrame(render)})()
-addEventListener('resize',()=>{camera.aspect=viewer3d.clientWidth/viewer3d.clientHeight;camera.updateProjectionMatrix();renderer.setSize(viewer3d.clientWidth,viewer3d.clientHeight)})
 </script>
 
 </body>
