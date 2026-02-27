@@ -32,28 +32,21 @@ p{font-size:19px;line-height:1.7;opacity:.8}
 #recent-projects{background:linear-gradient(180deg,#f8fafc,#fff);flex-direction:column;gap:160px}
 .project-row{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center;opacity:0;transform:translateY(140px) rotateX(15deg);transition:1.2s cubic-bezier(.22,1,.36,1)}
 .project-row.visible{opacity:1;transform:translateY(0) rotateX(0)}
+.project-row:nth-child(even){grid-template-columns:1fr 1fr}
 .project-row:nth-child(even) .project-card{order:-1}
 .project-text h3{font-size:38px;margin-bottom:22px}
-
-.project-card{
-height:380px;
-border-radius:34px;
-background:linear-gradient(145deg,#ffffffcc,#f1f5ffcc);
-backdrop-filter:blur(18px);
-box-shadow:0 60px 160px rgba(0,0,0,.15);
-position:relative;
-overflow:hidden;
-transition:1s cubic-bezier(.22,1,.36,1)
-}
-.project-card:hover{
-transform:rotateY(-18deg) rotateX(10deg) scale(1.08);
-box-shadow:0 100px 260px rgba(37,99,235,.45)
-}
-
-.project-viewer{
-width:100%;
-height:100%;
-}
+.project-card{height:380px;border-radius:34px;background:linear-gradient(145deg,#ffffffcc,#f1f5ffcc);backdrop-filter:blur(18px);box-shadow:0 60px 160px rgba(0,0,0,.15);position:relative;perspective:1400px;transition:1s cubic-bezier(.22,1,.36,1)}
+.project-card::after{content:"";position:absolute;inset:-1px;border-radius:inherit;background:linear-gradient(120deg,var(--primary),var(--accent));opacity:.25;filter:blur(40px);z-index:-1}
+.project-card:hover{transform:rotateY(-18deg) rotateX(10deg) scale(1.08);box-shadow:0 100px 260px rgba(37,99,235,.45)}
+.exploded span{position:absolute;width:90px;height:90px;border-radius:22px;background:linear-gradient(145deg,#dbeafe,#e0e7ff);box-shadow:0 30px 60px rgba(0,0,0,.18);transition:1s cubic-bezier(.22,1,.36,1)}
+.exploded span:nth-child(1){top:45%;left:45%}
+.exploded span:nth-child(2){top:45%;left:55%}
+.exploded span:nth-child(3){top:55%;left:45%}
+.exploded span:nth-child(4){top:55%;left:55%}
+.project-card:hover span:nth-child(1){transform:translate(-110px,-90px) rotate(35deg)}
+.project-card:hover span:nth-child(2){transform:translate(120px,-80px) rotate(-30deg)}
+.project-card:hover span:nth-child(3){transform:translate(-90px,120px) rotate(-25deg)}
+.project-card:hover span:nth-child(4){transform:translate(110px,130px) rotate(30deg)}
 
 #assembly{background:linear-gradient(120deg,#f1f5ff,#fff);flex-direction:column;gap:60px}
 .viewer{width:100%;max-width:900px;height:520px;border-radius:30px;overflow:hidden;background:#eef2ff;box-shadow:0 60px 120px rgba(0,0,0,.12)}
@@ -76,6 +69,7 @@ height:100%;
 .focus-item h3{font-size:64px;color:var(--primary)}
 
 footer{background:var(--dark);color:white;padding:80px 10vw}
+
 section::before{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.04),transparent 40%);opacity:0;transition:opacity .8s cubic-bezier(.22,1,.36,1);pointer-events:none}
 section.is-active::before{opacity:1}
 </style>
@@ -105,40 +99,8 @@ section.is-active::before{opacity:1}
 </section>
 
 <section id="recent-projects">
-<h2>Projets récents</h2>
-
-<!-- 6 PROJETS -->
-
-<script>
-const projectsData = [
-"Réducteur mécanique haute précision",
-"Système de convoyage automatisé",
-"Mécanisme de verrouillage industriel",
-"Boîtier de transmission compact",
-"Système de levage motorisé",
-"Module d’engrenage planétaire"
-];
-
-document.addEventListener("DOMContentLoaded",()=>{
-const container = document.getElementById("recent-projects");
-
-projectsData.forEach((title,i)=>{
-const row = document.createElement("div");
-row.className="project-row";
-row.innerHTML=`
-<div class="project-text">
-<h3>${title}</h3>
-<p>Étude mécanique détaillée, simulation, optimisation produit.</p>
-</div>
-<div class="project-card">
-<div class="project-viewer" id="viewer_project_${i+1}"></div>
-</div>
-`;
-container.appendChild(row);
-});
-});
-</script>
-
+  <h2>Projets récents</h2>
+  <div id="projectsContainer"></div>
 </section>
 
 <section id="assembly">
@@ -179,66 +141,213 @@ container.appendChild(row);
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
+<!-- ✅ AJOUTER ICI -->
 <script>
+/* CONFIGURATION PROJETS */
+const projects = [
+  {
+    title: "Réducteur mécanique haute précision",
+    text: "Étude cinématique complète, jeux fonctionnels, engrenages optimisés."
+  },
+  {
+    title: "Système de convoyage automatisé",
+    text: "Assemblage multi-corps, simulation de mouvement, intégration moteur."
+  },
+  {
+    title: "Mécanisme de verrouillage industriel",
+    text: "Conception robuste, démontabilité optimisée, validation mécanique."
+  }
+]
 
-/* ========================= */
-/* 3D VIEWER GENERIQUE */
-/* ========================= */
+const container = document.getElementById("projectsContainer")
 
-function createViewer(containerId, modelPath){
-const container=document.getElementById(containerId);
-if(!container) return;
+projects.forEach((proj, i) => {
 
-const scene=new THREE.Scene();
-const camera=new THREE.PerspectiveCamera(45,container.clientWidth/container.clientHeight,.1,1000);
-camera.position.set(0,0,4);
+  const row = document.createElement("div")
+  row.className = "project-row"
 
-const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
-renderer.setSize(container.clientWidth,container.clientHeight);
-renderer.setPixelRatio(devicePixelRatio);
-renderer.outputColorSpace=THREE.SRGBColorSpace;
-container.appendChild(renderer.domElement);
+  row.innerHTML = `
+    <div class="project-text">
+      <h3>${proj.title}</h3>
+      <p>${proj.text}</p>
+    </div>
+    <div class="project-card">
+      <div class="media" id="media-${i}" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"></div>
+    </div>
+  `
 
-scene.add(new THREE.AmbientLight(0xffffff,.6));
-const dir=new THREE.DirectionalLight(0xffffff,1);
-dir.position.set(5,5,5);
-scene.add(dir);
+  container.appendChild(row)
 
-const loader=new THREE.GLTFLoader();
-loader.load(modelPath,function(gltf){
-const model=gltf.scene;
-const box=new THREE.Box3().setFromObject(model);
-const size=box.getSize(new THREE.Vector3()).length();
-const center=box.getCenter(new THREE.Vector3());
-model.position.sub(center);
-camera.position.set(0,0,size*1.2);
-scene.add(model);
-});
+  loadProjectMedia(i)
+})
 
-let rot=0;
-(function render(){
-rot+=.01;
-scene.rotation.y=rot;
-renderer.render(scene,camera);
-requestAnimationFrame(render);
-})();
+function loadProjectMedia(index){
 
-addEventListener('resize',()=>{
-camera.aspect=container.clientWidth/container.clientHeight;
-camera.updateProjectionMatrix();
-renderer.setSize(container.clientWidth,container.clientHeight);
-});
+  const media = document.getElementById(`media-${index}`)
+  const gltfPath = `pieces/piece_${index+1}.gltf`
+  const pngPath = `pieces/piece_${index+1}.png`
+  const jpgPath = `pieces/piece_${index+1}.jpg`
+
+  const scene = new THREE.Scene()
+  const camera = new THREE.PerspectiveCamera(45,1,.1,1000)
+  const renderer = new THREE.WebGLRenderer({antialias:true,alpha:true})
+  renderer.setSize(350,350)
+  renderer.setPixelRatio(devicePixelRatio)
+  media.appendChild(renderer.domElement)
+
+  scene.add(new THREE.AmbientLight(0xffffff,.8))
+  const dir = new THREE.DirectionalLight(0xffffff,1)
+  dir.position.set(5,5,5)
+  scene.add(dir)
+
+  const loader = new THREE.GLTFLoader()
+
+  loader.load(
+    gltfPath,
+    gltf=>{
+      const model = gltf.scene
+      const box = new THREE.Box3().setFromObject(model)
+      const size = box.getSize(new THREE.Vector3()).length()
+      const center = box.getCenter(new THREE.Vector3())
+      model.position.sub(center)
+      camera.position.set(0,0,size*1.4)
+      camera.lookAt(0,0,0)
+      scene.add(model)
+
+      let r=0
+      ;(function animate(){
+        r+=.01
+        scene.rotation.y=r
+        renderer.render(scene,camera)
+        requestAnimationFrame(animate)
+      })()
+    },
+
+    undefined,
+
+    ()=>{ tryImage(pngPath) }
+  )
+
+  function tryImage(path){
+    const img = new Image()
+    img.src = path
+
+    img.onload = ()=>{
+      media.innerHTML=""
+      img.style.width="100%"
+      img.style.height="100%"
+      img.style.objectFit="cover"
+      media.appendChild(img)
+    }
+
+    img.onerror = ()=>{
+      if(path.includes(".png")){
+        tryImage(jpgPath)
+      } else {
+        showFallback()
+      }
+    }
+  }
+
+  function showFallback(){
+    media.innerHTML = `
+      <div style="
+        width:100%;
+        height:100%;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        background:#f1f5f9;
+        border:2px dashed #94a3b8;
+        border-radius:24px;
+        font-weight:600;
+        color:#475569;
+        text-align:center;
+        padding:20px;">
+        Le projet rencontre un problème d’affichage.
+      </div>
+    `
+  }
 }
+</script>
 
-/* MAIN ASSEMBLY */
-createViewer("viewer3d","pieces/piece_test.gltf");
+<script>
+const heroInner=document.querySelector('.hero-inner')
+let mx=0,my=0,tx=0,ty=0
+addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth-.5)*20;my=(e.clientY/innerHeight-.5)*20},{passive:true})
+;(function loop(){tx+=(mx-tx)*.08;ty+=(my-ty)*.08;heroInner.style.transform=`rotateY(${tx}deg) rotateX(${-ty}deg)`;requestAnimationFrame(loop)})()
 
-/* PROJECTS VIEWERS */
-for(let i=1;i<=6;i++){
-createViewer(`viewer_project_${i}`,`pieces/piece_${i}.gltf`);
-}
+document.querySelectorAll('.power-block').forEach((b,i)=>b.style.left=`${i*90}px`)
+const parts=document.querySelectorAll('.part')
+const power=document.getElementById('power')
+const assembly=document.getElementById('assembly')
+const focus=document.getElementById('focus')
 
+;(function anim(){
+const h=innerHeight
+const pp=Math.max(0,1-power.getBoundingClientRect().top/h)
+document.querySelectorAll('.power-block').forEach(b=>b.style.transform=`translateY(${pp*180}px) rotateY(${pp*160}deg)`)
+const ap=Math.max(0,1-assembly.getBoundingClientRect().top/h)
+parts.forEach((p,i)=>{const o=(i-3)*80;p.style.transform=`translate3d(${o+ap*220}px,${ap*140-o}px,${ap*380}px) rotateX(${ap*180}deg) rotateY(${ap*140}deg)`})
+const fr=focus.getBoundingClientRect()
+if(fr.top<h){const fp=Math.min(1,1-fr.top/h);c1.textContent=fp*120|0;c2.textContent=fp*40|0;c3.textContent=fp*85|0}
+requestAnimationFrame(anim)
+})()
+
+for(let i=1;i<=10;i++)galleryGrid.innerHTML+=`<div class="card"><h3>Projet ${i}</h3><p>Étude mécanique détaillée, simulation, optimisation produit.</p></div>`
+
+const io=new IntersectionObserver(e=>e.forEach(x=>x.isIntersecting&&x.target.classList.add('visible')),{threshold:.35})
+
+const sections=document.querySelectorAll("section")
+const sio=new IntersectionObserver(e=>e.forEach(x=>x.isIntersecting&&(sections.forEach(s=>s.classList.remove("is-active")),x.target.classList.add("is-active"))),{threshold:.6})
+sections.forEach(s=>sio.observe(s))
+
+const scene=new THREE.Scene()
+const camera=new THREE.PerspectiveCamera(45,viewer3d.clientWidth/viewer3d.clientHeight,.1,1000)
+camera.position.set(0,1.5,4)
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true})
+renderer.setSize(viewer3d.clientWidth,viewer3d.clientHeight)
+renderer.setPixelRatio(devicePixelRatio)
+renderer.outputColorSpace=THREE.SRGBColorSpace
+viewer3d.appendChild(renderer.domElement)
+scene.add(new THREE.AmbientLight(0xffffff,.6))
+const dir=new THREE.DirectionalLight(0xffffff,1)
+dir.position.set(5,5,5)
+scene.add(dir)
+
+const loader = new THREE.GLTFLoader()
+
+loader.load(
+  'pieces/piece_test.gltf',
+  function(gltf){
+
+    const model = gltf.scene
+
+    model.scale.set(500,500,500)
+
+    const box = new THREE.Box3().setFromObject(model)
+    const size = box.getSize(new THREE.Vector3()).length()
+    const center = box.getCenter(new THREE.Vector3())
+
+    model.position.sub(center)
+
+    camera.position.set(0, 0, size * 1.2)
+    camera.lookAt(0,0,0)
+
+    scene.add(model)
+  },
+  undefined,
+  function(error){
+    console.error("Erreur GLTF :", error)
+  }
+)
+
+let rot=0
+;(function render(){rot+=.0025;scene.rotation.y=rot;renderer.render(scene,camera);requestAnimationFrame(render)})()
+addEventListener('resize',()=>{camera.aspect=viewer3d.clientWidth/viewer3d.clientHeight;camera.updateProjectionMatrix();renderer.setSize(viewer3d.clientWidth,viewer3d.clientHeight)})
 </script>
 
 </body>
+
 </html>
+
