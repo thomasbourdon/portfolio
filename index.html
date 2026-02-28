@@ -26,10 +26,6 @@
   z-index:0;
 }
 
-.intro-center{
-  z-index:2;
-}
-
 @keyframes introSweep{
   from{transform:translateX(-40%)}
   to{transform:translateX(40%)}
@@ -50,12 +46,16 @@
 }
 
 .intro-center{
-  position:relative;
-  z-index:2;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  z-index:3;
   text-align:center;
-  color:white;
+  color:#f1f5f9;
   font-family:Inter,system-ui,sans-serif;
   letter-spacing:.08em;
+  pointer-events:none;
 }
 
 .intro-kicker{
@@ -589,17 +589,17 @@ let rot=0
 ;(function render(){rot+=.0025;scene.rotation.y=rot;renderer.render(scene,camera);requestAnimationFrame(render)})()
 addEventListener('resize',()=>{camera.aspect=viewer3d.clientWidth/viewer3d.clientHeight;camera.updateProjectionMatrix();renderer.setSize(viewer3d.clientWidth,viewer3d.clientHeight)})
 
-
-
 // =============================
-// CINEMATIC INTRO 3D
+// CINEMATIC INTRO (Concept → Product)
 // =============================
 
 const intro = document.getElementById("intro")
 
 const introScene = new THREE.Scene()
+introScene.background = new THREE.Color(0x0b0f17)
+
 const introCamera = new THREE.PerspectiveCamera(
-  45,
+  40,
   window.innerWidth / window.innerHeight,
   0.1,
   100
@@ -607,129 +607,161 @@ const introCamera = new THREE.PerspectiveCamera(
 
 introCamera.position.set(0, 0, 6)
 
-const introRenderer = new THREE.WebGLRenderer({
-  antialias: true,
-  alpha: false
-})
-
+const introRenderer = new THREE.WebGLRenderer({ antialias: true })
 introRenderer.setSize(window.innerWidth, window.innerHeight)
 introRenderer.setPixelRatio(window.devicePixelRatio)
+
 introRenderer.outputColorSpace = THREE.SRGBColorSpace
 introRenderer.toneMapping = THREE.ACESFilmicToneMapping
-introRenderer.toneMappingExposure = 1.1
+introRenderer.toneMappingExposure = 1.2
 
 intro.appendChild(introRenderer.domElement)
 
 
-// ---------- LIGHTING (STUDIO) ----------
+// ---------------- LIGHTING (SOFT STUDIO)
 
-const ambient = new THREE.AmbientLight(0xffffff, 0.2)
+const ambient = new THREE.AmbientLight(0xffffff, 0.4)
 introScene.add(ambient)
 
-const keyLight = new THREE.DirectionalLight(0xffffff, 1.8)
-keyLight.position.set(3, 4, 5)
+const keyLight = new THREE.DirectionalLight(0xffffff, 2.2)
+keyLight.position.set(5, 6, 8)
 introScene.add(keyLight)
 
-const rimLight = new THREE.DirectionalLight(0x88aaff, 1.2)
-rimLight.position.set(-5, 2, -5)
+const rimLight = new THREE.DirectionalLight(0x88aaff, 1.6)
+rimLight.position.set(-6, 2, -6)
 introScene.add(rimLight)
 
+const fillLight = new THREE.DirectionalLight(0xffffff, 0.6)
+fillLight.position.set(0, -3, 4)
+introScene.add(fillLight)
 
-// ---------- METAL MATERIAL (PBR) ----------
 
-const metalMaterial = new THREE.MeshPhysicalMaterial({
-  color: 0xcfd6e6,
-  metalness: 1,
-  roughness: 0.25,
-  clearcoat: 0.4,
-  clearcoatRoughness: 0.1
+// ---------------- SCENE 1 : BLUEPRINT LINES
+
+const lineMaterial = new THREE.LineBasicMaterial({
+  color: 0xffffff,
+  transparent: true,
+  opacity: 0.6
 })
 
-
-// ---------- CENTRAL CORE GEOMETRY ----------
-
-const coreGeometry = new THREE.CylinderGeometry(1.8, 1.8, 0.6, 64)
-const core = new THREE.Mesh(coreGeometry, metalMaterial)
-introScene.add(core)
-
-
-// ---------- INNER HUB ----------
-
-const hubGeometry = new THREE.CylinderGeometry(0.6, 0.6, 0.8, 64)
-const hub = new THREE.Mesh(hubGeometry, metalMaterial)
-introScene.add(hub)
-
-
-// ---------- BLADE RING ----------
-
-const bladeGroup = new THREE.Group()
-
-for (let i = 0; i < 12; i++) {
-
-  const bladeGeom = new THREE.BoxGeometry(0.25, 2.2, 0.3)
-  const blade = new THREE.Mesh(bladeGeom, metalMaterial)
-
-  blade.position.y = 1.1
-  blade.rotation.z = (i / 12) * Math.PI * 2
-
-  bladeGroup.add(blade)
+const circlePoints = []
+for (let i = 0; i <= 100; i++) {
+  const theta = (i / 100) * Math.PI * 2
+  circlePoints.push(
+    new THREE.Vector3(Math.cos(theta) * 1.5, Math.sin(theta) * 1.5, 0)
+  )
 }
 
-introScene.add(bladeGroup)
+const circleGeometry = new THREE.BufferGeometry().setFromPoints(circlePoints)
+const circleLine = new THREE.Line(circleGeometry, lineMaterial)
 
-bladeGroup.rotation.z = Math.PI / 12
+introScene.add(circleLine)
+
+circleLine.visible = false
 
 
-// ---------- ANIMATION ----------
+// ---------------- SCENE 2 : WIREFRAME OBJECT
 
-let introProgress = 0
-let introOpening = false
+const geometry = new THREE.CylinderGeometry(1.5, 1.5, 0.8, 64)
+const wireMaterial = new THREE.MeshBasicMaterial({
+  color: 0xffffff,
+  wireframe: true,
+  transparent: true,
+  opacity: 0
+})
 
-function renderIntro() {
+const wireMesh = new THREE.Mesh(geometry, wireMaterial)
+introScene.add(wireMesh)
 
-  introProgress += 0.003
 
-  core.rotation.y += 0.002
-  bladeGroup.rotation.z += 0.003
+// ---------------- SCENE 3 : PBR METAL
 
-  if (introOpening) {
-    introCamera.position.z -= 0.02
+const metalMaterial = new THREE.MeshPhysicalMaterial({
+  color: 0x9fb3c8, // acier bleuté premium
+  metalness: 1,
+  roughness: 0.18,
+  clearcoat: 0.6,
+  clearcoatRoughness: 0.08,
+  envMapIntensity: 1.4,
+  transparent: true,
+  opacity: 0
+})
+
+const solidMesh = new THREE.Mesh(geometry, metalMaterial)
+introScene.add(solidMesh)
+const sweepLight = new THREE.PointLight(0xffffff, 1.5, 20)
+introScene.add(sweepLight)
+
+
+// ---------------- TIMELINE
+
+let clock = new THREE.Clock()
+
+function animateIntro() {
+
+  const t = clock.getElapsedTime()
+
+  // SCENE 1 : blueprint fade-in progressif
+  if (t > 0.2 && t < 1.2) {
+    circleLine.visible = true
+    lineMaterial.opacity = THREE.MathUtils.clamp((t - 0.2) * 1.2, 0, 0.7)
   }
 
-  introRenderer.render(introScene, introCamera)
+  // SCENE 2 : wireframe apparition douce
+  if (t > 1.2 && t < 2.4) {
+    const progress = (t - 1.2) / 1.2
+    wireMaterial.opacity = progress
+    wireMesh.rotation.y = progress * 0.3
+  }
 
-  requestAnimationFrame(renderIntro)
+  // SCENE 3 : génération surface progressive
+  if (t > 2.4 && t < 3.6) {
+    const progress = (t - 2.4) / 1.2
+    metalMaterial.opacity = progress
+    wireMaterial.opacity = 1 - progress
+    solidMesh.rotation.y = 0.3 + progress * 0.3
+  }
+
+  // Camera push ultra doux
+  introCamera.position.z = 6 - t * 0.4
+
+  introRenderer.render(introScene, introCamera)
+  requestAnimationFrame(animateIntro)
+  
+  if (t > 2.6 && t < 3.6) {
+  const sweepProgress = (t - 2.6) / 1
+  sweepLight.position.set(
+    -4 + sweepProgress * 8,
+    2,
+    3
+  )
 }
 
-renderIntro()
+}
+
+animateIntro()
 
 
-// ---------- REVEAL SEQUENCE ----------
+// ---------------- FINAL TRANSITION
 
 window.addEventListener("load", () => {
 
   const hero = document.getElementById("hero")
 
   hero.style.opacity = 0
-  hero.style.transform = "scale(1.1)"
-
-  setTimeout(() => {
-    introOpening = true
-  }, 2500)
+  hero.style.transform = "translateY(40px) scale(1.02)"
 
   setTimeout(() => {
 
-    intro.style.transition =
-      "opacity 1.8s cubic-bezier(.22,1,.36,1)"
+    intro.style.transition = "opacity 1.4s cubic-bezier(.22,1,.36,1), transform 1.4s cubic-bezier(.22,1,.36,1)"
     intro.style.opacity = 0
+    intro.style.transform = "scale(1.05)"
 
-    hero.style.transition =
-      "opacity 2s cubic-bezier(.22,1,.36,1), transform 2s cubic-bezier(.22,1,.36,1)"
-
+    hero.style.transition = "opacity 1.8s cubic-bezier(.22,1,.36,1), transform 1.8s cubic-bezier(.22,1,.36,1)"
     hero.style.opacity = 1
-    hero.style.transform = "scale(1)"
+    hero.style.transform = "translateY(0px) scale(1)"
 
-  }, 4200)
+  }, 3600)
 
 })
 
@@ -746,7 +778,6 @@ window.addEventListener("resize", () => {
 </body>
 
 </html>
-
 
 
 
