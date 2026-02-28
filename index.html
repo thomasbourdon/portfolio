@@ -345,7 +345,17 @@ section.is-active::before{opacity:1}
 <footer><p>© 2026 – Mechanical Engineering Showcase</p></footer>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/Pass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/BokehPass.js"></script>
 
 <script>
 
@@ -419,6 +429,15 @@ function loadGLTF(media, gltfPath){
   const renderer = new THREE.WebGLRenderer({antialias:true,alpha:true})
   renderer.setSize(350,350)
   renderer.setPixelRatio(devicePixelRatio)
+
+	const pmremGenerator = new THREE.PMREMGenerator(introRenderer)
+	pmremGenerator.compileEquirectangularShader()
+
+	const envScene = new THREE.Scene()
+	envScene.background = new THREE.Color(0x101820)
+
+	const envMap = pmremGenerator.fromScene(envScene).texture
+	introScene.environment = envMap
 
   media.innerHTML=""
   media.appendChild(renderer.domElement)
@@ -608,6 +627,8 @@ const introCamera = new THREE.PerspectiveCamera(
 introCamera.position.set(0, 0, 6)
 
 const introRenderer = new THREE.WebGLRenderer({ antialias: true })
+introRenderer.shadowMap.enabled = true
+introRenderer.shadowMap.type = THREE.PCFSoftShadowMap
 introRenderer.setSize(window.innerWidth, window.innerHeight)
 introRenderer.setPixelRatio(window.devicePixelRatio)
 
@@ -617,6 +638,20 @@ introRenderer.toneMappingExposure = 1.2
 
 intro.appendChild(introRenderer.domElement)
 
+// POST PROCESSING
+const composer = new THREE.EffectComposer(introRenderer)
+
+const renderPass = new THREE.RenderPass(introScene, introCamera)
+composer.addPass(renderPass)
+
+const bokehPass = new THREE.BokehPass(introScene, introCamera, {
+  focus: 4.0,
+  aperture: 0.00018,
+  maxblur: 0.01
+})
+
+composer.addPass(bokehPass)
+
 
 // ---------------- LIGHTING (SOFT STUDIO)
 
@@ -625,6 +660,12 @@ introScene.add(ambient)
 
 const keyLight = new THREE.DirectionalLight(0xffffff, 2.2)
 keyLight.position.set(5, 6, 8)
+
+keyLight.castShadow = true
+keyLight.shadow.mapSize.width = 2048
+keyLight.shadow.mapSize.height = 2048
+keyLight.shadow.radius = 6
+
 introScene.add(keyLight)
 
 const rimLight = new THREE.DirectionalLight(0x88aaff, 1.6)
@@ -635,6 +676,15 @@ const fillLight = new THREE.DirectionalLight(0xffffff, 0.6)
 fillLight.position.set(0, -3, 4)
 introScene.add(fillLight)
 
+const floorGeo = new THREE.PlaneGeometry(20,20)
+const floorMat = new THREE.ShadowMaterial({ opacity: 0.25 })
+const floor = new THREE.Mesh(floorGeo, floorMat)
+
+floor.rotation.x = -Math.PI / 2
+floor.position.y = -1
+floor.receiveShadow = true
+
+introScene.add(floor)
 
 // ---------------- SCENE 1 : BLUEPRINT LINES
 
@@ -662,7 +712,34 @@ circleLine.visible = false
 
 // ---------------- SCENE 2 : WIREFRAME OBJECT
 
-const geometry = new THREE.CylinderGeometry(1.5, 1.5, 0.8, 64)
+// ---------------- MECHANICAL FLANGE GEOMETRY
+
+const flangeGroup = new THREE.Group()
+
+// Corps principal
+const bodyGeo = new THREE.CylinderGeometry(1.6, 1.6, 0.6, 128)
+const bodyMesh = new THREE.Mesh(bodyGeo)
+flangeGroup.add(bodyMesh)
+
+// Alésage central
+const boreGeo = new THREE.CylinderGeometry(0.6, 0.6, 0.8, 64)
+const boreMesh = new THREE.Mesh(boreGeo)
+boreMesh.position.z = 0.01
+flangeGroup.add(boreMesh)
+
+// Perçages périphériques
+for(let i=0;i<6;i++){
+  const holeGeo = new THREE.CylinderGeometry(0.15,0.15,0.8,32)
+  const hole = new THREE.Mesh(holeGeo)
+  const angle = (i/6)*Math.PI*2
+  hole.position.set(
+    Math.cos(angle)*1.1,
+    Math.sin(angle)*1.1,
+    0
+  )
+  flangeGroup.add(hole)
+}
+
 const wireMaterial = new THREE.MeshBasicMaterial({
   color: 0xffffff,
   wireframe: true,
@@ -670,7 +747,14 @@ const wireMaterial = new THREE.MeshBasicMaterial({
   opacity: 0
 })
 
-const wireMesh = new THREE.Mesh(geometry, wireMaterial)
+const wireMesh = flangeGroup.clone()
+wireMesh.traverse(obj=>{
+  if(obj.isMesh){
+    obj.material = wireMaterial
+    obj.castShadow = true
+    obj.receiveShadow = true
+  }
+})
 introScene.add(wireMesh)
 
 
@@ -687,7 +771,14 @@ const metalMaterial = new THREE.MeshPhysicalMaterial({
   opacity: 0
 })
 
-const solidMesh = new THREE.Mesh(geometry, metalMaterial)
+const solidMesh = flangeGroup.clone()
+solidMesh.traverse(obj=>{
+  if(obj.isMesh){
+    obj.material = metalMaterial
+    obj.castShadow = true
+    obj.receiveShadow = true
+  }
+})
 introScene.add(solidMesh)
 const sweepLight = new THREE.PointLight(0xffffff, 1.5, 20)
 introScene.add(sweepLight)
@@ -725,7 +816,7 @@ function animateIntro() {
   // Camera push ultra doux
   introCamera.position.z = 6 - t * 0.4
 
-  introRenderer.render(introScene, introCamera)
+  composer.render()
   requestAnimationFrame(animateIntro)
   
   if (t > 2.6 && t < 3.6) {
@@ -778,12 +869,3 @@ window.addEventListener("resize", () => {
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
