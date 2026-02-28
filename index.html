@@ -664,18 +664,6 @@ function resizeIntro(){
 resizeIntro()
 addEventListener("resize",resizeIntro)
 
-let t = 0
-
-const canvas = document.getElementById("intro-canvas")
-const ctx = canvas.getContext("2d")
-
-function resizeIntro(){
-  canvas.width = innerWidth
-  canvas.height = innerHeight
-}
-resizeIntro()
-addEventListener("resize",resizeIntro)
-
 let gears = []
 let startTime = performance.now()
 let opening = false
@@ -868,6 +856,7 @@ window.addEventListener("load",()=>{
 </body>
 
 </html>
+
 
 
 
