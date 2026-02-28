@@ -495,37 +495,35 @@ function loadGLTF(media, gltfPath){
 
   const loader=new THREE.GLTFLoader()
 
-  loader.load(
-    gltfPath,
-    gltf=>{
+loader.load(
+  gltfPath,
+  (gltf)=>{
+    const model = gltf.scene
 
-      const model = gltf.scene
+    const box = new THREE.Box3().setFromObject(model)
+    const size = box.getSize(new THREE.Vector3()).length()
+    const center = box.getCenter(new THREE.Vector3())
 
-      const box = new THREE.Box3().setFromObject(model)
-      const size = box.getSize(new THREE.Vector3()).length()
-      const center = box.getCenter(new THREE.Vector3())
+    model.position.sub(center)
 
-      model.position.sub(center)
+    camera.position.set(0,0,size*1.4)
+    camera.lookAt(0,0,0)
 
-      camera.position.set(0,0,size*1.4)
-      camera.lookAt(0,0,0)
+    scene.add(model)
 
-      scene.add(model)
-
-      let r=0
-      ;(function anim(){
-        r+=0.01
-        scene.rotation.y=r
-        renderer.render(scene,camera)
-        requestAnimationFrame(anim)
-      })()
-
-    },
-    undefined,
+    let r=0
+    ;(function anim(){
+      r+=0.01
+      scene.rotation.y=r
+      renderer.render(scene,camera)
+      requestAnimationFrame(anim)
+    })()
+  },
+  undefined,
   ()=>{
     showFallback(media)
   }
-  )
+)
 }
 
 function showImage(media,path){
@@ -874,6 +872,7 @@ window.addEventListener("load",()=>{
 </body>
 
 </html>
+
 
 
 
