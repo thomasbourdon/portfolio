@@ -30,20 +30,6 @@
   z-index:2;
 }
 
-/* sweep lumineux */
-#intro::after{
-  content:"";
-  position:absolute;
-  inset:-40%;
-  background:
-    linear-gradient(120deg,
-      transparent 40%,
-      rgba(255,255,255,.06) 50%,
-      transparent 60%);
-  animation:introSweep 2.6s ease-in-out forwards;
-  pointer-events:none;
-}
-
 @keyframes introSweep{
   from{transform:translateX(-40%)}
   to{transform:translateX(40%)}
@@ -52,30 +38,6 @@
 /* glitch reveal du titre */
 .intro-title{
   position:relative;
-}
-
-.intro-title.glitch::before,
-.intro-title.glitch::after{
-  content:attr(data-text);
-  position:absolute;
-  left:0;
-  top:0;
-  width:100%;
-  overflow:hidden;
-  color:#4fd1ff;
-  mix-blend-mode:screen;
-}
-
-.intro-title.glitch::before{
-  transform:translate(2px,-2px);
-  clip-path:inset(0 0 60% 0);
-  animation:g1 .25s steps(2) infinite;
-}
-
-.intro-title.glitch::after{
-  transform:translate(-2px,2px);
-  clip-path:inset(40% 0 0 0);
-  animation:g2 .22s steps(2) infinite;
 }
 
 @keyframes g1{to{transform:translate(-2px,2px)}}
@@ -93,66 +55,40 @@
   text-align:center;
   color:white;
   font-family:Inter,system-ui,sans-serif;
+  letter-spacing:.08em;
 }
 
 .intro-kicker{
-  letter-spacing:.35em;
-  font-size:12px;
-  opacity:.6;
-  margin-bottom:20px;
+  font-size:11px;
+  letter-spacing:.45em;
+  opacity:.35;
+  margin-bottom:28px;
 }
 
 .intro-title{
-  font-size:clamp(34px,6vw,72px);
-  font-weight:800;
-  letter-spacing:.08em;
-  margin-bottom:40px;
+  font-size:clamp(42px,5vw,64px);
+  font-weight:600;
+  letter-spacing:.12em;
 }
 
 .intro-bar{
-  width:280px;
-  height:3px;
-  background:rgba(255,255,255,.12);
+  width:240px;
+  height:2px;
+  background:rgba(255,255,255,.08);
+  margin:36px auto 0;
   overflow:hidden;
-  margin:auto;
-  border-radius:10px;
 }
 
 .intro-bar span{
   display:block;
   height:100%;
   width:0%;
-  background:linear-gradient(90deg,#2563eb,#06b6d4);
-  animation:introLoad 2.6s cubic-bezier(.22,1,.36,1) forwards;
+  background:white;
+  animation:introLoad 2.8s cubic-bezier(.22,1,.36,1) forwards;
 }
 
 @keyframes introLoad{
   to{width:100%;}
-}
-
-/* bruit léger */
-.intro-noise{
-  position:absolute;
-  inset:0;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.04'/></svg>");
-  mix-blend-mode:overlay;
-  pointer-events:none;
-}
-
-/* lignes verticales */
-.intro-lines{
-  position:absolute;
-  inset:0;
-  background:
-    repeating-linear-gradient(
-      90deg,
-      rgba(255,255,255,.03),
-      rgba(255,255,255,.03) 1px,
-      transparent 1px,
-      transparent 120px
-    );
-  pointer-events:none;
-  opacity:.35;
 }
 
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -321,7 +257,6 @@ section.is-active::before{opacity:1}
 <body>
 
 <div id="intro">
-  <canvas id="intro-canvas"></canvas>
   <div class="intro-noise"></div>
   <div class="intro-lines"></div>
 
@@ -654,338 +589,155 @@ let rot=0
 ;(function render(){rot+=.0025;scene.rotation.y=rot;renderer.render(scene,camera);requestAnimationFrame(render)})()
 addEventListener('resize',()=>{camera.aspect=viewer3d.clientWidth/viewer3d.clientHeight;camera.updateProjectionMatrix();renderer.setSize(viewer3d.clientWidth,viewer3d.clientHeight)})
 
-const canvas = document.getElementById("intro-canvas")
-const ctx = canvas.getContext("2d")
-
-function resizeIntro(){
-  canvas.width = innerWidth
-  canvas.height = innerHeight
-}
-resizeIntro()
-addEventListener("resize",resizeIntro)
-
-let gears = []
-let startTime = performance.now()
-let opening = false
-let portalOpen = 0
-
-function createGears(){
-
-  const cx = canvas.width * 0.5
-  const cy = canvas.height * 0.52
-
-  const layout = [
-    [-240,   40, 92, 20],
-    [-120, -110, 60, 14],
-    [ -40,   30, 42, 10],
-    [  80,  -80, 55, 12],
-    [ 150,   40, 75, 18],
-    [ 260,  -60, 48, 12],
-    [-320, -120, 38, 10],
-    [-200,  150, 55, 12],
-    [  20,  150, 65, 14],
-    [ 210,  140, 48, 12],
-    [ 350,   40, 60, 14],
-    [-380,   20, 50, 12]
-  ]
-
-  gears = []
-
-  let dir = 1
-
-  layout.forEach(g => {
-
-    gears.push({
-      x : cx + g[0],
-      y : cy + g[1],
-      r : g[2],
-      teeth : g[3],
-      a : Math.random()*Math.PI*2,
-      targetSpeed : dir * (0.8 + Math.random()*0.4),
-	   speed : 0,
-	   inertia : 0.02 + Math.random()*0.01
-    })
-
-    dir *= -1
-  })
-}
 
 
-function drawGear(g){
+// =============================
+// CINEMATIC INTRO 3D
+// =============================
 
-  ctx.save()
-  ctx.translate(g.x,g.y)
-  ctx.rotate(g.a)
+const intro = document.getElementById("intro")
 
-  const step = Math.PI * 2 / g.teeth
-  const toothH = g.r * 0.12
+const introScene = new THREE.Scene()
+const introCamera = new THREE.PerspectiveCamera(
+  45,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  100
+)
 
-  ctx.beginPath()
+introCamera.position.set(0, 0, 6)
 
-  for(let i=0;i<g.teeth;i++){
+const introRenderer = new THREE.WebGLRenderer({
+  antialias: true,
+  alpha: false
+})
 
-    const a = i*step
+introRenderer.setSize(window.innerWidth, window.innerHeight)
+introRenderer.setPixelRatio(window.devicePixelRatio)
+introRenderer.outputColorSpace = THREE.SRGBColorSpace
+introRenderer.toneMapping = THREE.ACESFilmicToneMapping
+introRenderer.toneMappingExposure = 1.1
 
-    const r1 = g.r
-    const r2 = g.r + toothH
-
-    ctx.lineTo(Math.cos(a) * r1, Math.sin(a) * r1)
-    ctx.lineTo(
-      Math.cos(a + step*0.30) * r2,
-      Math.sin(a + step*0.30) * r2
-    )
-    ctx.lineTo(
-      Math.cos(a + step*0.60) * r1,
-      Math.sin(a + step*0.60) * r1
-    )
-  }
-
-  ctx.closePath()
-
-  const grad = ctx.createRadialGradient(0,-g.r*0.4,10,0,0,g.r*1.4)
-  grad.addColorStop(0,"#f4f7ff")
-  grad.addColorStop(0.4,"#b8c6ff")
-  grad.addColorStop(1,"#6d84ff")
-
-  ctx.fillStyle = grad
-
-  ctx.shadowColor = "rgba(70,110,255,.45)"
-  ctx.shadowBlur = 22
-  ctx.fill()
-
-  // ombre interne
-  ctx.save()
-  ctx.globalCompositeOperation = "multiply"
-  const ig = ctx.createRadialGradient(0,0,10,0,0,g.r*1.2)
-  ig.addColorStop(0,"rgba(0,0,0,0)")
-  ig.addColorStop(1,"rgba(0,0,0,.35)")
-  ctx.fillStyle = ig
-  ctx.fill()
-  ctx.restore()
-
-  // moyeu
-  ctx.beginPath()
-  ctx.arc(0,0,g.r*0.30,0,Math.PI*2)
-  ctx.fillStyle = "#0a1024"
-  ctx.fill()
-
-  // bague métallique
-  ctx.beginPath()
-  ctx.arc(0,0,g.r*0.36,0,Math.PI*2)
-  ctx.strokeStyle="rgba(255,255,255,.25)"
-  ctx.lineWidth=2
-  ctx.stroke()
-
-  // rayons
-  ctx.strokeStyle="rgba(255,255,255,.18)"
-  ctx.lineWidth=3
-
-  const spokes = Math.max(4, Math.floor(g.teeth/4))
-
-  for(let i=0;i<spokes;i++){
-    const a = i*(Math.PI*2/spokes)
-    ctx.beginPath()
-    ctx.moveTo(
-      Math.cos(a)*g.r*0.32,
-      Math.sin(a)*g.r*0.32
-    )
-    ctx.lineTo(
-      Math.cos(a)*g.r*0.78,
-      Math.sin(a)*g.r*0.78
-    )
-    ctx.stroke()
-  }
-
-  ctx.restore()
-}
-
-function drawConnections(){
-  ctx.strokeStyle = "rgba(120,160,255,.08)"
-  ctx.lineWidth = 1
-
-  for(let i=0;i<gears.length;i++){
-    for(let j=i+1;j<gears.length;j++){
-      const dx = gears[i].x - gears[j].x
-      const dy = gears[i].y - gears[j].y
-      const dist = Math.sqrt(dx*dx + dy*dy)
-
-      if(dist < gears[i].r + gears[j].r + 20){
-        ctx.beginPath()
-        ctx.moveTo(gears[i].x,gears[i].y)
-        ctx.lineTo(gears[j].x,gears[j].y)
-        ctx.stroke()
-      }
-    }
-  }
-}	
-
-function drawPortal(progress){
-
-  const cx = canvas.width/2
-  const cy = canvas.height/2
-  const r  = 150
-
-  const blades = 14
-
-  ctx.save()
-  ctx.translate(cx,cy)
-
-  for(let i=0;i<blades;i++){
-
-    const a = i*(Math.PI*2/blades)
-    const open = progress*1.35
-
-    ctx.save()
-    ctx.rotate(a + open)
-
-    ctx.beginPath()
-    ctx.moveTo(0,0)
-    ctx.arc(0,0,r, -0.12, 0.12)
-    ctx.closePath()
-
-    const g = ctx.createLinearGradient(0,0,r,0)
-    g.addColorStop(0,"#ffffff")
-	g.addColorStop(.5,"#cbd5ff")
-	g.addColorStop(1,"#6d84ff")
-
-    ctx.fillStyle = g
-    ctx.shadowColor="rgba(120,160,255,.8)"
-    ctx.shadowBlur=18
-    ctx.fill()
-
-    ctx.restore()
-  }
-
-  ctx.beginPath()
-  ctx.arc(0,0,r-18,0,Math.PI*2)
-  ctx.strokeStyle="rgba(255,255,255,.35)"
-  ctx.lineWidth=2
-  ctx.stroke()
-
-  ctx.restore()
-}
+intro.appendChild(introRenderer.domElement)
 
 
-function drawBackground(){
+// ---------- LIGHTING (STUDIO) ----------
 
-  const g = ctx.createRadialGradient(
-    canvas.width/2,canvas.height/2,80,
-    canvas.width/2,canvas.height/2,canvas.width
-  )
-  g.addColorStop(0,"#0e1430")
-  g.addColorStop(1,"#04060d")
+const ambient = new THREE.AmbientLight(0xffffff, 0.2)
+introScene.add(ambient)
 
-  ctx.fillStyle=g
-  ctx.fillRect(0,0,canvas.width,canvas.height)
-  ctx.fillStyle = "radial-gradient(circle at center, transparent 60%, rgba(0,0,0,.7) 100%)"
-}
+const keyLight = new THREE.DirectionalLight(0xffffff, 1.8)
+keyLight.position.set(3, 4, 5)
+introScene.add(keyLight)
 
-let sparks = []
-
-function createSpark(){
-  sparks.push({
-    x: canvas.width/2 + (Math.random()-0.5)*200,
-    y: canvas.height/2 + (Math.random()-0.5)*200,
-    life: 1,
-    vx: (Math.random()-0.5)*2,
-    vy: (Math.random()-0.5)*2
-  })
-}
-
-function updateSparks(){
-  for(let i=sparks.length-1;i>=0;i--){
-    const s = sparks[i]
-    s.life -= 0.02
-    s.x += s.vx
-    s.y += s.vy
-
-    ctx.fillStyle = `rgba(120,160,255,${s.life})`
-    ctx.beginPath()
-    ctx.arc(s.x,s.y,2,0,Math.PI*2)
-    ctx.fill()
-
-    if(s.life<=0) sparks.splice(i,1)
-  }
-}
-	
-function loopIntro(t){
-
-  ctx.clearRect(0,0,canvas.width,canvas.height)
-
-  drawBackground()
-
-  gears.forEach(g=>{
-    g.speed += (g.targetSpeed - g.speed) * g.inertia
-	g.a += g.speed * 0.01
-    drawGear(g)
-  })
-	drawConnections()
-	
-  if(opening){
-    portalOpen = Math.min(1, portalOpen + 0.012)
-  }
-   if(Math.random() < 0.08) createSpark()
-updateSparks()
-	
-  drawPortal(portalOpen)
-  ctx.save()
-	ctx.globalCompositeOperation = "lighter"
-	drawPortal(portalOpen)
-	ctx.restore()
-  requestAnimationFrame(loopIntro)
-}
+const rimLight = new THREE.DirectionalLight(0x88aaff, 1.2)
+rimLight.position.set(-5, 2, -5)
+introScene.add(rimLight)
 
 
-createGears()
-requestAnimationFrame(loopIntro)
+// ---------- METAL MATERIAL (PBR) ----------
 
-addEventListener("resize",()=>{
-  resizeIntro()
-  createGears()
+const metalMaterial = new THREE.MeshPhysicalMaterial({
+  color: 0xcfd6e6,
+  metalness: 1,
+  roughness: 0.25,
+  clearcoat: 0.4,
+  clearcoatRoughness: 0.1
 })
 
 
+// ---------- CENTRAL CORE GEOMETRY ----------
+
+const coreGeometry = new THREE.CylinderGeometry(1.8, 1.8, 0.6, 64)
+const core = new THREE.Mesh(coreGeometry, metalMaterial)
+introScene.add(core)
 
 
+// ---------- INNER HUB ----------
+
+const hubGeometry = new THREE.CylinderGeometry(0.6, 0.6, 0.8, 64)
+const hub = new THREE.Mesh(hubGeometry, metalMaterial)
+introScene.add(hub)
 
 
-window.addEventListener("load",()=>{
+// ---------- BLADE RING ----------
 
-  const intro  = document.getElementById("intro")
-  const hero   = document.getElementById("hero")
-  const title  = document.querySelector(".intro-title")
+const bladeGroup = new THREE.Group()
 
-  title.dataset.text = title.textContent
+for (let i = 0; i < 12; i++) {
+
+  const bladeGeom = new THREE.BoxGeometry(0.25, 2.2, 0.3)
+  const blade = new THREE.Mesh(bladeGeom, metalMaterial)
+
+  blade.position.y = 1.1
+  blade.rotation.z = (i / 12) * Math.PI * 2
+
+  bladeGroup.add(blade)
+}
+
+introScene.add(bladeGroup)
+
+bladeGroup.rotation.z = Math.PI / 12
+
+
+// ---------- ANIMATION ----------
+
+let introProgress = 0
+let introOpening = false
+
+function renderIntro() {
+
+  introProgress += 0.003
+
+  core.rotation.y += 0.002
+  bladeGroup.rotation.z += 0.003
+
+  if (introOpening) {
+    introCamera.position.z -= 0.02
+  }
+
+  introRenderer.render(introScene, introCamera)
+
+  requestAnimationFrame(renderIntro)
+}
+
+renderIntro()
+
+
+// ---------- REVEAL SEQUENCE ----------
+
+window.addEventListener("load", () => {
+
+  const hero = document.getElementById("hero")
 
   hero.style.opacity = 0
-  hero.style.transform = "scale(1.15)"
+  hero.style.transform = "scale(1.1)"
 
-  // micro glitch au boot
-  setTimeout(()=>title.classList.add("glitch"),600)
-  setTimeout(()=>title.classList.remove("glitch"),1800)
+  setTimeout(() => {
+    introOpening = true
+  }, 2500)
 
-  setTimeout(()=>{
+  setTimeout(() => {
 
-	  opening = true
+    intro.style.transition =
+      "opacity 1.8s cubic-bezier(.22,1,.36,1)"
+    intro.style.opacity = 0
 
-	  setTimeout(()=>{
+    hero.style.transition =
+      "opacity 2s cubic-bezier(.22,1,.36,1), transform 2s cubic-bezier(.22,1,.36,1)"
 
-		intro.style.transition =
-		  "transform 1.4s cubic-bezier(.22,1,.36,1), opacity 1.2s ease"
-		  
-		document.body.style.background = "#000"
-		intro.style.transform = "scale(3) rotate(4deg)"
-		intro.style.opacity = 0
+    hero.style.opacity = 1
+    hero.style.transform = "scale(1)"
 
-		hero.style.transition =
-		  "opacity 1.6s cubic-bezier(.22,1,.36,1), transform 1.6s cubic-bezier(.22,1,.36,1)"
+  }, 4200)
 
-		hero.style.opacity = 1
-		hero.style.transform = "scale(1)"
+})
 
-	  },800)
+window.addEventListener("resize", () => {
 
-	},2600)
+  introCamera.aspect = window.innerWidth / window.innerHeight
+  introCamera.updateProjectionMatrix()
+  introRenderer.setSize(window.innerWidth, window.innerHeight)
 
 })
 
@@ -994,7 +746,6 @@ window.addEventListener("load",()=>{
 </body>
 
 </html>
-
 
 
 
