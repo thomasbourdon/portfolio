@@ -290,16 +290,23 @@ function loadGLTF(media, gltfPath){
 
     },
     undefined,
-    ()=>{
-      showFallback(media)
-    }
+  ()=>{
+    showFallback(media)
+  }
   )
 }
 
 function showImage(media,path){
 
   const img=new Image()
-  img.src=path
+  img.onload = () => {
+    media.innerHTML=""
+    media.appendChild(img)
+  }
+  img.onerror = () => {
+    showFallback(media)
+  }
+  img.src = path
   img.style.width="100%"
   img.style.height="100%"
   img.style.objectFit="cover"
@@ -379,32 +386,39 @@ const dir=new THREE.DirectionalLight(0xffffff,1)
 dir.position.set(5,5,5)
 scene.add(dir)
 
-const loader = new THREE.GLTFLoader()
-  
-loader.load(
-  'pieces/piece_test.gltf',
-  function(gltf){
+const testModelPath = "pieces/piece_test.gltf"
 
-    const model = gltf.scene
+fileExists(testModelPath).then(exists => {
 
-    model.scale.set(500,500,500)
-
-    const box = new THREE.Box3().setFromObject(model)
-    const size = box.getSize(new THREE.Vector3()).length()
-    const center = box.getCenter(new THREE.Vector3())
-
-    model.position.sub(center)
-
-    camera.position.set(0, 0, size * 1.2)
-    camera.lookAt(0,0,0)
-
-    scene.add(model)
-  },
-  undefined,
-  function(error){
-    console.error("Erreur GLTF :", error)
+  if(!exists){
+    // on ne tente même pas de charger
+    return
   }
-)
+
+  const loader = new THREE.GLTFLoader()
+
+  loader.load(
+    testModelPath,
+    function(gltf){
+
+      const model = gltf.scene
+
+      model.scale.set(500,500,500)
+
+      const box = new THREE.Box3().setFromObject(model)
+      const size = box.getSize(new THREE.Vector3()).length()
+      const center = box.getCenter(new THREE.Vector3())
+
+      model.position.sub(center)
+
+      camera.position.set(0, 0, size * 1.2)
+      camera.lookAt(0,0,0)
+
+      scene.add(model)
+    }
+  )
+
+})
 
 let rot=0
 ;(function render(){rot+=.0025;scene.rotation.y=rot;renderer.render(scene,camera);requestAnimationFrame(render)})()
@@ -414,6 +428,7 @@ addEventListener('resize',()=>{camera.aspect=viewer3d.clientWidth/viewer3d.clien
 </body>
 
 </html>
+
 
 
 
