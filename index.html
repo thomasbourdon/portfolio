@@ -24,9 +24,34 @@ p{font-size:19px;line-height:1.7;opacity:.8}
 .hero-cta:hover{transform:translateY(-6px) scale(1.04);box-shadow:0 30px 60px rgba(37,99,235,.35)}
 .hero-product{position:absolute;width:380px;height:380px;border-radius:40px;background:linear-gradient(145deg,#e0f2fe,#c7d2fe);box-shadow:0 60px 100px rgba(0,0,0,.1);transform:translateZ(200px) rotateX(20deg) rotateY(-15deg)}
 
-#power{gap:80px;flex-wrap:wrap}
-.power-left{flex:1;min-width:320px}
-.power-right{flex:1;min-width:320px;height:500px;perspective:1200px;position:relative}
+#power{
+  gap:80px;
+  flex-wrap:wrap;
+
+  background:
+    linear-gradient(
+      rgba(255,255,255,0.85),
+      rgba(255,255,255,0.85)
+    ),
+    url("Images/Profil.jpg");
+
+  background-size:cover;
+  background-position:center;
+}
+.power-left{
+  flex:1;
+  min-width:320px;
+  position:relative;
+  z-index:2;
+}
+.power-right{
+  flex:1;
+  min-width:320px;
+  height:500px;
+  perspective:1200px;
+  position:relative;
+  z-index:2;
+}
 .power-block{position:absolute;width:220px;height:220px;border-radius:var(--radius);background:linear-gradient(145deg,var(--primary),var(--accent));box-shadow:0 40px 80px rgba(37,99,235,.25);will-change:transform}
 
 #recent-projects{background:linear-gradient(180deg,#f8fafc,#fff);flex-direction:column;gap:160px}
@@ -88,8 +113,22 @@ section.is-active::before{opacity:1}
 
 <section id="power">
 <div class="power-left">
-<h2>Puissance d’ingénierie</h2>
-<p>Conception orientée performance, précision dimensionnelle et robustesse industrielle.</p>
+  <h2>Puissance d’ingénierie</h2>
+
+  <p>
+    Conception de systèmes mécaniques complexes sous CAO,
+    depuis la modélisation de pièces jusqu’à l’assemblage fonctionnel complet.
+  </p>
+
+  <p>
+    Mise en œuvre de mécanismes cinématiques, gestion des liaisons,
+    tolérancement fonctionnel, et validation par simulations mécaniques.
+  </p>
+
+  <p>
+    Démarche orientée industrialisation : démontabilité,
+    contraintes de fabrication, et cohérence produit.
+  </p>
 </div>
 <div class="power-right">
 <div class="power-block"></div>
@@ -375,6 +414,7 @@ addEventListener('resize',()=>{camera.aspect=viewer3d.clientWidth/viewer3d.clien
 </body>
 
 </html>
+
 
 
 
