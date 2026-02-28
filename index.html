@@ -666,9 +666,7 @@ addEventListener("resize",resizeIntro)
 
 let t = 0
 
-function drawGrid(){
-
-  const canvas = document.getElementById("intro-canvas")
+const canvas = document.getElementById("intro-canvas")
 const ctx = canvas.getContext("2d")
 
 function resizeIntro(){
@@ -821,8 +819,6 @@ function loopIntro(t){
 createGears()
 requestAnimationFrame(loopIntro)
 
-drawGrid()
-
 
 
 
@@ -872,6 +868,7 @@ window.addEventListener("load",()=>{
 </body>
 
 </html>
+
 
 
 
