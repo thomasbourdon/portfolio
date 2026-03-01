@@ -87,53 +87,6 @@
   animation:introLoad 2.8s cubic-bezier(.22,1,.36,1) forwards;
 }
 
-#intro::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  background:
-    radial-gradient(circle at center,
-      transparent 55%,
-      rgba(0,0,0,.35) 100%);
-  mix-blend-mode:multiply;
-}
-
-.intro-grain{
-  position:absolute;
-  inset:0;
-  background:url("https://grainy-gradients.vercel.app/noise.svg");
-  opacity:.05;
-  mix-blend-mode:overlay;
-  pointer-events:none;
-}
-
-.intro-sub{
-  margin-top:28px;
-  font-size:14px;
-  letter-spacing:.35em;
-  opacity:.4;
-}
-
-.glow{
-  position:relative;
-}
-
-.glow::after{
-  content:attr(class);
-  position:absolute;
-  inset:0;
-  color:#6ea8ff;
-  filter:blur(18px);
-  opacity:.5;
-  z-index:-1;
-}
-
-.fade{
-  margin:0 20px;
-  opacity:.4;
-}
-
 @keyframes introLoad{
   to{width:100%;}
 }
@@ -298,32 +251,18 @@ section.is-active::before{opacity:1}
   text-shadow:
     0 10px 40px rgba(37,99,235,.35);
 }
-
-.hero-manifest{
-  margin-top:50px;
-  font-size:18px;
-  opacity:.6;
-  letter-spacing:.12em;
-}
-
 </style>
 </head>
 
 <body>
 
 <div id="intro">
-  <div class="intro-grain"></div>
   <div class="intro-noise"></div>
   <div class="intro-lines"></div>
 
   <div class="intro-center">
-    <div class="intro-kicker">ADVANCED MECHANICAL ENGINEERING</div>
-	<div class="intro-title">
-	  <span class="glow">CONCEPT</span>
-	  <span class="fade">→</span>
-	  <span class="glow">REALITY</span>
-	</div>
-	<div class="intro-sub">Precision. Motion. Industrial Intelligence.</div>
+    <div class="intro-kicker">MECHANICAL ENGINEERING PORTFOLIO</div>
+    <div class="intro-title">INITIALIZING SYSTEM</div>
     <div class="intro-bar">
       <span></span>
     </div>
@@ -338,10 +277,6 @@ section.is-active::before{opacity:1}
 <div class="hero-cta">Explorer le portfolio</div>
 </div>
 </section>
-
-<p class="hero-manifest">
-From mechanical concept to industrial-grade product visualization.
-</p>
 
 <section id="power">
 <div class="power-left">
@@ -412,10 +347,8 @@ From mechanical concept to industrial-grade product visualization.
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/RGBELoader.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/BokehShader.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/Pass.js"></script>
@@ -423,7 +356,6 @@ From mechanical concept to industrial-grade product visualization.
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/BokehPass.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
 
 <script>
 
@@ -498,14 +430,14 @@ function loadGLTF(media, gltfPath){
   renderer.setSize(350,350)
   renderer.setPixelRatio(devicePixelRatio)
 
-	const pmremGenerator = new THREE.PMREMGenerator(renderer)
+	const pmremGenerator = new THREE.PMREMGenerator(introRenderer)
 	pmremGenerator.compileEquirectangularShader()
 
 	const envScene = new THREE.Scene()
 	envScene.background = new THREE.Color(0x101820)
 
 	const envMap = pmremGenerator.fromScene(envScene).texture
-	scene.environment = envMap
+	introScene.environment = envMap
 
   media.innerHTML=""
   media.appendChild(renderer.domElement)
@@ -683,19 +615,7 @@ addEventListener('resize',()=>{camera.aspect=viewer3d.clientWidth/viewer3d.clien
 const intro = document.getElementById("intro")
 
 const introScene = new THREE.Scene()
-introScene.fog = new THREE.FogExp2(0x0b0f17, 0.18)
-const rgbeLoader = new THREE.RGBELoader()
-rgbeLoader.load(
-  "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/studio_small_08_1k.hdr",
-  function(texture){
-
-    texture.mapping = THREE.EquirectangularReflectionMapping
-
-    introScene.environment = texture
-    introScene.background = texture
-
-  }
-)
+introScene.background = new THREE.Color(0x0b0f17)
 
 const introCamera = new THREE.PerspectiveCamera(
   40,
@@ -724,13 +644,14 @@ const composer = new THREE.EffectComposer(introRenderer)
 const renderPass = new THREE.RenderPass(introScene, introCamera)
 composer.addPass(renderPass)
 
-const bloomPass = new THREE.UnrealBloomPass(
-  new THREE.Vector2(window.innerWidth, window.innerHeight),
-  0.45,
-  0.3,
-  0.85
-)
-composer.addPass(bloomPass)
+const bokehPass = new THREE.BokehPass(introScene, introCamera, {
+  focus: 4.0,
+  aperture: 0.00018,
+  maxblur: 0.01
+})
+
+composer.addPass(bokehPass)
+
 
 // ---------------- LIGHTING (SOFT STUDIO)
 
@@ -764,34 +685,6 @@ floor.position.y = -1
 floor.receiveShadow = true
 
 introScene.add(floor)
-
-const particlesGeometry = new THREE.BufferGeometry()
-const particlesCount = 800
-
-const posArray = new Float32Array(particlesCount * 3)
-
-for(let i=0;i<particlesCount*3;i++){
-  posArray[i] = (Math.random() - 0.5) * 20
-}
-
-particlesGeometry.setAttribute(
-  'position',
-  new THREE.BufferAttribute(posArray,3)
-)
-
-const particlesMaterial = new THREE.PointsMaterial({
-  size: 0.03,
-  transparent: true,
-  opacity: 0.4,
-  color: 0xffffff
-})
-
-const particles = new THREE.Points(
-  particlesGeometry,
-  particlesMaterial
-)
-
-introScene.add(particles)
 
 // ---------------- SCENE 1 : BLUEPRINT LINES
 
@@ -868,13 +761,12 @@ introScene.add(wireMesh)
 // ---------------- SCENE 3 : PBR METAL
 
 const metalMaterial = new THREE.MeshPhysicalMaterial({
-  color: 0xcfd8e3,
+  color: 0x9fb3c8, // acier bleuté premium
   metalness: 1,
-  roughness: 0.22,
-  clearcoat: 1,
-  clearcoatRoughness: 0.1,
-  reflectivity: 1,
-  envMapIntensity: 2.2,
+  roughness: 0.18,
+  clearcoat: 0.6,
+  clearcoatRoughness: 0.08,
+  envMapIntensity: 1.4,
   transparent: true,
   opacity: 0
 })
@@ -905,26 +797,6 @@ function animateIntro() {
     circleLine.visible = true
     lineMaterial.opacity = THREE.MathUtils.clamp((t - 0.2) * 1.2, 0, 0.7)
   }
-  
-  if(t > 3.4){
-  solidMesh.rotation.y += 0.02
-  metalMaterial.roughness = 0.12
-  introRenderer.toneMappingExposure = 1.4
-}
-
-	if(t > 3.8 && t < 4.4){
-
-	  const impact = (t - 3.8) / 0.6
-
-	  introRenderer.toneMappingExposure = 1.2 + impact * 1.8
-
-	  metalMaterial.roughness = 0.22 - impact * 0.1
-
-	}
-	
-	if(t > 4.4){
-	  introRenderer.toneMappingExposure = 1.2
-	}
 
   // SCENE 2 : wireframe apparition douce
   if (t > 1.2 && t < 2.4) {
@@ -942,10 +814,7 @@ function animateIntro() {
   }
 
   // Camera push ultra doux
-  if(t < 4){
-	  introCamera.position.z = 6 - Math.pow(t,1.6)*1.1
-	  introCamera.position.y = Math.sin(t*0.6)*0.15
-	}
+  introCamera.position.z = 6 - t * 0.4
 
   composer.render()
   requestAnimationFrame(animateIntro)
@@ -959,8 +828,6 @@ function animateIntro() {
   )
 }
 
-particles.rotation.y += 0.0008
-
 }
 
 animateIntro()
@@ -972,14 +839,20 @@ window.addEventListener("load", () => {
 
   const hero = document.getElementById("hero")
 
-	hero.style.opacity = 0
-	hero.style.transform = "translateY(80px) scale(0.96)"
+  hero.style.opacity = 0
+  hero.style.transform = "translateY(40px) scale(1.02)"
 
-	setTimeout(() => {
-	  hero.style.transition = "opacity 1.8s cubic-bezier(.22,1,.36,1), transform 1.8s cubic-bezier(.22,1,.36,1)"
-	  hero.style.opacity = 1
-	  hero.style.transform = "translateY(0px) scale(1)"
-	}, 100)
+  setTimeout(() => {
+
+    intro.style.transition = "opacity 1.4s cubic-bezier(.22,1,.36,1), transform 1.4s cubic-bezier(.22,1,.36,1)"
+    intro.style.opacity = 0
+    intro.style.transform = "scale(1.05)"
+
+    hero.style.transition = "opacity 1.8s cubic-bezier(.22,1,.36,1), transform 1.8s cubic-bezier(.22,1,.36,1)"
+    hero.style.opacity = 1
+    hero.style.transform = "translateY(0px) scale(1)"
+
+  }, 3600)
 
 })
 
