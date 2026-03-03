@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Luxury Product — Hero</title>
 
-  <!-- ✅ GitHub Pages friendly : permet import "three" -->
+  <!-- GitHub Pages friendly -->
   <script type="importmap">
   {
     "imports": {
@@ -17,42 +17,35 @@
 
   <style>
     :root{
-      --bg0:#03050a;
-      --bg1:#07101d;
+      --bg0:#02040a;
       --text:#e9eef7;
       --muted: rgba(233,238,247,.62);
       --stroke: rgba(255,255,255,.14);
       --glass1: rgba(255,255,255,.10);
       --glass2: rgba(255,255,255,.06);
-      --shine: rgba(255,255,255,.55);
     }
-
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
     body{
       margin:0;
-      overflow:hidden; /* no scroll */
+      overflow:hidden;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
       color:var(--text);
-      background:
-        radial-gradient(1100px 650px at 50% 60%, #0b1628 0%, var(--bg0) 55%, #000 100%);
+      background: radial-gradient(1100px 650px at 50% 60%, #0a1527 0%, var(--bg0) 58%, #000 100%);
     }
 
-    /* WebGL stage */
     #stage{ position:fixed; inset:0; z-index:0; }
     canvas{ display:block; width:100%; height:100%; }
 
-    /* Cinematic overlays */
+    /* Cinematic layers */
     .vignette{
-      position:fixed; inset:0; z-index:5; pointer-events:none;
-      background:
-        radial-gradient(1200px 700px at 50% 62%, rgba(0,0,0,0) 40%, rgba(0,0,0,.78) 100%);
-      opacity:.92;
-    }
-
-    .grain{
       position:fixed; inset:0; z-index:6; pointer-events:none;
-      opacity:.085;
+      background: radial-gradient(1200px 700px at 50% 62%, rgba(0,0,0,0) 42%, rgba(0,0,0,.82) 100%);
+      opacity:.95;
+    }
+    .grain{
+      position:fixed; inset:0; z-index:7; pointer-events:none;
+      opacity:.075;
       mix-blend-mode: overlay;
       background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
       animation: grainMove 1.1s steps(2,end) infinite;
@@ -65,45 +58,45 @@
       100%{ transform:translate(0,0); }
     }
 
-    /* Fog overlay (volumetric-ish) */
+    /* Fog overlay (less “cartoon”, more subtle) */
     .fog{
       position:fixed; inset:-12%;
       z-index:3; pointer-events:none;
       opacity:0;
-      filter: blur(18px);
+      filter: blur(22px);
       mix-blend-mode: screen;
       background:
-        radial-gradient(900px 420px at 50% 62%, rgba(255,255,255,.22), rgba(255,255,255,0) 62%),
-        radial-gradient(700px 360px at 30% 74%, rgba(255,255,255,.16), rgba(255,255,255,0) 68%),
-        radial-gradient(700px 360px at 70% 76%, rgba(255,255,255,.14), rgba(255,255,255,0) 70%),
-        linear-gradient(to top, rgba(255,255,255,.10), rgba(255,255,255,0) 46%);
-      animation: fogDrift 9.5s ease-in-out infinite;
+        radial-gradient(900px 420px at 50% 62%, rgba(255,255,255,.16), rgba(255,255,255,0) 62%),
+        radial-gradient(700px 360px at 32% 76%, rgba(255,255,255,.10), rgba(255,255,255,0) 70%),
+        radial-gradient(700px 360px at 68% 78%, rgba(255,255,255,.09), rgba(255,255,255,0) 72%),
+        linear-gradient(to top, rgba(255,255,255,.06), rgba(255,255,255,0) 46%);
+      animation: fogDrift 10.5s ease-in-out infinite;
       transform: translate3d(0,0,0);
     }
     @keyframes fogDrift{
-      0%{ transform: translate3d(-1.8%, 0.6%, 0) scale(1.02); }
-      50%{ transform: translate3d(1.8%, -0.6%, 0) scale(1.05); }
-      100%{ transform: translate3d(-1.8%, 0.6%, 0) scale(1.02); }
+      0%{ transform: translate3d(-1.6%, 0.6%, 0) scale(1.02); }
+      50%{ transform: translate3d(1.6%, -0.6%, 0) scale(1.05); }
+      100%{ transform: translate3d(-1.6%, 0.6%, 0) scale(1.02); }
     }
 
-    /* Godrays overlay (fake beams) */
+    /* Subtle rays (less “white blobs”) */
     .rays{
       position:fixed; inset:0;
       z-index:2; pointer-events:none;
       opacity:0;
       mix-blend-mode: screen;
       background:
-        radial-gradient(closest-side at 18% 75%, rgba(255,255,255,.22), rgba(255,255,255,0) 70%),
-        radial-gradient(closest-side at 82% 75%, rgba(255,255,255,.22), rgba(255,255,255,0) 70%);
-      filter: blur(22px);
-      animation: raysPulse 3.4s ease-in-out infinite;
+        radial-gradient(closest-side at 18% 76%, rgba(255,255,255,.12), rgba(255,255,255,0) 72%),
+        radial-gradient(closest-side at 82% 76%, rgba(255,255,255,.12), rgba(255,255,255,0) 72%);
+      filter: blur(26px);
+      animation: raysPulse 3.6s ease-in-out infinite;
     }
     @keyframes raysPulse{
-      0%,100%{ opacity:.30; transform: translateY(0px); }
-      50%{ opacity:.55; transform: translateY(-6px); }
+      0%,100%{ opacity:.22; transform: translateY(0px); }
+      50%{ opacity:.40; transform: translateY(-5px); }
     }
 
-    /* UI Layout */
+    /* UI */
     .ui{
       position:fixed; inset:0; z-index:10;
       display:grid;
@@ -113,7 +106,7 @@
       gap: clamp(16px, 3vw, 44px);
       pointer-events:none;
       opacity:0;
-      transform: translateY(12px);
+      transform: translateY(14px);
     }
 
     .copy{
@@ -123,31 +116,11 @@
       border: 1px solid var(--stroke);
       background: linear-gradient(180deg, var(--glass1), var(--glass2));
       border-radius: 20px;
-      box-shadow:
-        0 24px 90px rgba(0,0,0,.55),
-        inset 0 1px 0 rgba(255,255,255,.12);
+      box-shadow: 0 24px 90px rgba(0,0,0,.58), inset 0 1px 0 rgba(255,255,255,.12);
       backdrop-filter: blur(14px);
       pointer-events:auto;
       position:relative;
       overflow:hidden;
-    }
-
-    /* Shimmer line */
-    .copy:before{
-      content:"";
-      position:absolute;
-      inset:-50%;
-      background: linear-gradient(115deg, rgba(255,255,255,0) 40%, rgba(255,255,255,.18) 50%, rgba(255,255,255,0) 60%);
-      transform: translateX(-25%);
-      opacity:.0;
-      transition: opacity .4s ease;
-      animation: shimmer 4.6s ease-in-out infinite;
-    }
-    @keyframes shimmer{
-      0%{ transform: translateX(-35%) rotate(8deg); opacity:0; }
-      30%{ opacity:.55; }
-      55%{ opacity:.10; }
-      100%{ transform: translateX(35%) rotate(8deg); opacity:0; }
     }
 
     .kicker{
@@ -157,7 +130,6 @@
       color: rgba(233,238,247,.55);
       margin:0 0 10px 0;
     }
-
     h1{
       font-size: clamp(34px, 4.2vw, 60px);
       line-height:1.02;
@@ -165,10 +137,7 @@
       font-weight: 780;
       text-shadow: 0 10px 40px rgba(0,0,0,.55);
     }
-    h1 span{
-      font-weight: 420;
-      color: rgba(233,238,247,.80);
-    }
+    h1 span{ font-weight: 420; color: rgba(233,238,247,.82); }
 
     .desc{
       margin: 0 0 18px 0;
@@ -177,16 +146,9 @@
       line-height: 1.55;
     }
 
-    .actions{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      flex-wrap: wrap;
-    }
-
+    .actions{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
     .btn{
-      border:none;
-      cursor:pointer;
+      border:none; cursor:pointer;
       padding: 12px 18px;
       border-radius: 14px;
       background: rgba(255,255,255,.90);
@@ -196,121 +158,63 @@
       transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
       position:relative;
       overflow:hidden;
-      transform: translateZ(0);
-    }
-    .btn:before{
-      content:"";
-      position:absolute; inset:0;
-      background: radial-gradient(140px 60px at 30% 20%, rgba(255,255,255,.85), rgba(255,255,255,0) 60%);
-      opacity:.35;
-      transform: translateX(-15%);
-      transition: opacity .25s ease;
     }
     .btn:hover{
       transform: translateY(-1px) scale(1.015);
-      box-shadow: 0 26px 64px rgba(0,0,0,.55);
+      box-shadow: 0 28px 70px rgba(0,0,0,.58);
       filter: brightness(1.05);
     }
-    .btn:hover:before{ opacity:.55; }
+    .hint{ font-size:12px; color: rgba(233,238,247,.45); user-select:none; }
 
-    .hint{
-      font-size:12px;
-      color: rgba(233,238,247,.45);
-      user-select:none;
-    }
-
-    /* Big spotlight “props” in UI */
-    .rig{
-      position:fixed; inset:0; z-index:9;
-      pointer-events:none;
-    }
-    .spot{
-      position:absolute;
-      bottom: clamp(18px, 5vh, 54px);
-      width: clamp(130px, 16vw, 240px);
-      height: clamp(130px, 16vw, 240px);
-      border-radius: 30px;
-      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
-      border:1px solid rgba(255,255,255,.16);
-      box-shadow: 0 30px 90px rgba(0,0,0,.60);
-      backdrop-filter: blur(12px);
-      opacity:0;
-      transform: translateY(14px);
-    }
-    .spot .lens{
-      position:absolute; inset:18%;
-      border-radius: 26px;
-      background:
-        radial-gradient(circle at 35% 30%, rgba(255,255,255,.55), rgba(255,255,255,.08) 55%, rgba(255,255,255,0) 72%),
-        radial-gradient(circle at 65% 65%, rgba(255,255,255,.22), rgba(255,255,255,0) 60%);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.10);
-      opacity:.9;
-    }
-    .spot .beam{
-      position:absolute;
-      left:50%; top:-135%;
-      width:130%; height:280%;
-      transform: translateX(-50%);
-      background: radial-gradient(closest-side, rgba(255,255,255,.25), rgba(255,255,255,0) 70%);
-      filter: blur(18px);
-      opacity:.0;
-      mix-blend-mode: screen;
-      animation: beamPulse 2.8s ease-in-out infinite;
-    }
-    @keyframes beamPulse{
-      0%,100%{ opacity:.30; transform: translateX(-50%) scale(1); }
-      50%{ opacity:.62; transform: translateX(-50%) scale(1.03); }
-    }
-    .spot.left{ left: clamp(10px, 3vw, 44px); }
-    .spot.right{ right: clamp(10px, 3vw, 44px); }
-
-    /* Intro overlay */
+    /* Intro : cinematic blackout + scan */
     .intro{
       position:fixed; inset:0; z-index:20;
       pointer-events:none;
-      display:grid;
-      place-items:center;
-      background: radial-gradient(900px 560px at 50% 62%, rgba(255,255,255,.06), rgba(0,0,0,.95));
+      background: #000;
       opacity:1;
-      transition: opacity 900ms ease;
+      transition: opacity 1100ms ease;
     }
     .intro.off{ opacity:0; }
 
-    .intro .title{
-      text-align:center;
-      transform: translateY(10px) scale(.98);
+    .scan{
+      position:absolute; inset:-20%;
+      background: linear-gradient(115deg, rgba(255,255,255,0) 46%, rgba(255,255,255,.12) 50%, rgba(255,255,255,0) 54%);
+      filter: blur(14px);
+      transform: translateX(-35%) rotate(10deg);
       opacity:.0;
-      animation: introTitle 1400ms ease forwards;
-      animation-delay: 220ms;
     }
-    @keyframes introTitle{
-      to { transform: translateY(0) scale(1); opacity:1; }
+
+    .introTitle{
+      position:absolute; inset:0;
+      display:grid; place-items:center;
+      text-align:center;
+      opacity:0;
+      transform: translateY(10px) scale(.98);
     }
-    .intro .line{
-      width:min(540px, 78vw);
-      height:1px;
-      background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.45), rgba(255,255,255,0));
-      margin: 14px auto 10px auto;
-      opacity:.75;
-    }
-    .intro .sub{
+    .introTitle .sub{
       font-size: 12px;
       letter-spacing:.30em;
       text-transform:uppercase;
       color: rgba(233,238,247,.55);
     }
-    .intro h2{
+    .introTitle .line{
+      width:min(560px, 78vw);
+      height:1px;
+      background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.35), rgba(255,255,255,0));
+      margin: 14px auto 10px auto;
+      opacity:.75;
+    }
+    .introTitle h2{
       margin:0;
-      font-size: clamp(26px, 4.2vw, 44px);
-      font-weight: 760;
+      font-size: clamp(26px, 4.2vw, 46px);
+      font-weight: 780;
       color: rgba(233,238,247,.92);
-      text-shadow: 0 18px 60px rgba(0,0,0,.65);
+      text-shadow: 0 18px 60px rgba(0,0,0,.70);
     }
 
     @media (max-width: 900px){
       .ui{ grid-template-columns: 1fr; align-items:end; }
       .copy{ justify-self:center; margin-bottom: clamp(10px, 2vh, 24px); }
-      .spot{ opacity:0 !important; } /* mobile: focus on WebGL */
     }
 
     .fallback{
@@ -333,40 +237,35 @@
 <body>
   <div id="stage"></div>
 
-  <!-- Overlays -->
   <div class="rays" id="rays"></div>
   <div class="fog" id="fog"></div>
   <div class="vignette"></div>
   <div class="grain"></div>
 
-  <!-- UI spotlights props -->
-  <div class="rig" aria-hidden="true">
-    <div class="spot left" id="uiSpotL"><div class="lens"></div><div class="beam"></div></div>
-    <div class="spot right" id="uiSpotR"><div class="lens"></div><div class="beam"></div></div>
-  </div>
-
-  <!-- Main UI -->
   <div class="ui" id="ui">
     <div></div>
     <section class="copy">
       <p class="kicker">CINEMATIC DROP</p>
       <h1>Luxury <span>product</span></h1>
       <p class="desc">
-        Studio noir, métal, faisceaux, poussière. Ta pièce 3D se révèle sur le podium avec une mise en scène premium.
+        Studio photo réaliste, reflets HDR, ombres douces, faisceaux lumineux et brume subtile.
       </p>
       <div class="actions">
         <button class="btn" id="shop">Shop Now</button>
-        <span class="hint">Bouge la souris / touche l’écran</span>
+        <span class="hint">Souris / tactile pour parallax</span>
       </div>
     </section>
   </div>
 
-  <!-- Intro overlay -->
+  <!-- Intro -->
   <div class="intro" id="intro">
-    <div class="title">
-      <div class="sub">REVEAL SEQUENCE</div>
-      <div class="line"></div>
-      <h2>THE SHOWROOM OPENS</h2>
+    <div class="scan" id="scan"></div>
+    <div class="introTitle" id="introTitle">
+      <div>
+        <div class="sub">REVEAL SEQUENCE</div>
+        <div class="line"></div>
+        <h2>THE SHOWROOM OPENS</h2>
+      </div>
     </div>
   </div>
 
@@ -380,6 +279,7 @@
   <script type="module">
     import * as THREE from "three";
     import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+    import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 
     const stage = document.getElementById("stage");
     const ui = document.getElementById("ui");
@@ -387,8 +287,10 @@
     const raysEl = document.getElementById("rays");
     const fallback = document.getElementById("fallback");
     const introEl = document.getElementById("intro");
+    const scanEl = document.getElementById("scan");
+    const introTitleEl = document.getElementById("introTitle");
 
-    // ✅ adapte si ton arborescence change
+    // ✅ adapte si besoin
     const MODEL_URL = "./pieces/piece_1/piece_1.gltf";
 
     function webglAvailable(){
@@ -405,98 +307,126 @@
 
     // Scene
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x07101d, 0.06);
+    scene.fog = new THREE.FogExp2(0x07101d, 0.055);
 
-    // Renderer
+    // Renderer (REALISTIC)
     const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:"high-performance" });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+    // ✅ Cinematic tone mapping (makes it “photo/film”)
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
+
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     stage.appendChild(renderer.domElement);
 
-    // Camera
-    const camera = new THREE.PerspectiveCamera(42, window.innerWidth/window.innerHeight, 0.1, 100);
-    camera.position.set(0, 1.35, 7.6);
+    // Camera (slightly longer focal feel)
+    const camera = new THREE.PerspectiveCamera(38, window.innerWidth/window.innerHeight, 0.1, 100);
+    camera.position.set(0, 1.45, 8.3);
 
-    // World group (podium + model)
+    // Group
     const rig = new THREE.Group();
     scene.add(rig);
 
-    // Podium (premium)
+    // Podium (more realistic material response)
     function makePodium(){
       const g = new THREE.Group();
       const metal = new THREE.MeshStandardMaterial({
-        color: 0x0b101a,
-        metalness: 0.98,
-        roughness: 0.22
+        color: 0x0a0f18,
+        metalness: 1.0,
+        roughness: 0.20
       });
 
-      const ring = (r, h, y) => {
-        const body = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 128), metal);
+      const make = (r, h, y) => {
+        const body = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 160), metal);
         body.position.y = y;
         body.castShadow = true;
         body.receiveShadow = true;
 
-        const edgeMat = new THREE.MeshStandardMaterial({
-          color:0xffffff,
-          metalness:1,
-          roughness:0.08,
-          emissive:0x0a0a0a
-        });
-        const edge = new THREE.Mesh(new THREE.TorusGeometry(r, 0.018, 12, 220), edgeMat);
-        edge.rotation.x = Math.PI/2;
-        edge.position.y = y + h/2 - 0.02;
+        const rim = new THREE.Mesh(
+          new THREE.TorusGeometry(r, 0.018, 14, 260),
+          new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            metalness: 1.0,
+            roughness: 0.06,
+            emissive: 0x050505
+          })
+        );
+        rim.rotation.x = Math.PI/2;
+        rim.position.y = y + h/2 - 0.02;
 
-        g.add(body, edge);
+        g.add(body, rim);
       };
 
-      ring(1.42, 0.30, 0.15);
-      ring(1.08, 0.22, 0.40);
-      ring(0.80, 0.18, 0.59);
+      make(1.45, 0.30, 0.15);
+      make(1.10, 0.22, 0.40);
+      make(0.82, 0.18, 0.59);
 
       return g;
     }
     const podium = makePodium();
     rig.add(podium);
 
-    // Ground (glossy)
+    // Floor (darker + less “plastic”)
     const floor = new THREE.Mesh(
-      new THREE.CircleGeometry(8.5, 160),
-      new THREE.MeshStandardMaterial({ color: 0x05070c, metalness:0.9, roughness:0.35 })
+      new THREE.CircleGeometry(9.0, 220),
+      new THREE.MeshStandardMaterial({ color: 0x04060b, metalness:0.55, roughness:0.42 })
     );
     floor.rotation.x = -Math.PI/2;
     floor.position.y = -0.01;
     floor.receiveShadow = true;
     scene.add(floor);
 
-    // Lights
-    const ambient = new THREE.AmbientLight(0xffffff, 0.08);
+    // HDR environment (huge improvement vs “CAD” look)
+    // NOTE: external HDRI - works on GitHub Pages
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    pmrem.compileEquirectangularShader();
+
+    const HDR_URL = "https://cdn.jsdelivr.net/gh/pmndrs/drei-assets@master/hdri/studio_small_09_1k.hdr";
+
+    new RGBELoader()
+      .setDataType(THREE.HalfFloatType)
+      .load(HDR_URL, (hdr) => {
+        const envMap = pmrem.fromEquirectangular(hdr).texture;
+        scene.environment = envMap;
+        hdr.dispose();
+        pmrem.dispose();
+      });
+
+    // Lights (studio setup)
+    const ambient = new THREE.AmbientLight(0xffffff, 0.05);
     scene.add(ambient);
 
-    const leftSpot = new THREE.SpotLight(0xffffff, 0.0, 40, Math.PI/7, 0.30, 1.25);
-    leftSpot.position.set(-3.9, 2.6, 3.0);
+    // Key light (left spotlight) - slightly warm
+    const leftSpot = new THREE.SpotLight(0xfff2e6, 0.0, 45, Math.PI/8.5, 0.25, 1.25);
+    leftSpot.position.set(-4.2, 2.8, 3.1);
     leftSpot.target = podium;
     leftSpot.castShadow = true;
-    leftSpot.shadow.mapSize.set(1024,1024);
+    leftSpot.shadow.mapSize.set(2048, 2048);
+    leftSpot.shadow.bias = -0.0002;
     scene.add(leftSpot, leftSpot.target);
 
-    const rightSpot = new THREE.SpotLight(0xffffff, 0.0, 40, Math.PI/7, 0.30, 1.25);
-    rightSpot.position.set(3.9, 2.6, 3.0);
+    // Fill light (right spotlight) - slightly cooler
+    const rightSpot = new THREE.SpotLight(0xe8f2ff, 0.0, 45, Math.PI/8.5, 0.25, 1.25);
+    rightSpot.position.set(4.2, 2.8, 3.1);
     rightSpot.target = podium;
     rightSpot.castShadow = true;
-    rightSpot.shadow.mapSize.set(1024,1024);
+    rightSpot.shadow.mapSize.set(2048, 2048);
+    rightSpot.shadow.bias = -0.0002;
     scene.add(rightSpot, rightSpot.target);
 
+    // Rim/back light
     const rim = new THREE.DirectionalLight(0xffffff, 0.0);
-    rim.position.set(0, 3.5, -4.0);
+    rim.position.set(0.5, 3.8, -4.4);
     scene.add(rim);
 
-    // Volumetric cones for spotlights (visible beams)
-    function makeLightCone(){
-      const geo = new THREE.ConeGeometry(1.15, 5.8, 44, 1, true);
-      geo.translate(0, -2.9, 0); // apex at top
+    // Volumetric beams (less “cone” look)
+    function makeBeam(){
+      const geo = new THREE.ConeGeometry(1.05, 6.2, 60, 1, true);
+      geo.translate(0, -3.1, 0);
       const mat = new THREE.MeshBasicMaterial({
         color: 0xffffff,
         transparent: true,
@@ -505,21 +435,21 @@
         blending: THREE.AdditiveBlending,
         side: THREE.DoubleSide
       });
-      return new THREE.Mesh(geo, mat);
+      const m = new THREE.Mesh(geo, mat);
+      return m;
     }
+    const beamL = makeBeam();
+    beamL.position.copy(leftSpot.position);
+    beamL.rotation.x = -Math.PI/2.75;
+    scene.add(beamL);
 
-    const coneL = makeLightCone();
-    coneL.position.copy(leftSpot.position);
-    coneL.rotation.x = -Math.PI/2.7;
-    scene.add(coneL);
+    const beamR = makeBeam();
+    beamR.position.copy(rightSpot.position);
+    beamR.rotation.x = -Math.PI/2.75;
+    scene.add(beamR);
 
-    const coneR = makeLightCone();
-    coneR.position.copy(rightSpot.position);
-    coneR.rotation.x = -Math.PI/2.7;
-    scene.add(coneR);
-
-    // Dust particles
-    const dustCount = 1700;
+    // Dust (finer, less “cartoon”)
+    const dustCount = 1900;
     const dustGeo = new THREE.BufferGeometry();
     const dustPos = new Float32Array(dustCount * 3);
     for(let i=0;i<dustCount;i++){
@@ -530,28 +460,31 @@
     dustGeo.setAttribute("position", new THREE.BufferAttribute(dustPos, 3));
     const dustMat = new THREE.PointsMaterial({
       color:0xffffff,
-      size:0.012,
+      size:0.010,
       transparent:true,
-      opacity:0.18,
+      opacity:0.13,
       depthWrite:false
     });
     const dust = new THREE.Points(dustGeo, dustMat);
     scene.add(dust);
 
-    // Model load
+    // Model
     let model = null;
     const loader = new GLTFLoader();
     loader.load(
       MODEL_URL,
       (gltf) => {
         model = gltf.scene;
+
         model.traverse((o)=>{
           if(o.isMesh){
             o.castShadow = true;
             o.receiveShadow = true;
-            if(o.material){
-              o.material.metalness = Math.min(1, (o.material.metalness ?? 0.25) + 0.25);
-              o.material.roughness = Math.max(0.12, (o.material.roughness ?? 0.65) - 0.18);
+
+            // Keep the artist materials, but nudge toward realism if they’re flat
+            if(o.material && o.material.isMeshStandardMaterial){
+              o.material.metalness = Math.min(1, (o.material.metalness ?? 0.2) + 0.15);
+              o.material.roughness = Math.max(0.10, (o.material.roughness ?? 0.65) - 0.12);
             }
           }
         });
@@ -565,17 +498,16 @@
         model.position.sub(center);
 
         const maxDim = Math.max(size.x, size.y, size.z) || 1;
-        const target = 1.20;
-        model.scale.setScalar(target / maxDim);
+        model.scale.setScalar(1.22 / maxDim);
+        model.position.y = 0.86;
 
-        model.position.y = 0.83;
         rig.add(model);
       },
       undefined,
       (err) => console.error("Erreur chargement GLTF:", err)
     );
 
-    // Interactions
+    // Input
     const pointer = { x:0, y:0, tx:0, ty:0 };
     const onMove = (x,y)=>{
       pointer.tx = (x / window.innerWidth) * 2 - 1;
@@ -598,78 +530,84 @@
     }
     window.addEventListener("resize", resize);
 
-    // Timeline / Intro
+    // Intro timeline (more cinematic)
     const t0 = performance.now();
-    const introDur = 3200;
+    const introDur = 4200;
 
-    const easeOutCubic = (t)=> 1 - Math.pow(1 - t, 3);
+    const easeOut = (t)=> 1 - Math.pow(1 - t, 3);
     const easeInOut = (t)=> t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
     const clamp01 = (t)=> Math.max(0, Math.min(1, t));
 
     function animate(now){
       const raw = clamp01((now - t0) / introDur);
-      const e = easeOutCubic(raw);
+      const e = easeOut(raw);
       const cin = easeInOut(raw);
 
-      // Camera cinematic dolly + subtle drift
-      const driftX = Math.sin(now*0.00035)*0.03;
-      const driftY = Math.cos(now*0.00028)*0.02;
+      // Camera: slow push-in + tiny drift (no “cartoon shake”)
+      const driftX = Math.sin(now*0.00022)*0.025;
+      const driftY = Math.cos(now*0.00018)*0.016;
 
-      camera.position.z = 8.4 - 1.9 * e;
-      camera.position.y = 1.52 - 0.16 * e + driftY;
+      camera.position.z = 9.2 - 2.25 * e;
+      camera.position.y = 1.62 - 0.18 * e + driftY;
       camera.position.x = 0.10 * (1 - e) + driftX;
+      camera.lookAt(0, 0.95, 0);
 
-      // Tiny "handheld" shake during reveal (very subtle)
-      const shake = (1 - e) * 0.010;
-      camera.position.x += (Math.random()-0.5) * shake;
-      camera.position.y += (Math.random()-0.5) * shake;
+      // UI + overlays appear later (more cinematic)
+      const uiGate = clamp01((raw - 0.28) / 0.72);
+      ui.style.opacity = (uiGate).toFixed(3);
+      ui.style.transform = `translateY(${(16*(1-uiGate)).toFixed(2)}px)`;
 
-      camera.lookAt(0, 0.92, 0);
+      fogEl.style.opacity = (0.62 * uiGate).toFixed(3);
+      raysEl.style.opacity = (0.55 * uiGate).toFixed(3);
 
-      // UI fade-in
-      ui.style.opacity = (e).toFixed(3);
-      ui.style.transform = `translateY(${(14*(1-e)).toFixed(2)}px)`;
+      // Intro title reveal + scan pass
+      const titleGate = clamp01((raw - 0.08) / 0.30);
+      introTitleEl.style.opacity = (titleGate).toFixed(3);
+      introTitleEl.style.transform = `translateY(${(10*(1-titleGate)).toFixed(2)}px) scale(${(0.98 + 0.02*titleGate).toFixed(3)})`;
 
-      // Overlays
-      fogEl.style.opacity = (0.70 * e).toFixed(3);
-      raysEl.style.opacity = (0.75 * e).toFixed(3);
+      const scanGate = clamp01((raw - 0.18) / 0.26);
+      scanEl.style.opacity = (0.35 * scanGate).toFixed(3);
+      scanEl.style.transform = `translateX(${(-35 + 85*scanGate).toFixed(2)}%) rotate(10deg)`;
 
-      // Reveal intro overlay then fade it out
-      if(raw > 0.62) introEl.classList.add("off");
-      if(raw > 0.90) introEl.style.display = "none";
+      // Projector “flicker on” (realistic)
+      const flick = (raw < 0.35)
+        ? (0.65 + 0.35*Math.sin(now*0.02) * Math.sin(now*0.011))
+        : 1.0;
 
-      // Lights ramp up
-      leftSpot.intensity  = 11.0 * cin;
-      rightSpot.intensity = 11.0 * cin;
-      rim.intensity       = 1.4 * cin;
+      // Lights ramp
+      const lightGate = clamp01((raw - 0.18) / 0.60);
+      const L = 12.5 * easeInOut(lightGate) * flick;
 
-      // Visible cones (beams)
-      const beamOpacity = 0.22 * cin;
-      coneL.material.opacity = beamOpacity;
-      coneR.material.opacity = beamOpacity;
+      leftSpot.intensity  = L * 0.98;
+      rightSpot.intensity = L * 0.95;
+      rim.intensity       = 1.35 * easeInOut(lightGate);
+
+      // Volumetric beams (subtle)
+      const beamOp = 0.13 * easeInOut(lightGate);
+      beamL.material.opacity = beamOp;
+      beamR.material.opacity = beamOp;
 
       // Pointer smoothing
       pointer.x += (pointer.tx - pointer.x) * 0.06;
       pointer.y += (pointer.ty - pointer.y) * 0.06;
 
-      // Parallax tilt (hero premium)
-      rig.rotation.x = pointer.y * 0.14;
-      rig.rotation.y = pointer.x * 0.26;
+      // Parallax (subtle, realistic)
+      rig.rotation.x = pointer.y * 0.10;
+      rig.rotation.y = pointer.x * 0.18;
 
-      // “Hover” effect on lights intensity
-      const pulse = 0.92 + (Math.abs(pointer.x) + Math.abs(pointer.y)) * 0.09;
-      leftSpot.intensity *= pulse;
-      rightSpot.intensity *= pulse;
-
-      // Model rotation
+      // Model slow rotation
       if(model){
-        model.rotation.y += 0.006;
-        model.rotation.x = -pointer.y * 0.05;
+        model.rotation.y += 0.0042;
+        model.rotation.x = -pointer.y * 0.03;
       }
 
       // Dust drift
-      dust.rotation.y += 0.00105;
-      dust.rotation.x += 0.00035;
+      dust.rotation.y += 0.0009;
+      dust.rotation.x += 0.00025;
+
+      // Fade intro to scene
+      if(raw > 0.58) introEl.classList.add("off");
+      if(raw > 0.92) introEl.style.display = "none";
 
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
