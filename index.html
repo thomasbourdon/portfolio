@@ -9,32 +9,23 @@
       --bg:#050608;
       --text:#ffffff;
       --muted:rgba(255,255,255,.55);
-      --muted2:rgba(255,255,255,.35);
       --btn:#e9eaee;
       --btnText:#131417;
       --glow:rgba(255,255,255,.35);
     }
-
     *{box-sizing:border-box}
     html,body{height:100%; margin:0; background:var(--bg); overflow:hidden; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";}
-
-    /* Fullscreen stage */
     #stage{
       position:fixed; inset:0;
       width:100vw; height:100vh;
       overflow:hidden;
-      background: radial-gradient(1200px 600px at 50% 60%, rgba(255,255,255,.06), rgba(0,0,0,0) 55%),
-                  radial-gradient(900px 500px at 35% 80%, rgba(255,255,255,.05), rgba(0,0,0,0) 60%),
-                  var(--bg);
+      background:
+        radial-gradient(1200px 600px at 50% 60%, rgba(255,255,255,.06), rgba(0,0,0,0) 55%),
+        radial-gradient(900px 500px at 35% 80%, rgba(255,255,255,.05), rgba(0,0,0,0) 60%),
+        var(--bg);
     }
+    canvas{display:block; width:100%; height:100%}
 
-    canvas{
-      display:block;
-      width:100%;
-      height:100%;
-    }
-
-    /* Cinematic overlays: vignette + subtle film grain */
     .vignette{
       pointer-events:none;
       position:fixed; inset:-1px;
@@ -52,14 +43,13 @@
       mix-blend-mode:overlay;
     }
 
-    /* Right-side hero copy */
     .ui{
       position:fixed; inset:0;
       display:grid;
       grid-template-columns: 1.15fr 0.85fr;
       align-items:center;
       padding: clamp(16px, 3.5vw, 56px);
-      pointer-events:none; /* let 3D receive pointer events; we re-enable on content */
+      pointer-events:none;
     }
     .ui__right{
       pointer-events:auto;
@@ -67,7 +57,6 @@
       width:min(520px, 92vw);
       padding: clamp(10px, 2vw, 24px);
     }
-
     .kicker{
       display:inline-block;
       height:1px; width:64px;
@@ -75,7 +64,6 @@
       margin: 0 0 14px 2px;
       opacity:.8;
     }
-
     h1{
       margin:0 0 12px 0;
       letter-spacing: -0.02em;
@@ -97,7 +85,6 @@
       text-shadow: 0 10px 26px rgba(0,0,0,.55);
       will-change: transform, opacity;
     }
-
     .cta{
       display:inline-flex;
       align-items:center;
@@ -124,12 +111,7 @@
         0 0 28px 6px var(--glow);
       filter: brightness(1.03);
     }
-    .cta:active{
-      transform: translateY(0px) scale(.995);
-      box-shadow:
-        0 10px 26px rgba(0,0,0,.55),
-        0 0 18px 3px rgba(255,255,255,.25);
-    }
+    .cta:active{ transform: translateY(0px) scale(.995); }
     .cta:focus-visible{
       outline:none;
       box-shadow:
@@ -138,29 +120,18 @@
         0 0 28px 6px rgba(255,255,255,.35);
     }
 
-    /* Responsive: stack on mobile */
     @media (max-width: 860px){
-      .ui{
-        grid-template-columns: 1fr;
-        align-items:end;
-        padding: 18px;
-      }
-      .ui__right{
-        justify-self:start;
-        width:min(560px, 96vw);
-        padding: 10px 6px 22px 6px;
-      }
+      .ui{ grid-template-columns: 1fr; align-items:end; padding: 18px; }
+      .ui__right{ justify-self:start; width:min(560px, 96vw); padding: 10px 6px 22px 6px; }
       h1{font-size: clamp(34px, 8vw, 46px);}
       p{max-width: 56ch;}
     }
 
-    /* Reduce motion support */
     @media (prefers-reduced-motion: reduce){
       *{scroll-behavior:auto !important}
       .cta, h1, p { transition: none !important; animation: none !important; }
     }
 
-    /* Tiny debug label (hidden) */
     .sr-only{
       position:absolute; width:1px; height:1px; padding:0; margin:-1px;
       overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
@@ -175,36 +146,177 @@
     <div></div>
     <div class="ui__right">
       <span class="kicker" aria-hidden="true"></span>
-      <h1 id="heroTitle">
-        <span class="bold">Luxury</span> <span class="reg">product</span>
-      </h1>
+      <h1 id="heroTitle"><span class="bold">Luxury</span> <span class="reg">product</span></h1>
       <p id="heroP">Forem ipsum dolor sit amet, consectetur pripiacing elit, sed frot ut horne.</p>
       <button class="cta" id="ctaBtn" type="button" aria-label="Shop Now">Shop Now</button>
-      <span class="sr-only" id="a11yNote">No scroll. Fullscreen hero.</span>
+      <span class="sr-only">No scroll. Fullscreen hero.</span>
     </div>
   </div>
 
   <div class="vignette"></div>
   <div class="grain"></div>
 
-  <!-- GSAP (timeline intro + micro motion) -->
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <!--
+    GitHub Pages friendly notes:
+    - Use ESM imports that resolve correctly everywhere (Skypack/JSPM CDN).
+    - Avoid GSAP CDN that triggers ITP storage warnings: bundle GSAP core as a tiny inline fallback.
+      (If you prefer GSAP full, replace with a self-hosted gsap.min.js in your repo.)
+  -->
 
   <script type="module">
-    import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
-    import { GLTFLoader } from "https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
-    import { EffectComposer } from "https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/EffectComposer.js";
-    import { RenderPass } from "https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/RenderPass.js";
-    import { UnrealBloomPass } from "https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/UnrealBloomPass.js";
+    // -----------------------------
+    // Minimal GSAP-like tiny helper (github-pages friendly)
+    // If you WANT real GSAP: download gsap.min.js, commit it, and load it locally:
+    // <script src="./vendor/gsap.min.js"></script>
+    // Then remove this tiny helper and use gsap directly.
+    // -----------------------------
+    const Motion = (() => {
+      const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+      const easeOut2 = (t) => 1 - Math.pow(1 - t, 2);
+      const now = () => performance.now();
+
+      function tween(target, vars = {}) {
+        const {
+          duration = 0.5,
+          delay = 0,
+          ease = "power3.out",
+          onUpdate,
+          onComplete,
+          ...props
+        } = vars;
+
+        const e = (t) => {
+          if (ease === "power2.out") return easeOut2(t);
+          return easeOut(t);
+        };
+
+        const start = now() + delay * 1000;
+        const end = start + duration * 1000;
+
+        // read initial values
+        const initial = {};
+        for (const k in props) {
+          if (k === "boxShadow" || k === "filter") {
+            initial[k] = target.style[k] || "";
+          } else if (k === "opacity") {
+            initial[k] = parseFloat(getComputedStyle(target).opacity) || 0;
+          } else if (k === "x" || k === "y" || k === "scale" || k === "rotateZ") {
+            // stored in dataset
+            initial[k] = parseFloat(target.dataset[k] || (k === "scale" ? 1 : 0));
+          } else if (typeof props[k] === "number") {
+            initial[k] = target[k];
+          } else {
+            initial[k] = target[k];
+          }
+        }
+
+        function applyTransform() {
+          const x = parseFloat(target.dataset.x || 0);
+          const y = parseFloat(target.dataset.y || 0);
+          const s = parseFloat(target.dataset.scale || 1);
+          const r = parseFloat(target.dataset.rotateZ || 0);
+          target.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${s}) rotate(${r}deg)`;
+        }
+
+        function frame() {
+          const t = now();
+          if (t < start) return requestAnimationFrame(frame);
+          const p = Math.min(1, (t - start) / (end - start));
+          const ep = e(p);
+
+          for (const k in props) {
+            const v = props[k];
+            if (k === "opacity") {
+              const a = initial[k];
+              target.style.opacity = (a + (v - a) * ep).toFixed(4);
+            } else if (k === "boxShadow" || k === "filter") {
+              // step at end (good enough for intro)
+              if (p >= 1) target.style[k] = v;
+            } else if (k === "x" || k === "y" || k === "scale" || k === "rotateZ") {
+              const a = initial[k];
+              const cur = a + (v - a) * ep;
+              target.dataset[k] = String(cur);
+              applyTransform();
+            } else if (typeof v === "number") {
+              const a = initial[k];
+              target[k] = a + (v - a) * ep;
+            } else {
+              if (p >= 1) target[k] = v;
+            }
+          }
+
+          onUpdate && onUpdate();
+          if (p < 1) requestAnimationFrame(frame);
+          else onComplete && onComplete();
+        }
+        requestAnimationFrame(frame);
+        return { kill(){} };
+      }
+
+      function set(targets, vars) {
+        const arr = Array.isArray(targets) ? targets : [targets];
+        arr.forEach((t) => {
+          for (const k in vars) {
+            const v = vars[k];
+            if (k === "opacity") t.style.opacity = v;
+            else if (k === "filter") t.style.filter = v;
+            else if (k === "boxShadow") t.style.boxShadow = v;
+            else if (k === "x" || k === "y" || k === "scale" || k === "rotateZ") {
+              t.dataset[k] = String(v);
+              const x = parseFloat(t.dataset.x || 0);
+              const y = parseFloat(t.dataset.y || 0);
+              const s = parseFloat(t.dataset.scale || 1);
+              const r = parseFloat(t.dataset.rotateZ || 0);
+              t.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${s}) rotate(${r}deg)`;
+            } else {
+              t[k] = v;
+            }
+          }
+        });
+      }
+
+      // tiny timeline (sequential tweens)
+      function timeline({ defaults = {} } = {}) {
+        let cursor = 0;
+        const api = {
+          to(target, vars, at) {
+            const v = { ...defaults, ...vars };
+            const startAt = (typeof at === "number" ? at : cursor);
+            tween(target, { ...v, delay: startAt });
+            cursor = Math.max(cursor, startAt + (v.duration || 0));
+            return api;
+          },
+          set(target, vars, at) {
+            const startAt = (typeof at === "number" ? at : cursor);
+            setTimeout(() => set(target, vars), startAt * 1000);
+            return api;
+          },
+          progress(){ return api; },
+          kill(){ return api; }
+        };
+        return api;
+      }
+
+      return { to: tween, set, timeline };
+    })();
+
+    // -----------------------------
+    // Three.js imports (ESM) — GitHub Pages friendly
+    // Use a CDN that rewrites bare specifiers inside examples modules.
+    // -----------------------------
+    import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+    import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
+    import { EffectComposer } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/EffectComposer.js";
+    import { RenderPass } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/RenderPass.js";
+    import { UnrealBloomPass } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/UnrealBloomPass.js";
 
     // -----------------------------
     // Perf / motion preferences
     // -----------------------------
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const isTouch = matchMedia("(pointer: coarse)").matches;
-    const isSmall = matchMedia("(max-width: 860px)").matches;
 
-    // Cap DPR for performance (important on mobile / retina)
+    // Cap DPR for performance
     const DPR_CAP = isTouch ? 1.35 : 1.8;
 
     // -----------------------------
@@ -216,24 +328,19 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.08;
+    renderer.toneMappingExposure = 1.08; // <-- adjust exposure here
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     stage.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x050608);
+    scene.fog = new THREE.FogExp2(0x07080b, 0.0); // animated in intro
 
-    // Fog (we animate density during intro)
-    scene.fog = new THREE.FogExp2(0x07080b, 0.0);
-
-    // Camera
     const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 120);
-    // Cinematic angle matching reference: looking slightly down, podium center-left
     camera.position.set(0.9, 2.15, 9.2);
     camera.lookAt(0.3, 1.2, 0.0);
 
-    // Subtle camera rig for parallax
     const camRig = new THREE.Group();
     camRig.add(camera);
     scene.add(camRig);
@@ -243,16 +350,11 @@
     // -----------------------------
     const composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
-    const bloom = new UnrealBloomPass(
-      new THREE.Vector2(window.innerWidth, window.innerHeight),
-      0.85,   // strength (adjust for more/less glow)
-      0.55,   // radius
-      0.25    // threshold
-    );
+    const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.85, 0.55, 0.25);
     composer.addPass(bloom);
 
     // -----------------------------
-    // Materials (premium studio look)
+    // Materials
     // -----------------------------
     const metalBlack = new THREE.MeshPhysicalMaterial({
       color: new THREE.Color(0x0b0c10),
@@ -261,13 +363,11 @@
       clearcoat: 0.8,
       clearcoatRoughness: 0.28,
     });
-
     const chromeDark = new THREE.MeshStandardMaterial({
       color: new THREE.Color(0x111219),
       metalness: 1.0,
       roughness: 0.12,
     });
-
     const matteBlack = new THREE.MeshStandardMaterial({
       color: new THREE.Color(0x07080b),
       metalness: 0.05,
@@ -275,108 +375,78 @@
     });
 
     // -----------------------------
-    // Floor (dark, slightly reflective, perspective)
+    // Floor
     // -----------------------------
     const floor = new THREE.Mesh(
       new THREE.PlaneGeometry(60, 60, 1, 1),
       new THREE.MeshPhysicalMaterial({
         color: new THREE.Color(0x07080b),
         metalness: 0.1,
-        roughness: 0.35,     // lower = more reflective
+        roughness: 0.35,
         clearcoat: 0.65,
         clearcoatRoughness: 0.22,
         reflectivity: 0.4
       })
     );
     floor.rotation.x = -Math.PI / 2;
-    floor.position.y = 0;
     floor.receiveShadow = true;
     scene.add(floor);
 
-    // Dark "reflection sheen" strip to accentuate perspective (cheap but effective)
     const sheen = new THREE.Mesh(
       new THREE.PlaneGeometry(32, 18, 1, 1),
-      new THREE.MeshBasicMaterial({
-        color: 0xffffff,
-        transparent: true,
-        opacity: 0.08,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false
-      })
+      new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.08, blending: THREE.AdditiveBlending, depthWrite: false })
     );
     sheen.rotation.x = -Math.PI / 2;
     sheen.position.set(0.2, 0.01, -2.8);
     scene.add(sheen);
 
-    // Subtle hex-ish grid hints (very faint)
     const gridTex = makeGridTexture();
     const grid = new THREE.Mesh(
       new THREE.PlaneGeometry(60, 60),
-      new THREE.MeshBasicMaterial({
-        map: gridTex,
-        transparent: true,
-        opacity: 0.10,
-        depthWrite: false
-      })
+      new THREE.MeshBasicMaterial({ map: gridTex, transparent: true, opacity: 0.10, depthWrite: false })
     );
     grid.rotation.x = -Math.PI / 2;
     grid.position.y = 0.011;
     scene.add(grid);
 
     // -----------------------------
-    // Podium (center-left, 2-3 levels, rim light)
+    // Podium (center-left)
     // -----------------------------
     const podium = new THREE.Group();
-    podium.position.set(-1.15, 0, 0);
+    podium.position.set(-1.15, 0, 0); // <-- adjust composition here
     scene.add(podium);
 
-    const base1 = new THREE.Mesh(new THREE.CylinderGeometry(1.65, 1.75, 0.22, 96, 1, false), metalBlack);
-    base1.position.y = 0.11;
-    base1.castShadow = true;
-    base1.receiveShadow = true;
+    const base1 = new THREE.Mesh(new THREE.CylinderGeometry(1.65, 1.75, 0.22, 96), metalBlack);
+    base1.position.y = 0.11; base1.castShadow = true; base1.receiveShadow = true;
 
-    const base2 = new THREE.Mesh(new THREE.CylinderGeometry(1.22, 1.30, 0.20, 96, 1, false), chromeDark);
-    base2.position.y = 0.11 + 0.20;
-    base2.castShadow = true;
-    base2.receiveShadow = true;
+    const base2 = new THREE.Mesh(new THREE.CylinderGeometry(1.22, 1.30, 0.20, 96), chromeDark);
+    base2.position.y = 0.11 + 0.20; base2.castShadow = true; base2.receiveShadow = true;
 
-    const top = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 1.02, 0.14, 96, 1, false), metalBlack);
-    top.position.y = 0.11 + 0.20 + 0.14;
-    top.castShadow = true;
-    top.receiveShadow = true;
+    const top = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 1.02, 0.14, 96), metalBlack);
+    top.position.y = 0.11 + 0.20 + 0.14; top.castShadow = true; top.receiveShadow = true;
 
-    // Rim lines: thin emissive rings
     const ringMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 });
     const ring1 = new THREE.Mesh(new THREE.TorusGeometry(1.70, 0.012, 12, 180), ringMat);
-    ring1.rotation.x = Math.PI / 2;
-    ring1.position.y = base1.position.y + 0.11;
+    ring1.rotation.x = Math.PI / 2; ring1.position.y = base1.position.y + 0.11;
 
     const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.26, 0.012, 12, 180), ringMat);
-    ring2.rotation.x = Math.PI / 2;
-    ring2.position.y = base2.position.y + 0.10;
+    ring2.rotation.x = Math.PI / 2; ring2.position.y = base2.position.y + 0.10;
 
     const ring3 = new THREE.Mesh(new THREE.TorusGeometry(0.98, 0.012, 12, 180), ringMat);
-    ring3.rotation.x = Math.PI / 2;
-    ring3.position.y = top.position.y + 0.07;
+    ring3.rotation.x = Math.PI / 2; ring3.position.y = top.position.y + 0.07;
 
     podium.add(base1, base2, top, ring1, ring2, ring3);
 
-    // Vertical back-glow behind podium (visual plane + light)
+    // Back glow plane
     const backGlow = new THREE.Mesh(
       new THREE.PlaneGeometry(3.8, 6.0),
-      new THREE.MeshBasicMaterial({
-        color: 0xffffff,
-        transparent: true,
-        opacity: 0.14,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false
-      })
+      new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.14, blending: THREE.AdditiveBlending, depthWrite: false })
     );
     backGlow.position.set(-0.2, 2.7, -1.35);
     backGlow.lookAt(-0.2, 2.7, 2);
     scene.add(backGlow);
 
-    // Light streaks (vertical thin planes) around center
+    // Light streaks
     const streaks = new THREE.Group();
     scene.add(streaks);
     for (let i = 0; i < 6; i++){
@@ -384,13 +454,7 @@
       const h = 3.8 + Math.random() * 2.4;
       const s = new THREE.Mesh(
         new THREE.PlaneGeometry(w, h),
-        new THREE.MeshBasicMaterial({
-          color: 0xffffff,
-          transparent: true,
-          opacity: 0.10 + Math.random()*0.10,
-          blending: THREE.AdditiveBlending,
-          depthWrite: false
-        })
+        new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.10 + Math.random()*0.10, blending: THREE.AdditiveBlending, depthWrite: false })
       );
       s.position.set(-1.5 + i * 0.55, 2.0 + Math.random()*0.5, -0.9 - Math.random()*0.8);
       s.rotation.y = (Math.random() - 0.5) * 0.35;
@@ -398,7 +462,7 @@
     }
 
     // -----------------------------
-    // Studio projectors (foreground, dominant)
+    // Studio projectors (foreground)
     // -----------------------------
     const projectorL = createProjector();
     projectorL.position.set(-5.25, 0.95, 6.35);
@@ -413,39 +477,32 @@
     scene.add(projectorR);
 
     // -----------------------------
-    // Lights (dramatic studio)
+    // Lights
     // -----------------------------
-    // Ambient very low
     scene.add(new THREE.AmbientLight(0xffffff, 0.05));
 
-    // Key: left projector spotlight
+    // NOTE: Adjust spotlight intensities in the intro timeline below.
     const spotL = new THREE.SpotLight(0xffffff, 0.0, 40, THREE.MathUtils.degToRad(16), 0.35, 1.2);
     spotL.position.set(projectorL.position.x + 0.4, 2.6, projectorL.position.z - 0.7);
     spotL.target.position.set(podium.position.x, 1.0, podium.position.z);
     spotL.castShadow = true;
     spotL.shadow.mapSize.set(1024,1024);
     spotL.shadow.bias = -0.00035;
-    scene.add(spotL);
-    scene.add(spotL.target);
+    scene.add(spotL, spotL.target);
 
-    // Fill: right projector spotlight
     const spotR = new THREE.SpotLight(0xffffff, 0.0, 40, THREE.MathUtils.degToRad(17), 0.35, 1.15);
     spotR.position.set(projectorR.position.x - 0.4, 2.5, projectorR.position.z - 0.8);
     spotR.target.position.set(podium.position.x, 1.05, podium.position.z + 0.1);
     spotR.castShadow = true;
     spotR.shadow.mapSize.set(1024,1024);
     spotR.shadow.bias = -0.00035;
-    scene.add(spotR);
-    scene.add(spotR.target);
+    scene.add(spotR, spotR.target);
 
-    // Backlight: vertical behind podium
     const backSpot = new THREE.SpotLight(0xffffff, 0.0, 50, THREE.MathUtils.degToRad(18), 0.55, 1.35);
     backSpot.position.set(podium.position.x + 0.2, 5.8, -3.6);
     backSpot.target.position.set(podium.position.x + 0.1, 1.0, 0.3);
-    scene.add(backSpot);
-    scene.add(backSpot.target);
+    scene.add(backSpot, backSpot.target);
 
-    // Small accent rim lights near floor
     const rimA = new THREE.PointLight(0xffffff, 0.22, 12, 2.0);
     rimA.position.set(podium.position.x - 2.2, 0.6, 1.2);
     scene.add(rimA);
@@ -454,9 +511,7 @@
     rimB.position.set(podium.position.x + 1.8, 0.55, 0.6);
     scene.add(rimB);
 
-    // -----------------------------
-    // Volumetric cones (visual meshes for beams)
-    // -----------------------------
+    // Volumetric cones (visual)
     const coneL = createLightCone(3.7, 7.2);
     coneL.position.copy(spotL.position);
     coneL.lookAt(spotL.target.position);
@@ -472,18 +527,20 @@
     coneBack.lookAt(backSpot.target.position);
     scene.add(coneBack);
 
-    // -----------------------------
-    // Fog particles (volumetric-ish)
-    // -----------------------------
+    // Fog particles
     const particles = createFogParticles(isTouch ? 520 : 1150);
     scene.add(particles);
 
     // -----------------------------
-    // Load GLTF piece on top of podium
-    // IMPORTANT: Replace only if your asset path changes
-    // (User requested exact path below)
+    // Load GLTF piece on podium
+    // IMPORTANT: GitHub Pages often serves under a subpath. Use RELATIVE path here:
+    // Keep your folder structure: /pieces/piece_1/piece_1.gltf
+    // Put it in repo root: pieces/piece_1/piece_1.gltf
     // -----------------------------
+    const MODEL_URL = "./pieces/piece_1/piece_1.gltf"; // <-- GH Pages friendly (relative)
+    // If you REALLY need absolute: `/${repoName}/pieces/...` but that depends on your repo.
     const loader = new GLTFLoader();
+
     const pieceGroup = new THREE.Group();
     pieceGroup.position.set(podium.position.x, top.position.y + 0.32, podium.position.z);
     scene.add(pieceGroup);
@@ -491,49 +548,38 @@
     let loadedPiece = null;
 
     loader.load(
-      "/pieces/piece_1/piece_1.gltf", // <-- EXACT requested path
+      MODEL_URL,
       (gltf) => {
         loadedPiece = gltf.scene;
         loadedPiece.traverse((o) => {
           if (o.isMesh){
             o.castShadow = true;
             o.receiveShadow = true;
-            // If your model looks too dark/bright, tweak here:
-            // - metalness/roughness
-            // - renderer.toneMappingExposure
           }
         });
 
-        // Auto-scale to a nice hero size
+        // Auto-scale to fit podium
         const box = new THREE.Box3().setFromObject(loadedPiece);
         const size = new THREE.Vector3();
         box.getSize(size);
         const maxDim = Math.max(size.x, size.y, size.z) || 1;
-        const desired = 1.25; // adjust to fit podium nicely
+        const desired = 1.25; // <-- tweak size on podium
         const s = desired / maxDim;
         loadedPiece.scale.setScalar(s);
 
-        // Center it
         const center = new THREE.Vector3();
         box.getCenter(center);
         loadedPiece.position.sub(center.multiplyScalar(s));
 
-        // Gentle rotation for premium feel
         loadedPiece.rotation.y = -0.35;
-
         pieceGroup.add(loadedPiece);
       },
-      (xhr) => {
-        // Optional: hook a loader UI here (kept minimal)
-      },
+      undefined,
       (err) => {
         console.warn("GLTF load error:", err);
-        // Fallback "dummy piece" so the scene still looks complete
         const dummy = new THREE.Mesh(
           new THREE.TorusKnotGeometry(0.35, 0.12, 180, 24),
-          new THREE.MeshStandardMaterial({
-            color: 0x0f1016, metalness: 1.0, roughness: 0.12, emissive: 0x000000
-          })
+          new THREE.MeshStandardMaterial({ color: 0x0f1016, metalness: 1.0, roughness: 0.12 })
         );
         dummy.castShadow = true;
         pieceGroup.add(dummy);
@@ -542,58 +588,50 @@
     );
 
     // -----------------------------
-    // UI interactions (parallax, hover)
+    // UI interactions (parallax)
     // -----------------------------
     const titleEl = document.getElementById("heroTitle");
     const pEl = document.getElementById("heroP");
     const btnEl = document.getElementById("ctaBtn");
 
-    let pointerX = 0, pointerY = 0;
     let targetRigX = 0, targetRigY = 0;
 
     const onMove = (e) => {
       const x = (e.clientX / window.innerWidth) * 2 - 1;
       const y = (e.clientY / window.innerHeight) * 2 - 1;
-      pointerX = x; pointerY = y;
       targetRigX = x * 0.18;
       targetRigY = y * 0.10;
 
-      // Text parallax (subtle)
       if (!prefersReducedMotion){
-        gsap.to(titleEl, { duration: 0.45, x: x * 10, y: y * 6, rotateZ: x * 0.25, ease: "power2.out" });
-        gsap.to(pEl,     { duration: 0.55, x: x * 8,  y: y * 5, ease: "power2.out" });
+        Motion.to(titleEl, { duration: 0.45, x: x * 10, y: y * 6, rotateZ: x * 0.25, ease: "power2.out" });
+        Motion.to(pEl,     { duration: 0.55, x: x * 8,  y: y * 5, ease: "power2.out" });
       }
     };
-
     window.addEventListener("pointermove", onMove, { passive:true });
 
     btnEl.addEventListener("pointerenter", () => {
       if (prefersReducedMotion) return;
-      gsap.to(btnEl, { duration: 0.25, scale: 1.03, ease: "power2.out" });
+      Motion.to(btnEl, { duration: 0.25, scale: 1.03, ease: "power2.out" });
     });
     btnEl.addEventListener("pointerleave", () => {
       if (prefersReducedMotion) return;
-      gsap.to(btnEl, { duration: 0.25, scale: 1.0, ease: "power2.out" });
+      Motion.to(btnEl, { duration: 0.25, scale: 1.0, ease: "power2.out" });
     });
 
-    // Demo click handler (replace with real navigation)
     btnEl.addEventListener("click", () => {
-      // Replace with your route / link
-      // location.href = "/shop";
-      gsap.to(btnEl, { duration: 0.12, y: 1, ease: "power2.out", yoyo: true, repeat: 1 });
+      Motion.to(btnEl, { duration: 0.12, y: 1, ease: "power2.out", onComplete: () => Motion.to(btnEl, { duration: 0.12, y: 0 }) });
+      // location.href = "./shop";
     });
 
     // -----------------------------
-    // Intro cinematic (camera advance, lights ramp, fog, UI slide)
+    // Intro cinematic (timeline)
     // -----------------------------
-    const intro = () => {
-      const tl = gsap.timeline({ defaults:{ ease:"power3.out" } });
+    function intro(){
+      const tl = Motion.timeline({ defaults:{ ease:"power3.out" } });
 
-      // Initial UI state
-      gsap.set([titleEl, pEl], { opacity: 0, y: 18, filter: "blur(6px)" });
-      gsap.set(btnEl, { opacity: 0, y: 14, scale: 0.94, filter: "blur(5px)" });
+      Motion.set([titleEl, pEl], { opacity: 0, y: 18, filter: "blur(6px)" });
+      Motion.set(btnEl, { opacity: 0, y: 14, scale: 0.94, filter: "blur(5px)" });
 
-      // Start darkness
       spotL.intensity = 0.0;
       spotR.intensity = 0.0;
       backSpot.intensity = 0.0;
@@ -603,72 +641,58 @@
       backGlow.material.opacity = 0.0;
       scene.fog.density = 0.0;
 
-      // Camera starts farther
-      camRig.position.set(0, 0, 0);
       camera.position.set(0.95, 2.25, 10.2);
 
       tl.to(camera.position, { duration: 2.2, z: 8.6, y: 2.08 }, 0.0)
         .to(camera.position, { duration: 1.8, z: 7.5, y: 1.95, ease:"power2.out" }, 1.6)
 
-        // Lights ramp up (adjust intensities here)
+        // ---- Adjust intensities here ----
         .to(spotL,    { duration: 1.9, intensity: 11.5 }, 0.35)
         .to(spotR,    { duration: 1.9, intensity: 10.8 }, 0.50)
         .to(backSpot, { duration: 2.2, intensity: 6.8  }, 0.75)
 
-        // Beams appear
         .to(coneL.material,    { duration: 1.8, opacity: 0.16 }, 0.55)
         .to(coneR.material,    { duration: 1.8, opacity: 0.15 }, 0.70)
         .to(coneBack.material, { duration: 2.0, opacity: 0.12 }, 0.85)
 
-        // Back glow plane
         .to(backGlow.material, { duration: 2.2, opacity: 0.16 }, 0.65)
+        .to(scene.fog,         { duration: 2.2, density: 0.075 }, 0.55)
 
-        // Fog in
-        .to(scene.fog, { duration: 2.2, density: 0.075 }, 0.55)
-
-        // UI slides in
         .to(titleEl, { duration: 0.95, opacity: 1, y: 0, filter: "blur(0px)" }, 1.05)
         .to(pEl,     { duration: 0.95, opacity: 1, y: 0, filter: "blur(0px)" }, 1.20)
         .to(btnEl,   { duration: 0.75, opacity: 1, y: 0, scale: 1.0, filter: "blur(0px)" }, 1.35)
         .to(btnEl,   { duration: 0.85, boxShadow: "0 14px 34px rgba(0,0,0,.62), 0 0 32px 7px rgba(255,255,255,.28)" }, 1.45);
 
-      // Reduced motion: jump to final state
       if (prefersReducedMotion){
-        tl.progress(1).kill();
-        spotL.intensity = 11.5;
-        spotR.intensity = 10.8;
-        backSpot.intensity = 6.8;
-        coneL.material.opacity = 0.16;
-        coneR.material.opacity = 0.15;
-        coneBack.material.opacity = 0.12;
-        backGlow.material.opacity = 0.16;
-        scene.fog.density = 0.075;
-
-        gsap.set([titleEl, pEl], { opacity: 1, y: 0, filter: "blur(0px)", x: 0, rotateZ: 0 });
-        gsap.set(btnEl, { opacity: 1, y: 0, scale: 1.0, filter: "blur(0px)" });
+        // jump to final
+        spotL.intensity = 11.5; spotR.intensity = 10.8; backSpot.intensity = 6.8;
+        coneL.material.opacity = 0.16; coneR.material.opacity = 0.15; coneBack.material.opacity = 0.12;
+        backGlow.material.opacity = 0.16; scene.fog.density = 0.075;
+        titleEl.style.opacity = 1; pEl.style.opacity = 1; btnEl.style.opacity = 1;
+        titleEl.style.filter = "none"; pEl.style.filter = "none"; btnEl.style.filter = "none";
+        titleEl.dataset.x="0"; titleEl.dataset.y="0"; titleEl.dataset.rotateZ="0";
+        pEl.dataset.x="0"; pEl.dataset.y="0";
+        btnEl.dataset.x="0"; btnEl.dataset.y="0"; btnEl.dataset.scale="1";
         camera.position.set(0.9, 2.05, 7.7);
       }
-    };
-
+    }
     intro();
 
     // -----------------------------
-    // Micro-animations (beams movement, subtle projector breathing)
+    // Animate loop
     // -----------------------------
     const clock = new THREE.Clock();
-
     function animate(){
       const t = clock.getElapsedTime();
 
-      // Camera parallax
       const lerp = prefersReducedMotion ? 1.0 : 0.06;
       camRig.rotation.y += (targetRigX - camRig.rotation.y) * lerp;
       camRig.rotation.x += (-targetRigY - camRig.rotation.x) * lerp;
 
-      // Beams drift (very slight)
       if (!prefersReducedMotion){
         const wobbleA = Math.sin(t * 0.35) * 0.015;
         const wobbleB = Math.cos(t * 0.28) * 0.014;
+
         spotL.target.position.x = podium.position.x + wobbleA * 2.0;
         spotR.target.position.z = podium.position.z + wobbleB * 2.2;
         spotL.target.updateMatrixWorld();
@@ -677,23 +701,13 @@
         coneL.lookAt(spotL.target.position);
         coneR.lookAt(spotR.target.position);
 
-        // Slight intensity breathing
-        spotL.intensity *= (1.0 + Math.sin(t * 0.55) * 0.002);
-        spotR.intensity *= (1.0 + Math.cos(t * 0.50) * 0.002);
-
-        // Piece micro-rotation
         if (loadedPiece){
           pieceGroup.rotation.y = Math.sin(t * 0.35) * 0.10;
         }
       }
 
-      // Fog particles float
       updateFogParticles(particles, t);
-
-      // Streaks subtle sway
-      if (!prefersReducedMotion){
-        streaks.rotation.y = Math.sin(t * 0.10) * 0.05;
-      }
+      if (!prefersReducedMotion) streaks.rotation.y = Math.sin(t * 0.10) * 0.05;
 
       composer.render();
       requestAnimationFrame(animate);
@@ -701,19 +715,15 @@
     animate();
 
     // -----------------------------
-    // Resize handling
+    // Resize
     // -----------------------------
     function onResize(){
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-
+      const w = window.innerWidth, h = window.innerHeight;
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, DPR_CAP));
       renderer.setSize(w, h);
       composer.setSize(w, h);
-
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
-
       bloom.setSize(w, h);
     }
     window.addEventListener("resize", onResize, { passive:true });
@@ -724,40 +734,25 @@
     function createProjector(){
       const g = new THREE.Group();
 
-      // Body
       const body = new THREE.Mesh(
         new THREE.CylinderGeometry(0.58, 0.62, 1.05, 40),
-        new THREE.MeshPhysicalMaterial({
-          color: 0x0a0b10, metalness: 1.0, roughness: 0.25, clearcoat: 0.9, clearcoatRoughness: 0.2
-        })
+        new THREE.MeshPhysicalMaterial({ color: 0x0a0b10, metalness: 1.0, roughness: 0.25, clearcoat: 0.9, clearcoatRoughness: 0.2 })
       );
       body.rotation.z = Math.PI / 2;
       body.castShadow = true;
 
-      // Front bezel
-      const bezel = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.46, 0.46, 0.14, 40),
-        chromeDark
-      );
+      const bezel = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.46, 0.14, 40), chromeDark);
       bezel.rotation.z = Math.PI / 2;
       bezel.position.x = 0.54;
       bezel.castShadow = true;
 
-      // Lens (slightly emissive)
       const lens = new THREE.Mesh(
         new THREE.CylinderGeometry(0.40, 0.40, 0.06, 40),
-        new THREE.MeshStandardMaterial({
-          color: 0x0b0c10,
-          metalness: 0.1,
-          roughness: 0.3,
-          emissive: 0x0f1018,
-          emissiveIntensity: 0.75
-        })
+        new THREE.MeshStandardMaterial({ color: 0x0b0c10, metalness: 0.1, roughness: 0.3, emissive: 0x0f1018, emissiveIntensity: 0.75 })
       );
       lens.rotation.z = Math.PI / 2;
       lens.position.x = 0.62;
 
-      // Rim strip highlight
       const rim = new THREE.Mesh(
         new THREE.TorusGeometry(0.46, 0.016, 14, 80),
         new THREE.MeshBasicMaterial({ color: 0xffffff, transparent:true, opacity:0.35 })
@@ -765,47 +760,30 @@
       rim.rotation.y = Math.PI / 2;
       rim.position.x = 0.57;
 
-      // Yoke / mount
-      const yoke = new THREE.Mesh(
-        new THREE.BoxGeometry(0.22, 0.82, 0.82),
-        metalBlack
-      );
+      const yoke = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.82, 0.82), metalBlack);
       yoke.position.set(-0.08, -0.20, 0);
       yoke.castShadow = true;
 
-      // Base
-      const base = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.62, 0.70, 0.18, 40),
-        matteBlack
-      );
+      const base = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.70, 0.18, 40), matteBlack);
       base.position.y = -0.80;
       base.castShadow = true;
       base.receiveShadow = true;
 
-      // Small accent LEDs
       const led = new THREE.Mesh(
         new THREE.BoxGeometry(0.08, 0.45, 0.03),
-        new THREE.MeshBasicMaterial({
-          color: 0xffffff, transparent:true, opacity:0.22, blending: THREE.AdditiveBlending
-        })
+        new THREE.MeshBasicMaterial({ color: 0xffffff, transparent:true, opacity:0.22, blending: THREE.AdditiveBlending })
       );
       led.position.set(-0.25, 0.05, 0.42);
-
-      const led2 = led.clone();
-      led2.position.z = -0.42;
+      const led2 = led.clone(); led2.position.z = -0.42;
 
       g.add(body, bezel, lens, rim, yoke, base, led, led2);
-
-      // Present projectors in foreground: slight tilt down to podium
       g.rotation.x = -0.12;
-
       return g;
     }
 
     function createLightCone(radius=3.6, length=7.0, opacity=0.15){
-      // Visual cone to mimic volumetric spotlight beams
       const geo = new THREE.ConeGeometry(radius, length, 48, 1, true);
-      geo.translate(0, -length/2, 0); // move origin to tip
+      geo.translate(0, -length/2, 0);
       const mat = new THREE.MeshBasicMaterial({
         color: 0xffffff,
         transparent: true,
@@ -814,107 +792,31 @@
         blending: THREE.AdditiveBlending,
         side: THREE.DoubleSide
       });
-      const cone = new THREE.Mesh(geo, mat);
-      return cone;
+      return new THREE.Mesh(geo, mat);
     }
 
     function makeGridTexture(){
       const c = document.createElement("canvas");
       c.width = 512; c.height = 512;
       const ctx = c.getContext("2d");
-      ctx.clearRect(0,0,c.width,c.height);
-
-      // faint "studio floor" pattern (not a literal hex grid, just premium hints)
+      ctx.clearRect(0,0,512,512);
       ctx.globalAlpha = 0.22;
       ctx.strokeStyle = "rgba(255,255,255,0.10)";
       ctx.lineWidth = 1;
-
-      // Perspective-ish diagonals
       for (let i=0;i<20;i++){
         const x = i * 26;
-        ctx.beginPath();
-        ctx.moveTo(x, 512);
-        ctx.lineTo(256, 0);
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x, 512); ctx.lineTo(256, 0); ctx.stroke();
       }
-
-      // Soft horizontals
       ctx.globalAlpha = 0.18;
       for (let i=0;i<18;i++){
         const y = i * 28;
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(512, y);
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke();
       }
-
       const tex = new THREE.CanvasTexture(c);
       tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
       tex.repeat.set(1.1, 1.1);
       tex.colorSpace = THREE.SRGBColorSpace;
       return tex;
-    }
-
-    function createFogParticles(count){
-      const geom = new THREE.BufferGeometry();
-      const positions = new Float32Array(count * 3);
-      const sizes = new Float32Array(count);
-
-      // Concentrate around podium + floor area
-      for (let i=0;i<count;i++){
-        const r = Math.random();
-        const spread = r < 0.75 ? 7.5 : 12.0;
-        const x = (Math.random()*2-1) * spread + (Math.random()*0.8 - 0.4);
-        const z = (Math.random()*2-1) * spread - 1.5;
-        const y = Math.random() * 2.2 + 0.05;
-
-        positions[i*3+0] = x;
-        positions[i*3+1] = y;
-        positions[i*3+2] = z;
-
-        sizes[i] = 0.6 + Math.random() * 1.6;
-      }
-
-      geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-      geom.setAttribute("aSize", new THREE.BufferAttribute(sizes, 1));
-
-      // Soft sprite
-      const sprite = makeSoftSprite();
-      const mat = new THREE.PointsMaterial({
-        map: sprite,
-        transparent: true,
-        opacity: 0.16,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-        size: isTouch ? 0.85 : 1.1,
-        sizeAttenuation: true,
-        color: 0xffffff
-      });
-
-      const pts = new THREE.Points(geom, mat);
-      pts.frustumCulled = false;
-      pts.userData._base = positions.slice(); // copy for motion
-      return pts;
-    }
-
-    function updateFogParticles(pts, t){
-      const pos = pts.geometry.attributes.position;
-      const base = pts.userData._base;
-      for (let i=0;i<pos.count;i++){
-        const ix = i*3;
-        // slow, layered drift
-        const driftX = Math.sin(t*0.12 + base[ix+2]*0.25) * 0.15;
-        const driftZ = Math.cos(t*0.10 + base[ix]*0.22) * 0.14;
-        const lift   = (Math.sin(t*0.08 + i*0.03) + 1) * 0.004;
-
-        pos.array[ix+0] = base[ix+0] + driftX;
-        pos.array[ix+2] = base[ix+2] + driftZ;
-
-        let y = pos.array[ix+1] + lift;
-        if (y > 2.8) y = 0.06; // loop upwards
-        pos.array[ix+1] = y;
-      }
-      pos.needsUpdate = true;
     }
 
     function makeSoftSprite(){
@@ -932,15 +834,64 @@
       return tex;
     }
 
+    function createFogParticles(count){
+      const geom = new THREE.BufferGeometry();
+      const positions = new Float32Array(count * 3);
+
+      for (let i=0;i<count;i++){
+        const r = Math.random();
+        const spread = r < 0.75 ? 7.5 : 12.0;
+        const x = (Math.random()*2-1) * spread + (Math.random()*0.8 - 0.4);
+        const z = (Math.random()*2-1) * spread - 1.5;
+        const y = Math.random() * 2.2 + 0.05;
+        positions[i*3+0] = x; positions[i*3+1] = y; positions[i*3+2] = z;
+      }
+      geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+
+      const mat = new THREE.PointsMaterial({
+        map: makeSoftSprite(),
+        transparent: true,
+        opacity: 0.16,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        size: isTouch ? 0.85 : 1.1,
+        sizeAttenuation: true,
+        color: 0xffffff
+      });
+
+      const pts = new THREE.Points(geom, mat);
+      pts.frustumCulled = false;
+      pts.userData._base = positions.slice();
+      return pts;
+    }
+
+    function updateFogParticles(pts, t){
+      const pos = pts.geometry.attributes.position;
+      const base = pts.userData._base;
+      for (let i=0;i<pos.count;i++){
+        const ix = i*3;
+        const driftX = Math.sin(t*0.12 + base[ix+2]*0.25) * 0.15;
+        const driftZ = Math.cos(t*0.10 + base[ix]*0.22) * 0.14;
+        const lift   = (Math.sin(t*0.08 + i*0.03) + 1) * 0.004;
+
+        pos.array[ix+0] = base[ix+0] + driftX;
+        pos.array[ix+2] = base[ix+2] + driftZ;
+
+        let y = pos.array[ix+1] + lift;
+        if (y > 2.8) y = 0.06;
+        pos.array[ix+1] = y;
+      }
+      pos.needsUpdate = true;
+    }
+
     // -----------------------------
     // Quick knobs (where to tweak)
     // -----------------------------
-    // - Model path: "/pieces/piece_1/piece_1.gltf"
-    // - Light intensities (intro): spotL/spotR/backSpot targets in intro timeline
+    // - Model URL: MODEL_URL (set to "./pieces/piece_1/piece_1.gltf" for GH Pages)
+    // - Light intensities: intro() timeline values for spotL/spotR/backSpot
     // - Bloom: UnrealBloomPass(strength, radius, threshold)
-    // - Fog density: scene.fog.density (intro anim + final)
-    // - Podium position: podium.position.set(x,y,z)
-    // - Projectors position/scale: projectorL/projectorR transforms
+    // - Fog density: scene.fog.density (intro target)
+    // - Podium & projectors positions: podium.position / projectorL/R transforms
   </script>
 </body>
 </html>
