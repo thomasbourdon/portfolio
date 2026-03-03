@@ -5,11 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Luxury product — Hero</title>
 
-  <!-- ✅ FIX PRINCIPAL (GitHub Pages friendly) :
-       Les modules "examples/jsm" importent souvent "three" (bare specifier).
-       Sur GitHub Pages (navigateur pur), ça casse si tu n’as pas d’import map / bundler.
-       => On ajoute une importmap qui mappe "three" + "three/addons/" vers un CDN.
-  -->
+  <!-- ✅ GitHub Pages friendly (résout "three" dans les modules addons) -->
   <script type="importmap">
     {
       "imports": {
@@ -68,7 +64,7 @@
       align-items:center;
       padding: clamp(16px, 3.5vw, 56px);
       pointer-events:none;
-      z-index:4; /* above canvas */
+      z-index:4;
     }
     .ui__right{
       pointer-events:auto;
@@ -113,7 +109,7 @@
       border-radius: 10px;
       border: 1px solid rgba(255,255,255,.18);
       background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(230,232,238,.92));
-      color: var(--btnText);
+      color: #131417;
       font-weight: 600;
       box-shadow: 0 10px 28px rgba(0,0,0,.55), 0 0 0 0 rgba(255,255,255,0);
       cursor:pointer;
@@ -170,22 +166,30 @@
 
   <script type="module">
     /**
-     * ✅ Pourquoi "rien ne s'affiche" chez toi :
-     * - Sur GitHub Pages, tes imports "examples/jsm" finissent par faire `import ... from 'three'`
-     *   (bare specifier), et le navigateur ne sait pas le résoudre => script module crash => pas de rendu.
-     * - La importmap au <head> corrige ça proprement, sans bundler.
+     * ✅ Ton erreur actuelle :
+     * "Cannot read properties of undefined (reading 'y')" vient de Motion.tween()
+     * quand tu fais Motion.to(scene.fog, { density: 0.075 }).
+     *
+     * Le tween essaye de lire/écrire target.style / dataset (logique DOM),
+     * mais scene.fog n'est pas un élément DOM => target.style est undefined => crash.
+     *
+     * ✅ Correction :
+     * - Motion = tween pour DOM (UI) uniquement
+     * - Motion3 = tween pour objets JS (Three.js / fog / lights / camera.position)
      */
 
     // -----------------------------
-    // Mini helper façon GSAP (0 dépendance, pas de Tracking Prevention)
-    // (Si tu veux GSAP officiel: héberge gsap.min.js dans ton repo et charge-le en local.)
+    // Motion DOM (UI)
     // -----------------------------
     const Motion = (() => {
       const easeOut = (t) => 1 - Math.pow(1 - t, 3);
       const easeOut2 = (t) => 1 - Math.pow(1 - t, 2);
       const now = () => performance.now();
 
+      function isEl(t){ return t && (t.nodeType === 1 || t === window || t === document); }
+
       function tween(target, vars = {}) {
+        if (!isEl(target)) throw new Error("Motion.to() cible non-DOM. Utilise Motion3.to() pour Three.js/JS objects.");
         const {
           duration = 0.5,
           delay = 0,
@@ -204,7 +208,6 @@
           if (k === "boxShadow" || k === "filter") initial[k] = target.style[k] || "";
           else if (k === "opacity") initial[k] = parseFloat(getComputedStyle(target).opacity) || 0;
           else if (k === "x" || k === "y" || k === "scale" || k === "rotateZ") initial[k] = parseFloat(target.dataset[k] || (k === "scale" ? 1 : 0));
-          else if (typeof props[k] === "number") initial[k] = target[k];
           else initial[k] = target[k];
         }
 
@@ -233,11 +236,10 @@
               const a = initial[k];
               target.dataset[k] = String(a + (v - a) * ep);
               applyTransform();
-            } else if (typeof v === "number") {
-              const a = initial[k];
-              target[k] = a + (v - a) * ep;
             } else {
-              if (p >= 1) target[k] = v;
+              // fall back (rare)
+              if (typeof v === "number") target[k] = initial[k] + (v - initial[k]) * ep;
+              else if (p >= 1) target[k] = v;
             }
           }
 
@@ -286,14 +288,67 @@
             const startAt = (typeof at === "number" ? at : cursor);
             setTimeout(() => set(target, vars), startAt * 1000);
             return api;
-          },
-          progress(){ return api; },
-          kill(){ return api; }
+          }
         };
         return api;
       }
 
       return { to: tween, set, timeline };
+    })();
+
+    // -----------------------------
+    // Motion3 (objets JS / Three.js)
+    // -----------------------------
+    const Motion3 = (() => {
+      const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+      const easeOut2 = (t) => 1 - Math.pow(1 - t, 2);
+      const now = () => performance.now();
+
+      function tween(obj, vars = {}) {
+        const { duration = 0.5, delay = 0, ease = "power3.out", onUpdate, onComplete, ...props } = vars;
+        const e = (t) => (ease === "power2.out" ? easeOut2(t) : easeOut(t));
+        const start = now() + delay * 1000;
+        const end = start + duration * 1000;
+
+        const initial = {};
+        for (const k in props) initial[k] = obj[k];
+
+        function frame(){
+          const t = now();
+          if (t < start) return requestAnimationFrame(frame);
+          const p = Math.min(1, (t - start) / (end - start));
+          const ep = e(p);
+
+          for (const k in props) {
+            const v = props[k];
+            const a = initial[k];
+            if (typeof v === "number" && typeof a === "number") obj[k] = a + (v - a) * ep;
+            else if (p >= 1) obj[k] = v;
+          }
+
+          onUpdate && onUpdate();
+          if (p < 1) requestAnimationFrame(frame);
+          else onComplete && onComplete();
+        }
+        requestAnimationFrame(frame);
+        return { kill(){} };
+      }
+
+      function timeline({ defaults = {} } = {}) {
+        let cursor = 0;
+        const api = {
+          to(obj, vars, at){
+            const v = { ...defaults, ...vars };
+            const startAt = (typeof at === "number" ? at : cursor);
+            tween(obj, { ...v, delay: startAt });
+            cursor = Math.max(cursor, startAt + (v.duration || 0));
+            return api;
+          }
+        };
+        return api;
+      }
+
+      return { to: tween, timeline };
     })();
 
     // -----------------------------
@@ -305,30 +360,21 @@
     import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
     import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 
-    // -----------------------------
-    // Prefs & perf
-    // -----------------------------
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const isTouch = matchMedia("(pointer: coarse)").matches;
     const DPR_CAP = isTouch ? 1.35 : 1.8;
 
-    // -----------------------------
-    // Renderer
-    // -----------------------------
     const stage = document.getElementById("stage");
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, DPR_CAP));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.08; // <-- ajuste l'expo ici
+    renderer.toneMappingExposure = 1.08;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     stage.appendChild(renderer.domElement);
 
-    // -----------------------------
-    // Scene & camera
-    // -----------------------------
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x050608);
     scene.fog = new THREE.FogExp2(0x07080b, 0.0);
@@ -341,48 +387,18 @@
     camRig.add(camera);
     scene.add(camRig);
 
-    // -----------------------------
-    // Post (bloom)
-    // -----------------------------
     const composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
     const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.85, 0.55, 0.25);
     composer.addPass(bloom);
 
-    // -----------------------------
-    // Materials
-    // -----------------------------
-    const metalBlack = new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color(0x0b0c10),
-      metalness: 1.0,
-      roughness: 0.22,
-      clearcoat: 0.8,
-      clearcoatRoughness: 0.28,
-    });
-    const chromeDark = new THREE.MeshStandardMaterial({
-      color: new THREE.Color(0x111219),
-      metalness: 1.0,
-      roughness: 0.12,
-    });
-    const matteBlack = new THREE.MeshStandardMaterial({
-      color: new THREE.Color(0x07080b),
-      metalness: 0.05,
-      roughness: 0.95,
-    });
+    const metalBlack = new THREE.MeshPhysicalMaterial({ color: 0x0b0c10, metalness: 1.0, roughness: 0.22, clearcoat: 0.8, clearcoatRoughness: 0.28 });
+    const chromeDark = new THREE.MeshStandardMaterial({ color: 0x111219, metalness: 1.0, roughness: 0.12 });
+    const matteBlack = new THREE.MeshStandardMaterial({ color: 0x07080b, metalness: 0.05, roughness: 0.95 });
 
-    // -----------------------------
-    // Floor
-    // -----------------------------
     const floor = new THREE.Mesh(
       new THREE.PlaneGeometry(60, 60),
-      new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color(0x07080b),
-        metalness: 0.1,
-        roughness: 0.35,
-        clearcoat: 0.65,
-        clearcoatRoughness: 0.22,
-        reflectivity: 0.4
-      })
+      new THREE.MeshPhysicalMaterial({ color: 0x07080b, metalness: 0.1, roughness: 0.35, clearcoat: 0.65, clearcoatRoughness: 0.22, reflectivity: 0.4 })
     );
     floor.rotation.x = -Math.PI / 2;
     floor.receiveShadow = true;
@@ -405,9 +421,6 @@
     grid.position.y = 0.011;
     scene.add(grid);
 
-    // -----------------------------
-    // Podium
-    // -----------------------------
     const podium = new THREE.Group();
     podium.position.set(-1.15, 0, 0);
     scene.add(podium);
@@ -433,7 +446,6 @@
 
     podium.add(base1, base2, top, ring1, ring2, ring3);
 
-    // Back glow plane
     const backGlow = new THREE.Mesh(
       new THREE.PlaneGeometry(3.8, 6.0),
       new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.14, blending: THREE.AdditiveBlending, depthWrite: false })
@@ -442,7 +454,6 @@
     backGlow.lookAt(-0.2, 2.7, 2);
     scene.add(backGlow);
 
-    // Light streaks
     const streaks = new THREE.Group();
     scene.add(streaks);
     for (let i = 0; i < 6; i++){
@@ -457,9 +468,6 @@
       streaks.add(s);
     }
 
-    // -----------------------------
-    // Projecteurs (foreground)
-    // -----------------------------
     const projectorL = createProjector();
     projectorL.position.set(-5.25, 0.95, 6.35);
     projectorL.rotation.y = Math.PI * 0.18;
@@ -472,9 +480,6 @@
     projectorR.scale.set(1.45, 1.45, 1.45);
     scene.add(projectorR);
 
-    // -----------------------------
-    // Lights
-    // -----------------------------
     scene.add(new THREE.AmbientLight(0xffffff, 0.05));
 
     const spotL = new THREE.SpotLight(0xffffff, 0.0, 40, THREE.MathUtils.degToRad(16), 0.35, 1.2);
@@ -506,7 +511,6 @@
     rimB.position.set(podium.position.x + 1.8, 0.55, 0.6);
     scene.add(rimB);
 
-    // Volumetric cones (visual)
     const coneL = createLightCone(3.7, 7.2);
     coneL.position.copy(spotL.position);
     coneL.lookAt(spotL.target.position);
@@ -522,36 +526,27 @@
     coneBack.lookAt(backSpot.target.position);
     scene.add(coneBack);
 
-    // Fog particles
     const particles = createFogParticles(isTouch ? 520 : 1150);
     scene.add(particles);
 
-    // -----------------------------
-    // ✅ GLTF path (GitHub Pages safe)
-    // IMPORTANT: garde ton dossier: pieces/piece_1/piece_1.gltf à la racine du repo
-    // On résout via URL relative au fichier courant (évite les soucis de sous-chemin GitHub Pages)
-    // -----------------------------
+    // --- Model ---
     const MODEL_URL = new URL("./pieces/piece_1/piece_1.gltf", import.meta.url).href;
-
     const loader = new GLTFLoader();
     const pieceGroup = new THREE.Group();
     pieceGroup.position.set(podium.position.x, top.position.y + 0.32, podium.position.z);
     scene.add(pieceGroup);
 
     let loadedPiece = null;
-
     loader.load(
       MODEL_URL,
       (gltf) => {
         loadedPiece = gltf.scene;
-        loadedPiece.traverse((o) => {
-          if (o.isMesh){ o.castShadow = true; o.receiveShadow = true; }
-        });
+        loadedPiece.traverse((o) => { if (o.isMesh){ o.castShadow = true; o.receiveShadow = true; } });
 
         const box = new THREE.Box3().setFromObject(loadedPiece);
         const size = new THREE.Vector3(); box.getSize(size);
         const maxDim = Math.max(size.x, size.y, size.z) || 1;
-        const desired = 1.25; // <-- ajuste la taille du modèle sur le podium
+        const desired = 1.25;
         const s = desired / maxDim;
         loadedPiece.scale.setScalar(s);
 
@@ -574,9 +569,7 @@
       }
     );
 
-    // -----------------------------
-    // UI interactions
-    // -----------------------------
+    // UI hooks
     const titleEl = document.getElementById("heroTitle");
     const pEl = document.getElementById("heroP");
     const btnEl = document.getElementById("ctaBtn");
@@ -600,37 +593,38 @@
       // location.href = "./shop";
     });
 
-    // -----------------------------
-    // Intro cinematic
-    // -----------------------------
+    // Intro (IMPORTANT: Motion3 pour Three.js objects)
     function intro(){
-      const tl = Motion.timeline({ defaults:{ ease:"power3.out" } });
+      const tlUI = Motion.timeline({ defaults:{ ease:"power3.out" } });
+      const tl3  = Motion3.timeline({ defaults:{ ease:"power3.out" } });
 
       Motion.set([titleEl, pEl], { opacity: 0, y: 18, filter: "blur(6px)" });
       Motion.set(btnEl, { opacity: 0, y: 14, scale: 0.94, filter: "blur(5px)" });
 
-      spotL.intensity = 0.0; spotR.intensity = 0.0; backSpot.intensity = 0.0;
-      coneL.material.opacity = 0.0; coneR.material.opacity = 0.0; coneBack.material.opacity = 0.0;
-      backGlow.material.opacity = 0.0;
-      scene.fog.density = 0.0;
+      spotL.intensity = 0; spotR.intensity = 0; backSpot.intensity = 0;
+      coneL.material.opacity = 0; coneR.material.opacity = 0; coneBack.material.opacity = 0;
+      backGlow.material.opacity = 0;
+      scene.fog.density = 0;
 
       camera.position.set(0.95, 2.25, 10.2);
 
-      tl.to(camera.position, { duration: 2.2, z: 8.6, y: 2.08 }, 0.0)
-        .to(camera.position, { duration: 1.8, z: 7.5, y: 1.95, ease:"power2.out" }, 1.6)
-        // Ajuste intensités ici
-        .to(spotL,    { duration: 1.9, intensity: 11.5 }, 0.35)
-        .to(spotR,    { duration: 1.9, intensity: 10.8 }, 0.50)
-        .to(backSpot, { duration: 2.2, intensity: 6.8  }, 0.75)
-        .to(coneL.material,    { duration: 1.8, opacity: 0.16 }, 0.55)
-        .to(coneR.material,    { duration: 1.8, opacity: 0.15 }, 0.70)
-        .to(coneBack.material, { duration: 2.0, opacity: 0.12 }, 0.85)
-        .to(backGlow.material, { duration: 2.2, opacity: 0.16 }, 0.65)
-        .to(scene.fog,         { duration: 2.2, density: 0.075 }, 0.55)
-        .to(titleEl, { duration: 0.95, opacity: 1, y: 0, filter: "blur(0px)" }, 1.05)
-        .to(pEl,     { duration: 0.95, opacity: 1, y: 0, filter: "blur(0px)" }, 1.20)
-        .to(btnEl,   { duration: 0.75, opacity: 1, y: 0, scale: 1.0, filter: "blur(0px)" }, 1.35)
-        .to(btnEl,   { duration: 0.85, boxShadow: "0 14px 34px rgba(0,0,0,.62), 0 0 32px 7px rgba(255,255,255,.28)" }, 1.45);
+      // Camera / lights / fog (Three)
+      tl3.to(camera.position, { duration: 2.2, z: 8.6, y: 2.08 }, 0.0)
+         .to(camera.position, { duration: 1.8, z: 7.5, y: 1.95, ease:"power2.out" }, 1.6)
+         .to(spotL,    { duration: 1.9, intensity: 11.5 }, 0.35)
+         .to(spotR,    { duration: 1.9, intensity: 10.8 }, 0.50)
+         .to(backSpot, { duration: 2.2, intensity: 6.8  }, 0.75)
+         .to(coneL.material,    { duration: 1.8, opacity: 0.16 }, 0.55)
+         .to(coneR.material,    { duration: 1.8, opacity: 0.15 }, 0.70)
+         .to(coneBack.material, { duration: 2.0, opacity: 0.12 }, 0.85)
+         .to(backGlow.material, { duration: 2.2, opacity: 0.16 }, 0.65)
+         .to(scene.fog,         { duration: 2.2, density: 0.075 }, 0.55);
+
+      // UI (DOM)
+      tlUI.to(titleEl, { duration: 0.95, opacity: 1, y: 0, filter: "blur(0px)" }, 1.05)
+          .to(pEl,     { duration: 0.95, opacity: 1, y: 0, filter: "blur(0px)" }, 1.20)
+          .to(btnEl,   { duration: 0.75, opacity: 1, y: 0, scale: 1.0, filter: "blur(0px)" }, 1.35)
+          .to(btnEl,   { duration: 0.85, boxShadow: "0 14px 34px rgba(0,0,0,.62), 0 0 32px 7px rgba(255,255,255,.28)" }, 1.45);
 
       if (prefersReducedMotion){
         spotL.intensity = 11.5; spotR.intensity = 10.8; backSpot.intensity = 6.8;
@@ -643,9 +637,7 @@
     }
     intro();
 
-    // -----------------------------
     // Loop
-    // -----------------------------
     const clock = new THREE.Clock();
     function animate(){
       const t = clock.getElapsedTime();
@@ -674,9 +666,6 @@
     }
     animate();
 
-    // -----------------------------
-    // Resize
-    // -----------------------------
     window.addEventListener("resize", () => {
       const w = window.innerWidth, h = window.innerHeight;
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, DPR_CAP));
@@ -687,9 +676,7 @@
       bloom.setSize(w, h);
     }, { passive:true });
 
-    // -----------------------------
     // Helpers
-    // -----------------------------
     function createProjector(){
       const g = new THREE.Group();
 
