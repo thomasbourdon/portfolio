@@ -2,637 +2,945 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Luxury Product — Hero</title>
-
-  <!-- GitHub Pages friendly -->
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-      "three/examples/jsm/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-    }
-  }
-  </script>
-
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Luxury product — Hero</title>
   <style>
     :root{
-      --bg0:#02040a;
-      --text:#e9eef7;
-      --muted: rgba(233,238,247,.62);
-      --stroke: rgba(255,255,255,.14);
-      --glass1: rgba(255,255,255,.10);
-      --glass2: rgba(255,255,255,.06);
+      --bg:#050608;
+      --text:#ffffff;
+      --muted:rgba(255,255,255,.55);
+      --muted2:rgba(255,255,255,.35);
+      --btn:#e9eaee;
+      --btnText:#131417;
+      --glow:rgba(255,255,255,.35);
     }
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
-    body{
-      margin:0;
-      overflow:hidden;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      color:var(--text);
-      background: radial-gradient(1200px 720px at 50% 62%, #0a1527 0%, var(--bg0) 60%, #000 100%);
-    }
-    #stage{ position:fixed; inset:0; z-index:0; }
-    canvas{ display:block; width:100%; height:100%; }
 
-    /* ===== cinematic overlays (proche de ton image) ===== */
+    *{box-sizing:border-box}
+    html,body{height:100%; margin:0; background:var(--bg); overflow:hidden; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";}
+
+    /* Fullscreen stage */
+    #stage{
+      position:fixed; inset:0;
+      width:100vw; height:100vh;
+      overflow:hidden;
+      background: radial-gradient(1200px 600px at 50% 60%, rgba(255,255,255,.06), rgba(0,0,0,0) 55%),
+                  radial-gradient(900px 500px at 35% 80%, rgba(255,255,255,.05), rgba(0,0,0,0) 60%),
+                  var(--bg);
+    }
+
+    canvas{
+      display:block;
+      width:100%;
+      height:100%;
+    }
+
+    /* Cinematic overlays: vignette + subtle film grain */
     .vignette{
-      position:fixed; inset:0; z-index:6; pointer-events:none;
-      background: radial-gradient(1200px 700px at 50% 62%,
-        rgba(0,0,0,0) 38%,
-        rgba(0,0,0,.84) 100%);
-      opacity:.95;
+      pointer-events:none;
+      position:fixed; inset:-1px;
+      background:
+        radial-gradient(1200px 700px at 45% 65%, rgba(0,0,0,0) 45%, rgba(0,0,0,.55) 78%, rgba(0,0,0,.90) 100%),
+        radial-gradient(900px 600px at 80% 40%, rgba(0,0,0,0) 40%, rgba(0,0,0,.45) 85%, rgba(0,0,0,.80) 100%);
+      mix-blend-mode:multiply;
     }
     .grain{
-      position:fixed; inset:0; z-index:7; pointer-events:none;
-      opacity:.07;
-      mix-blend-mode: overlay;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
-      animation: grainMove 1.15s steps(2,end) infinite;
-    }
-    @keyframes grainMove{
-      0%{ transform:translate(0,0); }
-      25%{ transform:translate(-1%,1%); }
-      50%{ transform:translate(1%,-1%); }
-      75%{ transform:translate(-2%,-1%); }
-      100%{ transform:translate(0,0); }
-    }
-
-    /* Brume écran (en + du fog Three) */
-    .fogOverlay{
-      position:fixed; inset:-12%;
-      z-index:3; pointer-events:none;
-      opacity:0;
-      filter: blur(22px);
-      mix-blend-mode: screen;
-      background:
-        radial-gradient(900px 420px at 50% 64%, rgba(255,255,255,.18), rgba(255,255,255,0) 62%),
-        radial-gradient(700px 360px at 32% 76%, rgba(255,255,255,.10), rgba(255,255,255,0) 70%),
-        radial-gradient(700px 360px at 68% 78%, rgba(255,255,255,.09), rgba(255,255,255,0) 72%),
-        linear-gradient(to top, rgba(255,255,255,.07), rgba(255,255,255,0) 50%);
-      animation: fogDrift 10.8s ease-in-out infinite;
-      transform: translate3d(0,0,0);
-    }
-    @keyframes fogDrift{
-      0%{ transform: translate3d(-1.6%, 0.6%, 0) scale(1.02); }
-      50%{ transform: translate3d(1.6%, -0.6%, 0) scale(1.05); }
-      100%{ transform: translate3d(-1.6%, 0.6%, 0) scale(1.02); }
-    }
-
-    /* Traits verticaux (streaks) comme l'image */
-    .streaks{
+      pointer-events:none;
       position:fixed; inset:0;
-      z-index:2; pointer-events:none;
-      opacity:0;
-      mix-blend-mode: screen;
-      background:
-        linear-gradient(to bottom, rgba(255,255,255,.18), rgba(255,255,255,0) 60%) 25% 25% / 2px 55% no-repeat,
-        linear-gradient(to bottom, rgba(255,255,255,.14), rgba(255,255,255,0) 60%) 35% 28% / 2px 52% no-repeat,
-        linear-gradient(to bottom, rgba(255,255,255,.18), rgba(255,255,255,0) 60%) 45% 24% / 2px 58% no-repeat,
-        linear-gradient(to bottom, rgba(255,255,255,.14), rgba(255,255,255,0) 60%) 55% 28% / 2px 52% no-repeat,
-        linear-gradient(to bottom, rgba(255,255,255,.18), rgba(255,255,255,0) 60%) 65% 25% / 2px 55% no-repeat,
-        radial-gradient(900px 420px at 50% 60%, rgba(255,255,255,.10), rgba(255,255,255,0) 65%);
-      filter: blur(0.5px);
-      animation: streakPulse 3.8s ease-in-out infinite;
-    }
-    @keyframes streakPulse{
-      0%,100%{ opacity:.25; }
-      50%{ opacity:.55; }
+      opacity:.075;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E");
+      background-size:180px 180px;
+      mix-blend-mode:overlay;
     }
 
-    /* UI */
+    /* Right-side hero copy */
     .ui{
-      position:fixed; inset:0; z-index:10;
+      position:fixed; inset:0;
       display:grid;
-      grid-template-columns: 1fr minmax(280px, 480px);
+      grid-template-columns: 1.15fr 0.85fr;
       align-items:center;
-      padding: clamp(16px, 4vw, 54px);
-      gap: clamp(16px, 3vw, 44px);
-      pointer-events:none;
-      opacity:0;
-      transform: translateY(14px);
+      padding: clamp(16px, 3.5vw, 56px);
+      pointer-events:none; /* let 3D receive pointer events; we re-enable on content */
     }
-    .copy{
-      justify-self:end;
-      width: min(480px, 92vw);
-      padding: clamp(16px, 2.2vw, 26px);
-      border: 1px solid var(--stroke);
-      background: linear-gradient(180deg, var(--glass1), var(--glass2));
-      border-radius: 20px;
-      box-shadow: 0 28px 100px rgba(0,0,0,.62), inset 0 1px 0 rgba(255,255,255,.12);
-      backdrop-filter: blur(14px);
+    .ui__right{
       pointer-events:auto;
-      position:relative;
-      overflow:hidden;
+      justify-self:end;
+      width:min(520px, 92vw);
+      padding: clamp(10px, 2vw, 24px);
     }
+
     .kicker{
-      font-size: 12px;
-      letter-spacing:.28em;
-      text-transform: uppercase;
-      color: rgba(233,238,247,.55);
-      margin:0 0 10px 0;
+      display:inline-block;
+      height:1px; width:64px;
+      background: linear-gradient(90deg, rgba(255,255,255,.0), rgba(255,255,255,.35), rgba(255,255,255,0));
+      margin: 0 0 14px 2px;
+      opacity:.8;
     }
+
     h1{
-      font-size: clamp(34px, 4.2vw, 60px);
-      line-height:1.02;
-      margin:0 0 10px 0;
-      font-weight: 800;
-      text-shadow: 0 10px 46px rgba(0,0,0,.60);
+      margin:0 0 12px 0;
+      letter-spacing: -0.02em;
+      line-height: 1.04;
+      font-size: clamp(36px, 4.6vw, 56px);
+      color:var(--text);
+      text-shadow: 0 10px 30px rgba(0,0,0,.55);
+      transform-origin: left center;
+      will-change: transform, opacity, filter;
     }
-    h1 span{ font-weight: 420; color: rgba(233,238,247,.82); }
-    .desc{
-      margin: 0 0 18px 0;
+    h1 .bold{font-weight: 800;}
+    h1 .reg{font-weight: 300; opacity:.95;}
+    p{
+      margin: 0 0 18px 2px;
       color: var(--muted);
-      font-size: clamp(13px, 1.35vw, 16px);
+      font-size: clamp(14px, 1.35vw, 16px);
       line-height: 1.55;
-    }
-    .actions{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-    .btn{
-      border:none; cursor:pointer;
-      padding: 12px 18px;
-      border-radius: 14px;
-      background: rgba(255,255,255,.90);
-      color:#070c15;
-      font-weight: 740;
-      box-shadow: 0 20px 50px rgba(0,0,0,.48);
-      transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
-      position:relative;
-      overflow:hidden;
-    }
-    .btn:hover{
-      transform: translateY(-1px) scale(1.015);
-      box-shadow: 0 30px 78px rgba(0,0,0,.62);
-      filter: brightness(1.06);
-    }
-    .hint{ font-size:12px; color: rgba(233,238,247,.45); user-select:none; }
-
-    /* Intro blackout */
-    .intro{
-      position:fixed; inset:0; z-index:20;
-      pointer-events:none;
-      background:#000;
-      opacity:1;
-      transition: opacity 1200ms ease;
-    }
-    .intro.off{ opacity:0; }
-    .introTitle{
-      position:absolute; inset:0;
-      display:grid; place-items:center;
-      text-align:center;
-      opacity:0;
-      transform: translateY(10px) scale(.985);
-    }
-    .introTitle .sub{
-      font-size: 12px;
-      letter-spacing:.30em;
-      text-transform:uppercase;
-      color: rgba(233,238,247,.55);
-    }
-    .introTitle .line{
-      width:min(560px, 78vw);
-      height:1px;
-      background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.35), rgba(255,255,255,0));
-      margin: 14px auto 10px auto;
-      opacity:.75;
-    }
-    .introTitle h2{
-      margin:0;
-      font-size: clamp(26px, 4.2vw, 46px);
-      font-weight: 820;
-      color: rgba(233,238,247,.92);
-      text-shadow: 0 18px 70px rgba(0,0,0,.70);
+      max-width: 46ch;
+      text-shadow: 0 10px 26px rgba(0,0,0,.55);
+      will-change: transform, opacity;
     }
 
-    @media (max-width: 900px){
-      .ui{ grid-template-columns: 1fr; align-items:end; }
-      .copy{ justify-self:center; margin-bottom: clamp(10px, 2vh, 24px); }
+    .cta{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding: 12px 22px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(230,232,238,.92));
+      color: var(--btnText);
+      font-weight: 600;
+      box-shadow:
+        0 10px 28px rgba(0,0,0,.55),
+        0 0 0 0 rgba(255,255,255,0);
+      cursor:pointer;
+      user-select:none;
+      transform: translateZ(0);
+      will-change: transform, box-shadow, filter, opacity;
+    }
+    .cta:hover{
+      transform: translateY(-1px) scale(1.01);
+      box-shadow:
+        0 14px 34px rgba(0,0,0,.62),
+        0 0 28px 6px var(--glow);
+      filter: brightness(1.03);
+    }
+    .cta:active{
+      transform: translateY(0px) scale(.995);
+      box-shadow:
+        0 10px 26px rgba(0,0,0,.55),
+        0 0 18px 3px rgba(255,255,255,.25);
+    }
+    .cta:focus-visible{
+      outline:none;
+      box-shadow:
+        0 14px 34px rgba(0,0,0,.62),
+        0 0 0 3px rgba(255,255,255,.55),
+        0 0 28px 6px rgba(255,255,255,.35);
     }
 
-    .fallback{
-      position:fixed; inset:0; z-index:30;
-      display:none; place-items:center;
-      padding:24px; text-align:center;
-      background: radial-gradient(900px 500px at 50% 60%, #101a2b, #000);
+    /* Responsive: stack on mobile */
+    @media (max-width: 860px){
+      .ui{
+        grid-template-columns: 1fr;
+        align-items:end;
+        padding: 18px;
+      }
+      .ui__right{
+        justify-self:start;
+        width:min(560px, 96vw);
+        padding: 10px 6px 22px 6px;
+      }
+      h1{font-size: clamp(34px, 8vw, 46px);}
+      p{max-width: 56ch;}
     }
-    .fallback > div{
-      max-width:540px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      border-radius: 18px;
-      padding: 18px;
+
+    /* Reduce motion support */
+    @media (prefers-reduced-motion: reduce){
+      *{scroll-behavior:auto !important}
+      .cta, h1, p { transition: none !important; animation: none !important; }
     }
-    .fallback p{ color: rgba(233,238,247,.65); margin:8px 0 0 0; }
+
+    /* Tiny debug label (hidden) */
+    .sr-only{
+      position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+      overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+    }
   </style>
 </head>
 
 <body>
-  <div id="stage"></div>
+  <div id="stage" aria-hidden="true"></div>
 
-  <!-- overlays -->
-  <div class="streaks" id="streaks"></div>
-  <div class="fogOverlay" id="fogOverlay"></div>
+  <div class="ui" aria-label="Hero content">
+    <div></div>
+    <div class="ui__right">
+      <span class="kicker" aria-hidden="true"></span>
+      <h1 id="heroTitle">
+        <span class="bold">Luxury</span> <span class="reg">product</span>
+      </h1>
+      <p id="heroP">Forem ipsum dolor sit amet, consectetur pripiacing elit, sed frot ut horne.</p>
+      <button class="cta" id="ctaBtn" type="button" aria-label="Shop Now">Shop Now</button>
+      <span class="sr-only" id="a11yNote">No scroll. Fullscreen hero.</span>
+    </div>
+  </div>
+
   <div class="vignette"></div>
   <div class="grain"></div>
 
-  <div class="ui" id="ui">
-    <div></div>
-    <section class="copy">
-      <p class="kicker">CINEMATIC DROP</p>
-      <h1>Luxury <span>product</span></h1>
-      <p class="desc">Éclairage studio intense, brume, profondeur et reflets premium sur le podium.</p>
-      <div class="actions">
-        <button class="btn" id="shop">Shop Now</button>
-        <span class="hint">Souris / tactile pour parallax</span>
-      </div>
-    </section>
-  </div>
-
-  <div class="intro" id="intro">
-    <div class="introTitle" id="introTitle">
-      <div>
-        <div class="sub">REVEAL SEQUENCE</div>
-        <div class="line"></div>
-        <h2>THE SHOWROOM OPENS</h2>
-      </div>
-    </div>
-  </div>
-
-  <div class="fallback" id="fallback">
-    <div>
-      <h2 style="margin:0 0 6px 0;">WebGL indisponible</h2>
-      <p>Ton navigateur ne supporte pas WebGL. Essaie un navigateur récent.</p>
-    </div>
-  </div>
+  <!-- GSAP (timeline intro + micro motion) -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 
   <script type="module">
-    import * as THREE from "three";
-    import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-    import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
+    import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
+    import { GLTFLoader } from "https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
+    import { EffectComposer } from "https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/EffectComposer.js";
+    import { RenderPass } from "https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/RenderPass.js";
+    import { UnrealBloomPass } from "https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/UnrealBloomPass.js";
 
-    // Postprocessing (bloom)
-    import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
-    import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
-    import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
+    // -----------------------------
+    // Perf / motion preferences
+    // -----------------------------
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isTouch = matchMedia("(pointer: coarse)").matches;
+    const isSmall = matchMedia("(max-width: 860px)").matches;
 
+    // Cap DPR for performance (important on mobile / retina)
+    const DPR_CAP = isTouch ? 1.35 : 1.8;
+
+    // -----------------------------
+    // Scene / renderer setup
+    // -----------------------------
     const stage = document.getElementById("stage");
-    const ui = document.getElementById("ui");
-    const streaksEl = document.getElementById("streaks");
-    const fogOverlayEl = document.getElementById("fogOverlay");
-    const fallback = document.getElementById("fallback");
-    const introEl = document.getElementById("intro");
-    const introTitleEl = document.getElementById("introTitle");
-
-    // ✅ adapte si besoin
-    const MODEL_URL = "./pieces/piece_1/piece_1.gltf";
-
-    function webglAvailable(){
-      try{
-        const c = document.createElement("canvas");
-        return !!(window.WebGLRenderingContext &&
-          (c.getContext("webgl") || c.getContext("experimental-webgl")));
-      }catch(e){ return false; }
-    }
-    if(!webglAvailable()){
-      fallback.style.display = "grid";
-      throw new Error("WebGL not available");
-    }
-
-    // ===== Renderer (ciné) =====
-    const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:"high-performance" });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, DPR_CAP));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.35; // + lumineux comme la ref
+    renderer.toneMappingExposure = 1.08;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     stage.appendChild(renderer.domElement);
 
-    // ===== Scene =====
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x07101d, 0.06);
+    scene.background = new THREE.Color(0x050608);
 
-    // ===== Camera =====
-    const camera = new THREE.PerspectiveCamera(36, window.innerWidth/window.innerHeight, 0.1, 120);
-    camera.position.set(0, 1.45, 9.4);
+    // Fog (we animate density during intro)
+    scene.fog = new THREE.FogExp2(0x07080b, 0.0);
 
-    // ===== Postprocessing (Bloom) =====
+    // Camera
+    const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 120);
+    // Cinematic angle matching reference: looking slightly down, podium center-left
+    camera.position.set(0.9, 2.15, 9.2);
+    camera.lookAt(0.3, 1.2, 0.0);
+
+    // Subtle camera rig for parallax
+    const camRig = new THREE.Group();
+    camRig.add(camera);
+    scene.add(camRig);
+
+    // -----------------------------
+    // Postprocessing (minimal bloom)
+    // -----------------------------
     const composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
     const bloom = new UnrealBloomPass(
       new THREE.Vector2(window.innerWidth, window.innerHeight),
-      1.25,   // strength
-      0.38,   // radius
-      0.20    // threshold (bas => beaucoup de bloom)
+      0.85,   // strength (adjust for more/less glow)
+      0.55,   // radius
+      0.25    // threshold
     );
     composer.addPass(bloom);
 
-    // ===== Environment HDR (reflets) =====
-    const pmrem = new THREE.PMREMGenerator(renderer);
-    pmrem.compileEquirectangularShader();
-    const HDR_URL = "https://cdn.jsdelivr.net/gh/pmndrs/drei-assets@master/hdri/studio_small_09_1k.hdr";
-    new RGBELoader()
-      .setDataType(THREE.HalfFloatType)
-      .load(HDR_URL, (hdr) => {
-        const env = pmrem.fromEquirectangular(hdr).texture;
-        scene.environment = env;
-        hdr.dispose();
-        pmrem.dispose();
-      });
+    // -----------------------------
+    // Materials (premium studio look)
+    // -----------------------------
+    const metalBlack = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color(0x0b0c10),
+      metalness: 1.0,
+      roughness: 0.22,
+      clearcoat: 0.8,
+      clearcoatRoughness: 0.28,
+    });
 
-    // ===== World =====
-    const rig = new THREE.Group();
-    scene.add(rig);
+    const chromeDark = new THREE.MeshStandardMaterial({
+      color: new THREE.Color(0x111219),
+      metalness: 1.0,
+      roughness: 0.12,
+    });
 
-    // Podium plus proche ref (bords + glow)
-    function makePodium(){
-      const g = new THREE.Group();
+    const matteBlack = new THREE.MeshStandardMaterial({
+      color: new THREE.Color(0x07080b),
+      metalness: 0.05,
+      roughness: 0.95,
+    });
 
-      const metal = new THREE.MeshStandardMaterial({
-        color: 0x070b12,
-        metalness: 1.0,
-        roughness: 0.18
-      });
-
-      const edgeMat = new THREE.MeshStandardMaterial({
-        color: 0xffffff,
-        metalness: 1.0,
-        roughness: 0.06,
-        emissive: 0x101010
-      });
-
-      const ring = (r, h, y) => {
-        const body = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 200), metal);
-        body.position.y = y;
-        body.castShadow = true;
-        body.receiveShadow = true;
-
-        const edge = new THREE.Mesh(new THREE.TorusGeometry(r, 0.020, 14, 300), edgeMat);
-        edge.rotation.x = Math.PI/2;
-        edge.position.y = y + h/2 - 0.02;
-
-        g.add(body, edge);
-      };
-
-      ring(1.55, 0.30, 0.16);
-      ring(1.18, 0.22, 0.41);
-      ring(0.88, 0.18, 0.60);
-
-      return g;
-    }
-    const podium = makePodium();
-    rig.add(podium);
-
-    // Sol glossy + “profondeur”
-    // Petite texture procédurale (très légère) pour casser le “CAD”
-    function makeFloorTexture(){
-      const c = document.createElement("canvas");
-      c.width = c.height = 512;
-      const ctx = c.getContext("2d");
-      ctx.fillStyle = "#070a10";
-      ctx.fillRect(0,0,512,512);
-      ctx.strokeStyle = "rgba(255,255,255,0.06)";
-      ctx.lineWidth = 1;
-
-      // hex-ish grid soft
-      for(let y=0;y<512;y+=32){
-        for(let x=0;x<512;x+=32){
-          ctx.beginPath();
-          ctx.arc(x+16, y+16, 14, 0, Math.PI*2);
-          ctx.stroke();
-        }
-      }
-      const tex = new THREE.CanvasTexture(c);
-      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-      tex.repeat.set(2.2, 2.2);
-      tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-      return tex;
-    }
-
+    // -----------------------------
+    // Floor (dark, slightly reflective, perspective)
+    // -----------------------------
     const floor = new THREE.Mesh(
-      new THREE.CircleGeometry(10.0, 240),
-      new THREE.MeshStandardMaterial({
-        color: 0x04060b,
-        metalness: 0.55,
-        roughness: 0.38,
-        map: makeFloorTexture()
+      new THREE.PlaneGeometry(60, 60, 1, 1),
+      new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color(0x07080b),
+        metalness: 0.1,
+        roughness: 0.35,     // lower = more reflective
+        clearcoat: 0.65,
+        clearcoatRoughness: 0.22,
+        reflectivity: 0.4
       })
     );
-    floor.rotation.x = -Math.PI/2;
-    floor.position.y = -0.01;
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = 0;
     floor.receiveShadow = true;
     scene.add(floor);
 
-    // ===== Lights (beaucoup + intense comme la ref) =====
-    scene.add(new THREE.AmbientLight(0xffffff, 0.05));
-
-    // Key/Fill projecteurs (chaud/froid)
-    const leftSpot  = new THREE.SpotLight(0xfff2e6, 0.0, 55, Math.PI/10, 0.22, 1.35);
-    leftSpot.position.set(-5.2, 3.0, 3.2);
-    leftSpot.target = podium;
-    leftSpot.castShadow = true;
-    leftSpot.shadow.mapSize.set(2048,2048);
-    leftSpot.shadow.bias = -0.00015;
-    scene.add(leftSpot, leftSpot.target);
-
-    const rightSpot = new THREE.SpotLight(0xe8f2ff, 0.0, 55, Math.PI/10, 0.22, 1.35);
-    rightSpot.position.set(5.2, 3.0, 3.2);
-    rightSpot.target = podium;
-    rightSpot.castShadow = true;
-    rightSpot.shadow.mapSize.set(2048,2048);
-    rightSpot.shadow.bias = -0.00015;
-    scene.add(rightSpot, rightSpot.target);
-
-    // Gros “burst” central (comme l'image)
-    const centerBurst = new THREE.PointLight(0xffffff, 0.0, 18, 2);
-    centerBurst.position.set(0, 0.95, 0);
-    scene.add(centerBurst);
-
-    // Rim/back light
-    const rim = new THREE.DirectionalLight(0xffffff, 0.0);
-    rim.position.set(0.7, 4.0, -5.2);
-    scene.add(rim);
-
-    // ===== Volumetric beams (plus subtils, plus “réel”) =====
-    function makeBeam(){
-      const geo = new THREE.ConeGeometry(1.25, 7.0, 80, 1, true);
-      geo.translate(0, -3.5, 0);
-      const mat = new THREE.MeshBasicMaterial({
+    // Dark "reflection sheen" strip to accentuate perspective (cheap but effective)
+    const sheen = new THREE.Mesh(
+      new THREE.PlaneGeometry(32, 18, 1, 1),
+      new THREE.MeshBasicMaterial({
         color: 0xffffff,
         transparent: true,
-        opacity: 0.0,
-        depthWrite: false,
+        opacity: 0.08,
         blending: THREE.AdditiveBlending,
-        side: THREE.DoubleSide
-      });
-      return new THREE.Mesh(geo, mat);
-    }
-    const beamL = makeBeam(); beamL.position.copy(leftSpot.position); beamL.rotation.x = -Math.PI/2.85; scene.add(beamL);
-    const beamR = makeBeam(); beamR.position.copy(rightSpot.position); beamR.rotation.x = -Math.PI/2.85; scene.add(beamR);
-
-    // ===== Dust particles =====
-    const dustCount = 2200;
-    const dustGeo = new THREE.BufferGeometry();
-    const dustPos = new Float32Array(dustCount * 3);
-    for(let i=0;i<dustCount;i++){
-      dustPos[i*3+0] = (Math.random()-0.5)*14;
-      dustPos[i*3+1] = Math.random()*5.2;
-      dustPos[i*3+2] = (Math.random()-0.5)*14;
-    }
-    dustGeo.setAttribute("position", new THREE.BufferAttribute(dustPos, 3));
-    const dust = new THREE.Points(
-      dustGeo,
-      new THREE.PointsMaterial({ color:0xffffff, size:0.010, transparent:true, opacity:0.12, depthWrite:false })
+        depthWrite: false
+      })
     );
-    scene.add(dust);
+    sheen.rotation.x = -Math.PI / 2;
+    sheen.position.set(0.2, 0.01, -2.8);
+    scene.add(sheen);
 
-    // ===== Model load =====
-    let model = null;
-    new GLTFLoader().load(
-      MODEL_URL,
+    // Subtle hex-ish grid hints (very faint)
+    const gridTex = makeGridTexture();
+    const grid = new THREE.Mesh(
+      new THREE.PlaneGeometry(60, 60),
+      new THREE.MeshBasicMaterial({
+        map: gridTex,
+        transparent: true,
+        opacity: 0.10,
+        depthWrite: false
+      })
+    );
+    grid.rotation.x = -Math.PI / 2;
+    grid.position.y = 0.011;
+    scene.add(grid);
+
+    // -----------------------------
+    // Podium (center-left, 2-3 levels, rim light)
+    // -----------------------------
+    const podium = new THREE.Group();
+    podium.position.set(-1.15, 0, 0);
+    scene.add(podium);
+
+    const base1 = new THREE.Mesh(new THREE.CylinderGeometry(1.65, 1.75, 0.22, 96, 1, false), metalBlack);
+    base1.position.y = 0.11;
+    base1.castShadow = true;
+    base1.receiveShadow = true;
+
+    const base2 = new THREE.Mesh(new THREE.CylinderGeometry(1.22, 1.30, 0.20, 96, 1, false), chromeDark);
+    base2.position.y = 0.11 + 0.20;
+    base2.castShadow = true;
+    base2.receiveShadow = true;
+
+    const top = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 1.02, 0.14, 96, 1, false), metalBlack);
+    top.position.y = 0.11 + 0.20 + 0.14;
+    top.castShadow = true;
+    top.receiveShadow = true;
+
+    // Rim lines: thin emissive rings
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 });
+    const ring1 = new THREE.Mesh(new THREE.TorusGeometry(1.70, 0.012, 12, 180), ringMat);
+    ring1.rotation.x = Math.PI / 2;
+    ring1.position.y = base1.position.y + 0.11;
+
+    const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.26, 0.012, 12, 180), ringMat);
+    ring2.rotation.x = Math.PI / 2;
+    ring2.position.y = base2.position.y + 0.10;
+
+    const ring3 = new THREE.Mesh(new THREE.TorusGeometry(0.98, 0.012, 12, 180), ringMat);
+    ring3.rotation.x = Math.PI / 2;
+    ring3.position.y = top.position.y + 0.07;
+
+    podium.add(base1, base2, top, ring1, ring2, ring3);
+
+    // Vertical back-glow behind podium (visual plane + light)
+    const backGlow = new THREE.Mesh(
+      new THREE.PlaneGeometry(3.8, 6.0),
+      new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.14,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      })
+    );
+    backGlow.position.set(-0.2, 2.7, -1.35);
+    backGlow.lookAt(-0.2, 2.7, 2);
+    scene.add(backGlow);
+
+    // Light streaks (vertical thin planes) around center
+    const streaks = new THREE.Group();
+    scene.add(streaks);
+    for (let i = 0; i < 6; i++){
+      const w = 0.08 + Math.random() * 0.06;
+      const h = 3.8 + Math.random() * 2.4;
+      const s = new THREE.Mesh(
+        new THREE.PlaneGeometry(w, h),
+        new THREE.MeshBasicMaterial({
+          color: 0xffffff,
+          transparent: true,
+          opacity: 0.10 + Math.random()*0.10,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        })
+      );
+      s.position.set(-1.5 + i * 0.55, 2.0 + Math.random()*0.5, -0.9 - Math.random()*0.8);
+      s.rotation.y = (Math.random() - 0.5) * 0.35;
+      streaks.add(s);
+    }
+
+    // -----------------------------
+    // Studio projectors (foreground, dominant)
+    // -----------------------------
+    const projectorL = createProjector();
+    projectorL.position.set(-5.25, 0.95, 6.35);
+    projectorL.rotation.y = Math.PI * 0.18;
+    projectorL.scale.set(1.45, 1.45, 1.45);
+    scene.add(projectorL);
+
+    const projectorR = createProjector();
+    projectorR.position.set(5.45, 0.95, 6.15);
+    projectorR.rotation.y = -Math.PI * 0.20;
+    projectorR.scale.set(1.45, 1.45, 1.45);
+    scene.add(projectorR);
+
+    // -----------------------------
+    // Lights (dramatic studio)
+    // -----------------------------
+    // Ambient very low
+    scene.add(new THREE.AmbientLight(0xffffff, 0.05));
+
+    // Key: left projector spotlight
+    const spotL = new THREE.SpotLight(0xffffff, 0.0, 40, THREE.MathUtils.degToRad(16), 0.35, 1.2);
+    spotL.position.set(projectorL.position.x + 0.4, 2.6, projectorL.position.z - 0.7);
+    spotL.target.position.set(podium.position.x, 1.0, podium.position.z);
+    spotL.castShadow = true;
+    spotL.shadow.mapSize.set(1024,1024);
+    spotL.shadow.bias = -0.00035;
+    scene.add(spotL);
+    scene.add(spotL.target);
+
+    // Fill: right projector spotlight
+    const spotR = new THREE.SpotLight(0xffffff, 0.0, 40, THREE.MathUtils.degToRad(17), 0.35, 1.15);
+    spotR.position.set(projectorR.position.x - 0.4, 2.5, projectorR.position.z - 0.8);
+    spotR.target.position.set(podium.position.x, 1.05, podium.position.z + 0.1);
+    spotR.castShadow = true;
+    spotR.shadow.mapSize.set(1024,1024);
+    spotR.shadow.bias = -0.00035;
+    scene.add(spotR);
+    scene.add(spotR.target);
+
+    // Backlight: vertical behind podium
+    const backSpot = new THREE.SpotLight(0xffffff, 0.0, 50, THREE.MathUtils.degToRad(18), 0.55, 1.35);
+    backSpot.position.set(podium.position.x + 0.2, 5.8, -3.6);
+    backSpot.target.position.set(podium.position.x + 0.1, 1.0, 0.3);
+    scene.add(backSpot);
+    scene.add(backSpot.target);
+
+    // Small accent rim lights near floor
+    const rimA = new THREE.PointLight(0xffffff, 0.22, 12, 2.0);
+    rimA.position.set(podium.position.x - 2.2, 0.6, 1.2);
+    scene.add(rimA);
+
+    const rimB = new THREE.PointLight(0xffffff, 0.18, 10, 2.0);
+    rimB.position.set(podium.position.x + 1.8, 0.55, 0.6);
+    scene.add(rimB);
+
+    // -----------------------------
+    // Volumetric cones (visual meshes for beams)
+    // -----------------------------
+    const coneL = createLightCone(3.7, 7.2);
+    coneL.position.copy(spotL.position);
+    coneL.lookAt(spotL.target.position);
+    scene.add(coneL);
+
+    const coneR = createLightCone(3.8, 7.2);
+    coneR.position.copy(spotR.position);
+    coneR.lookAt(spotR.target.position);
+    scene.add(coneR);
+
+    const coneBack = createLightCone(4.2, 10.5, 0.12);
+    coneBack.position.copy(backSpot.position);
+    coneBack.lookAt(backSpot.target.position);
+    scene.add(coneBack);
+
+    // -----------------------------
+    // Fog particles (volumetric-ish)
+    // -----------------------------
+    const particles = createFogParticles(isTouch ? 520 : 1150);
+    scene.add(particles);
+
+    // -----------------------------
+    // Load GLTF piece on top of podium
+    // IMPORTANT: Replace only if your asset path changes
+    // (User requested exact path below)
+    // -----------------------------
+    const loader = new GLTFLoader();
+    const pieceGroup = new THREE.Group();
+    pieceGroup.position.set(podium.position.x, top.position.y + 0.32, podium.position.z);
+    scene.add(pieceGroup);
+
+    let loadedPiece = null;
+
+    loader.load(
+      "/pieces/piece_1/piece_1.gltf", // <-- EXACT requested path
       (gltf) => {
-        model = gltf.scene;
-        model.traverse((o)=>{
-          if(o.isMesh){
+        loadedPiece = gltf.scene;
+        loadedPiece.traverse((o) => {
+          if (o.isMesh){
             o.castShadow = true;
             o.receiveShadow = true;
-            // si matériau trop “plat”, on le pousse un peu vers le photoréaliste
-            if(o.material && o.material.isMeshStandardMaterial){
-              o.material.metalness = Math.min(1, (o.material.metalness ?? 0.2) + 0.12);
-              o.material.roughness = Math.max(0.10, (o.material.roughness ?? 0.65) - 0.10);
-            }
+            // If your model looks too dark/bright, tweak here:
+            // - metalness/roughness
+            // - renderer.toneMappingExposure
           }
         });
 
-        const box = new THREE.Box3().setFromObject(model);
+        // Auto-scale to a nice hero size
+        const box = new THREE.Box3().setFromObject(loadedPiece);
         const size = new THREE.Vector3();
-        const center = new THREE.Vector3();
         box.getSize(size);
-        box.getCenter(center);
-        model.position.sub(center);
-
         const maxDim = Math.max(size.x, size.y, size.z) || 1;
-        model.scale.setScalar(1.25 / maxDim);
-        model.position.y = 0.88;
+        const desired = 1.25; // adjust to fit podium nicely
+        const s = desired / maxDim;
+        loadedPiece.scale.setScalar(s);
 
-        rig.add(model);
+        // Center it
+        const center = new THREE.Vector3();
+        box.getCenter(center);
+        loadedPiece.position.sub(center.multiplyScalar(s));
+
+        // Gentle rotation for premium feel
+        loadedPiece.rotation.y = -0.35;
+
+        pieceGroup.add(loadedPiece);
       },
-      undefined,
-      (err) => console.error("Erreur chargement GLTF:", err)
+      (xhr) => {
+        // Optional: hook a loader UI here (kept minimal)
+      },
+      (err) => {
+        console.warn("GLTF load error:", err);
+        // Fallback "dummy piece" so the scene still looks complete
+        const dummy = new THREE.Mesh(
+          new THREE.TorusKnotGeometry(0.35, 0.12, 180, 24),
+          new THREE.MeshStandardMaterial({
+            color: 0x0f1016, metalness: 1.0, roughness: 0.12, emissive: 0x000000
+          })
+        );
+        dummy.castShadow = true;
+        pieceGroup.add(dummy);
+        loadedPiece = dummy;
+      }
     );
 
-    // ===== Interaction =====
-    const pointer = { x:0, y:0, tx:0, ty:0 };
-    const onMove = (x,y)=>{
-      pointer.tx = (x / window.innerWidth) * 2 - 1;
-      pointer.ty = (y / window.innerHeight) * 2 - 1;
+    // -----------------------------
+    // UI interactions (parallax, hover)
+    // -----------------------------
+    const titleEl = document.getElementById("heroTitle");
+    const pEl = document.getElementById("heroP");
+    const btnEl = document.getElementById("ctaBtn");
+
+    let pointerX = 0, pointerY = 0;
+    let targetRigX = 0, targetRigY = 0;
+
+    const onMove = (e) => {
+      const x = (e.clientX / window.innerWidth) * 2 - 1;
+      const y = (e.clientY / window.innerHeight) * 2 - 1;
+      pointerX = x; pointerY = y;
+      targetRigX = x * 0.18;
+      targetRigY = y * 0.10;
+
+      // Text parallax (subtle)
+      if (!prefersReducedMotion){
+        gsap.to(titleEl, { duration: 0.45, x: x * 10, y: y * 6, rotateZ: x * 0.25, ease: "power2.out" });
+        gsap.to(pEl,     { duration: 0.55, x: x * 8,  y: y * 5, ease: "power2.out" });
+      }
     };
-    window.addEventListener("mousemove", (e)=> onMove(e.clientX, e.clientY), { passive:true });
-    window.addEventListener("touchmove", (e)=>{
-      if(!e.touches?.length) return;
-      onMove(e.touches[0].clientX, e.touches[0].clientY);
-    }, { passive:true });
 
-    document.getElementById("shop").addEventListener("click", ()=> alert("CTA: Shop Now (à brancher)"));
+    window.addEventListener("pointermove", onMove, { passive:true });
 
-    // ===== Resize =====
-    function resize(){
-      camera.aspect = window.innerWidth/window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      composer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    }
-    window.addEventListener("resize", resize);
+    btnEl.addEventListener("pointerenter", () => {
+      if (prefersReducedMotion) return;
+      gsap.to(btnEl, { duration: 0.25, scale: 1.03, ease: "power2.out" });
+    });
+    btnEl.addEventListener("pointerleave", () => {
+      if (prefersReducedMotion) return;
+      gsap.to(btnEl, { duration: 0.25, scale: 1.0, ease: "power2.out" });
+    });
 
-    // ===== Intro timeline (match ref) =====
-    const t0 = performance.now();
-    const introDur = 5200;
+    // Demo click handler (replace with real navigation)
+    btnEl.addEventListener("click", () => {
+      // Replace with your route / link
+      // location.href = "/shop";
+      gsap.to(btnEl, { duration: 0.12, y: 1, ease: "power2.out", yoyo: true, repeat: 1 });
+    });
 
-    const clamp01 = (t)=> Math.max(0, Math.min(1, t));
-    const easeOut = (t)=> 1 - Math.pow(1 - t, 3);
-    const easeInOut = (t)=> t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
+    // -----------------------------
+    // Intro cinematic (camera advance, lights ramp, fog, UI slide)
+    // -----------------------------
+    const intro = () => {
+      const tl = gsap.timeline({ defaults:{ ease:"power3.out" } });
 
-    function animate(now){
-      const raw = clamp01((now - t0) / introDur);
-      const e = easeOut(raw);
+      // Initial UI state
+      gsap.set([titleEl, pEl], { opacity: 0, y: 18, filter: "blur(6px)" });
+      gsap.set(btnEl, { opacity: 0, y: 14, scale: 0.94, filter: "blur(5px)" });
 
-      // Camera push-in + légère profondeur
-      const driftX = Math.sin(now*0.00018)*0.025;
-      const driftY = Math.cos(now*0.00014)*0.016;
+      // Start darkness
+      spotL.intensity = 0.0;
+      spotR.intensity = 0.0;
+      backSpot.intensity = 0.0;
+      coneL.material.opacity = 0.0;
+      coneR.material.opacity = 0.0;
+      coneBack.material.opacity = 0.0;
+      backGlow.material.opacity = 0.0;
+      scene.fog.density = 0.0;
 
-      camera.position.z = 10.1 - 2.65 * e;
-      camera.position.y = 1.68 - 0.22 * e + driftY;
-      camera.position.x = 0.10 * (1 - e) + driftX;
-      camera.lookAt(0, 0.96, 0);
+      // Camera starts farther
+      camRig.position.set(0, 0, 0);
+      camera.position.set(0.95, 2.25, 10.2);
 
-      // UI apparaît après l'allumage
-      const uiGate = clamp01((raw - 0.34) / 0.66);
-      ui.style.opacity = (uiGate).toFixed(3);
-      ui.style.transform = `translateY(${(16*(1-uiGate)).toFixed(2)}px)`;
+      tl.to(camera.position, { duration: 2.2, z: 8.6, y: 2.08 }, 0.0)
+        .to(camera.position, { duration: 1.8, z: 7.5, y: 1.95, ease:"power2.out" }, 1.6)
 
-      // overlays (streaks + fog) comme l'image
-      fogOverlayEl.style.opacity = (0.70 * uiGate).toFixed(3);
-      streaksEl.style.opacity = (0.85 * uiGate).toFixed(3);
+        // Lights ramp up (adjust intensities here)
+        .to(spotL,    { duration: 1.9, intensity: 11.5 }, 0.35)
+        .to(spotR,    { duration: 1.9, intensity: 10.8 }, 0.50)
+        .to(backSpot, { duration: 2.2, intensity: 6.8  }, 0.75)
 
-      // intro title
-      const titleGate = clamp01((raw - 0.08) / 0.24);
-      introTitleEl.style.opacity = (titleGate).toFixed(3);
-      introTitleEl.style.transform =
-        `translateY(${(10*(1-titleGate)).toFixed(2)}px) scale(${(0.985 + 0.015*titleGate).toFixed(3)})`;
+        // Beams appear
+        .to(coneL.material,    { duration: 1.8, opacity: 0.16 }, 0.55)
+        .to(coneR.material,    { duration: 1.8, opacity: 0.15 }, 0.70)
+        .to(coneBack.material, { duration: 2.0, opacity: 0.12 }, 0.85)
 
-      // “flicker” projecteurs au démarrage (ciné)
-      const flick = (raw < 0.34)
-        ? (0.60 + 0.40*Math.sin(now*0.020) * Math.sin(now*0.011))
-        : 1.0;
+        // Back glow plane
+        .to(backGlow.material, { duration: 2.2, opacity: 0.16 }, 0.65)
 
-      // Lights ramp
-      const lightGate = clamp01((raw - 0.16) / 0.56);
-      const L = 18.0 * easeInOut(lightGate) * flick;
+        // Fog in
+        .to(scene.fog, { duration: 2.2, density: 0.075 }, 0.55)
 
-      leftSpot.intensity  = L * 0.95;
-      rightSpot.intensity = L * 0.92;
-      rim.intensity       = 1.55 * easeInOut(lightGate);
+        // UI slides in
+        .to(titleEl, { duration: 0.95, opacity: 1, y: 0, filter: "blur(0px)" }, 1.05)
+        .to(pEl,     { duration: 0.95, opacity: 1, y: 0, filter: "blur(0px)" }, 1.20)
+        .to(btnEl,   { duration: 0.75, opacity: 1, y: 0, scale: 1.0, filter: "blur(0px)" }, 1.35)
+        .to(btnEl,   { duration: 0.85, boxShadow: "0 14px 34px rgba(0,0,0,.62), 0 0 32px 7px rgba(255,255,255,.28)" }, 1.45);
 
-      // Central burst (gros halo)
-      const burstGate = clamp01((raw - 0.26) / 0.22);
-      const burst = 30.0 * easeInOut(burstGate);
-      centerBurst.intensity = burst;
-      bloom.strength = 1.10 + 0.85 * burstGate; // + bloom au reveal
-      bloom.radius = 0.42;
-      bloom.threshold = 0.14;
+      // Reduced motion: jump to final state
+      if (prefersReducedMotion){
+        tl.progress(1).kill();
+        spotL.intensity = 11.5;
+        spotR.intensity = 10.8;
+        backSpot.intensity = 6.8;
+        coneL.material.opacity = 0.16;
+        coneR.material.opacity = 0.15;
+        coneBack.material.opacity = 0.12;
+        backGlow.material.opacity = 0.16;
+        scene.fog.density = 0.075;
 
-      // Beams visibles
-      const beamOp = 0.18 * easeInOut(lightGate);
-      beamL.material.opacity = beamOp;
-      beamR.material.opacity = beamOp;
+        gsap.set([titleEl, pEl], { opacity: 1, y: 0, filter: "blur(0px)", x: 0, rotateZ: 0 });
+        gsap.set(btnEl, { opacity: 1, y: 0, scale: 1.0, filter: "blur(0px)" });
+        camera.position.set(0.9, 2.05, 7.7);
+      }
+    };
 
-      // Parallax (subtil)
-      pointer.x += (pointer.tx - pointer.x) * 0.06;
-      pointer.y += (pointer.ty - pointer.y) * 0.06;
-      rig.rotation.x = pointer.y * 0.10;
-      rig.rotation.y = pointer.x * 0.18;
+    intro();
 
-      // rotation modèle
-      if(model){
-        model.rotation.y += 0.0040;
-        model.rotation.x = -pointer.y * 0.03;
+    // -----------------------------
+    // Micro-animations (beams movement, subtle projector breathing)
+    // -----------------------------
+    const clock = new THREE.Clock();
+
+    function animate(){
+      const t = clock.getElapsedTime();
+
+      // Camera parallax
+      const lerp = prefersReducedMotion ? 1.0 : 0.06;
+      camRig.rotation.y += (targetRigX - camRig.rotation.y) * lerp;
+      camRig.rotation.x += (-targetRigY - camRig.rotation.x) * lerp;
+
+      // Beams drift (very slight)
+      if (!prefersReducedMotion){
+        const wobbleA = Math.sin(t * 0.35) * 0.015;
+        const wobbleB = Math.cos(t * 0.28) * 0.014;
+        spotL.target.position.x = podium.position.x + wobbleA * 2.0;
+        spotR.target.position.z = podium.position.z + wobbleB * 2.2;
+        spotL.target.updateMatrixWorld();
+        spotR.target.updateMatrixWorld();
+
+        coneL.lookAt(spotL.target.position);
+        coneR.lookAt(spotR.target.position);
+
+        // Slight intensity breathing
+        spotL.intensity *= (1.0 + Math.sin(t * 0.55) * 0.002);
+        spotR.intensity *= (1.0 + Math.cos(t * 0.50) * 0.002);
+
+        // Piece micro-rotation
+        if (loadedPiece){
+          pieceGroup.rotation.y = Math.sin(t * 0.35) * 0.10;
+        }
       }
 
-      // dust
-      dust.rotation.y += 0.0009;
-      dust.rotation.x += 0.00025;
+      // Fog particles float
+      updateFogParticles(particles, t);
 
-      // fade intro
-      if(raw > 0.62) introEl.classList.add("off");
-      if(raw > 0.94) introEl.style.display = "none";
+      // Streaks subtle sway
+      if (!prefersReducedMotion){
+        streaks.rotation.y = Math.sin(t * 0.10) * 0.05;
+      }
 
       composer.render();
       requestAnimationFrame(animate);
     }
+    animate();
 
-    requestAnimationFrame(animate);
+    // -----------------------------
+    // Resize handling
+    // -----------------------------
+    function onResize(){
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, DPR_CAP));
+      renderer.setSize(w, h);
+      composer.setSize(w, h);
+
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+
+      bloom.setSize(w, h);
+    }
+    window.addEventListener("resize", onResize, { passive:true });
+
+    // -----------------------------
+    // Helpers
+    // -----------------------------
+    function createProjector(){
+      const g = new THREE.Group();
+
+      // Body
+      const body = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.58, 0.62, 1.05, 40),
+        new THREE.MeshPhysicalMaterial({
+          color: 0x0a0b10, metalness: 1.0, roughness: 0.25, clearcoat: 0.9, clearcoatRoughness: 0.2
+        })
+      );
+      body.rotation.z = Math.PI / 2;
+      body.castShadow = true;
+
+      // Front bezel
+      const bezel = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.46, 0.46, 0.14, 40),
+        chromeDark
+      );
+      bezel.rotation.z = Math.PI / 2;
+      bezel.position.x = 0.54;
+      bezel.castShadow = true;
+
+      // Lens (slightly emissive)
+      const lens = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.40, 0.40, 0.06, 40),
+        new THREE.MeshStandardMaterial({
+          color: 0x0b0c10,
+          metalness: 0.1,
+          roughness: 0.3,
+          emissive: 0x0f1018,
+          emissiveIntensity: 0.75
+        })
+      );
+      lens.rotation.z = Math.PI / 2;
+      lens.position.x = 0.62;
+
+      // Rim strip highlight
+      const rim = new THREE.Mesh(
+        new THREE.TorusGeometry(0.46, 0.016, 14, 80),
+        new THREE.MeshBasicMaterial({ color: 0xffffff, transparent:true, opacity:0.35 })
+      );
+      rim.rotation.y = Math.PI / 2;
+      rim.position.x = 0.57;
+
+      // Yoke / mount
+      const yoke = new THREE.Mesh(
+        new THREE.BoxGeometry(0.22, 0.82, 0.82),
+        metalBlack
+      );
+      yoke.position.set(-0.08, -0.20, 0);
+      yoke.castShadow = true;
+
+      // Base
+      const base = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.62, 0.70, 0.18, 40),
+        matteBlack
+      );
+      base.position.y = -0.80;
+      base.castShadow = true;
+      base.receiveShadow = true;
+
+      // Small accent LEDs
+      const led = new THREE.Mesh(
+        new THREE.BoxGeometry(0.08, 0.45, 0.03),
+        new THREE.MeshBasicMaterial({
+          color: 0xffffff, transparent:true, opacity:0.22, blending: THREE.AdditiveBlending
+        })
+      );
+      led.position.set(-0.25, 0.05, 0.42);
+
+      const led2 = led.clone();
+      led2.position.z = -0.42;
+
+      g.add(body, bezel, lens, rim, yoke, base, led, led2);
+
+      // Present projectors in foreground: slight tilt down to podium
+      g.rotation.x = -0.12;
+
+      return g;
+    }
+
+    function createLightCone(radius=3.6, length=7.0, opacity=0.15){
+      // Visual cone to mimic volumetric spotlight beams
+      const geo = new THREE.ConeGeometry(radius, length, 48, 1, true);
+      geo.translate(0, -length/2, 0); // move origin to tip
+      const mat = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        side: THREE.DoubleSide
+      });
+      const cone = new THREE.Mesh(geo, mat);
+      return cone;
+    }
+
+    function makeGridTexture(){
+      const c = document.createElement("canvas");
+      c.width = 512; c.height = 512;
+      const ctx = c.getContext("2d");
+      ctx.clearRect(0,0,c.width,c.height);
+
+      // faint "studio floor" pattern (not a literal hex grid, just premium hints)
+      ctx.globalAlpha = 0.22;
+      ctx.strokeStyle = "rgba(255,255,255,0.10)";
+      ctx.lineWidth = 1;
+
+      // Perspective-ish diagonals
+      for (let i=0;i<20;i++){
+        const x = i * 26;
+        ctx.beginPath();
+        ctx.moveTo(x, 512);
+        ctx.lineTo(256, 0);
+        ctx.stroke();
+      }
+
+      // Soft horizontals
+      ctx.globalAlpha = 0.18;
+      for (let i=0;i<18;i++){
+        const y = i * 28;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(512, y);
+        ctx.stroke();
+      }
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(1.1, 1.1);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    function createFogParticles(count){
+      const geom = new THREE.BufferGeometry();
+      const positions = new Float32Array(count * 3);
+      const sizes = new Float32Array(count);
+
+      // Concentrate around podium + floor area
+      for (let i=0;i<count;i++){
+        const r = Math.random();
+        const spread = r < 0.75 ? 7.5 : 12.0;
+        const x = (Math.random()*2-1) * spread + (Math.random()*0.8 - 0.4);
+        const z = (Math.random()*2-1) * spread - 1.5;
+        const y = Math.random() * 2.2 + 0.05;
+
+        positions[i*3+0] = x;
+        positions[i*3+1] = y;
+        positions[i*3+2] = z;
+
+        sizes[i] = 0.6 + Math.random() * 1.6;
+      }
+
+      geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      geom.setAttribute("aSize", new THREE.BufferAttribute(sizes, 1));
+
+      // Soft sprite
+      const sprite = makeSoftSprite();
+      const mat = new THREE.PointsMaterial({
+        map: sprite,
+        transparent: true,
+        opacity: 0.16,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        size: isTouch ? 0.85 : 1.1,
+        sizeAttenuation: true,
+        color: 0xffffff
+      });
+
+      const pts = new THREE.Points(geom, mat);
+      pts.frustumCulled = false;
+      pts.userData._base = positions.slice(); // copy for motion
+      return pts;
+    }
+
+    function updateFogParticles(pts, t){
+      const pos = pts.geometry.attributes.position;
+      const base = pts.userData._base;
+      for (let i=0;i<pos.count;i++){
+        const ix = i*3;
+        // slow, layered drift
+        const driftX = Math.sin(t*0.12 + base[ix+2]*0.25) * 0.15;
+        const driftZ = Math.cos(t*0.10 + base[ix]*0.22) * 0.14;
+        const lift   = (Math.sin(t*0.08 + i*0.03) + 1) * 0.004;
+
+        pos.array[ix+0] = base[ix+0] + driftX;
+        pos.array[ix+2] = base[ix+2] + driftZ;
+
+        let y = pos.array[ix+1] + lift;
+        if (y > 2.8) y = 0.06; // loop upwards
+        pos.array[ix+1] = y;
+      }
+      pos.needsUpdate = true;
+    }
+
+    function makeSoftSprite(){
+      const c = document.createElement("canvas");
+      c.width = 128; c.height = 128;
+      const ctx = c.getContext("2d");
+      const g = ctx.createRadialGradient(64,64,0, 64,64,64);
+      g.addColorStop(0.0, "rgba(255,255,255,0.95)");
+      g.addColorStop(0.45,"rgba(255,255,255,0.28)");
+      g.addColorStop(1.0, "rgba(255,255,255,0.0)");
+      ctx.fillStyle = g;
+      ctx.fillRect(0,0,128,128);
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    // -----------------------------
+    // Quick knobs (where to tweak)
+    // -----------------------------
+    // - Model path: "/pieces/piece_1/piece_1.gltf"
+    // - Light intensities (intro): spotL/spotR/backSpot targets in intro timeline
+    // - Bloom: UnrealBloomPass(strength, radius, threshold)
+    // - Fog density: scene.fog.density (intro anim + final)
+    // - Podium position: podium.position.set(x,y,z)
+    // - Projectors position/scale: projectorL/projectorR transforms
   </script>
 </body>
 </html>
