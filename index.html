@@ -31,24 +31,25 @@
       overflow:hidden;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
       color:var(--text);
-      background: radial-gradient(1100px 650px at 50% 60%, #0a1527 0%, var(--bg0) 58%, #000 100%);
+      background: radial-gradient(1200px 720px at 50% 62%, #0a1527 0%, var(--bg0) 60%, #000 100%);
     }
-
     #stage{ position:fixed; inset:0; z-index:0; }
     canvas{ display:block; width:100%; height:100%; }
 
-    /* Cinematic layers */
+    /* ===== cinematic overlays (proche de ton image) ===== */
     .vignette{
       position:fixed; inset:0; z-index:6; pointer-events:none;
-      background: radial-gradient(1200px 700px at 50% 62%, rgba(0,0,0,0) 42%, rgba(0,0,0,.82) 100%);
+      background: radial-gradient(1200px 700px at 50% 62%,
+        rgba(0,0,0,0) 38%,
+        rgba(0,0,0,.84) 100%);
       opacity:.95;
     }
     .grain{
       position:fixed; inset:0; z-index:7; pointer-events:none;
-      opacity:.075;
+      opacity:.07;
       mix-blend-mode: overlay;
       background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
-      animation: grainMove 1.1s steps(2,end) infinite;
+      animation: grainMove 1.15s steps(2,end) infinite;
     }
     @keyframes grainMove{
       0%{ transform:translate(0,0); }
@@ -58,19 +59,19 @@
       100%{ transform:translate(0,0); }
     }
 
-    /* Fog overlay (less “cartoon”, more subtle) */
-    .fog{
+    /* Brume écran (en + du fog Three) */
+    .fogOverlay{
       position:fixed; inset:-12%;
       z-index:3; pointer-events:none;
       opacity:0;
       filter: blur(22px);
       mix-blend-mode: screen;
       background:
-        radial-gradient(900px 420px at 50% 62%, rgba(255,255,255,.16), rgba(255,255,255,0) 62%),
+        radial-gradient(900px 420px at 50% 64%, rgba(255,255,255,.18), rgba(255,255,255,0) 62%),
         radial-gradient(700px 360px at 32% 76%, rgba(255,255,255,.10), rgba(255,255,255,0) 70%),
         radial-gradient(700px 360px at 68% 78%, rgba(255,255,255,.09), rgba(255,255,255,0) 72%),
-        linear-gradient(to top, rgba(255,255,255,.06), rgba(255,255,255,0) 46%);
-      animation: fogDrift 10.5s ease-in-out infinite;
+        linear-gradient(to top, rgba(255,255,255,.07), rgba(255,255,255,0) 50%);
+      animation: fogDrift 10.8s ease-in-out infinite;
       transform: translate3d(0,0,0);
     }
     @keyframes fogDrift{
@@ -79,21 +80,25 @@
       100%{ transform: translate3d(-1.6%, 0.6%, 0) scale(1.02); }
     }
 
-    /* Subtle rays (less “white blobs”) */
-    .rays{
+    /* Traits verticaux (streaks) comme l'image */
+    .streaks{
       position:fixed; inset:0;
       z-index:2; pointer-events:none;
       opacity:0;
       mix-blend-mode: screen;
       background:
-        radial-gradient(closest-side at 18% 76%, rgba(255,255,255,.12), rgba(255,255,255,0) 72%),
-        radial-gradient(closest-side at 82% 76%, rgba(255,255,255,.12), rgba(255,255,255,0) 72%);
-      filter: blur(26px);
-      animation: raysPulse 3.6s ease-in-out infinite;
+        linear-gradient(to bottom, rgba(255,255,255,.18), rgba(255,255,255,0) 60%) 25% 25% / 2px 55% no-repeat,
+        linear-gradient(to bottom, rgba(255,255,255,.14), rgba(255,255,255,0) 60%) 35% 28% / 2px 52% no-repeat,
+        linear-gradient(to bottom, rgba(255,255,255,.18), rgba(255,255,255,0) 60%) 45% 24% / 2px 58% no-repeat,
+        linear-gradient(to bottom, rgba(255,255,255,.14), rgba(255,255,255,0) 60%) 55% 28% / 2px 52% no-repeat,
+        linear-gradient(to bottom, rgba(255,255,255,.18), rgba(255,255,255,0) 60%) 65% 25% / 2px 55% no-repeat,
+        radial-gradient(900px 420px at 50% 60%, rgba(255,255,255,.10), rgba(255,255,255,0) 65%);
+      filter: blur(0.5px);
+      animation: streakPulse 3.8s ease-in-out infinite;
     }
-    @keyframes raysPulse{
-      0%,100%{ opacity:.22; transform: translateY(0px); }
-      50%{ opacity:.40; transform: translateY(-5px); }
+    @keyframes streakPulse{
+      0%,100%{ opacity:.25; }
+      50%{ opacity:.55; }
     }
 
     /* UI */
@@ -102,13 +107,12 @@
       display:grid;
       grid-template-columns: 1fr minmax(280px, 480px);
       align-items:center;
-      padding: clamp(16px, 4vw, 52px);
+      padding: clamp(16px, 4vw, 54px);
       gap: clamp(16px, 3vw, 44px);
       pointer-events:none;
       opacity:0;
       transform: translateY(14px);
     }
-
     .copy{
       justify-self:end;
       width: min(480px, 92vw);
@@ -116,13 +120,12 @@
       border: 1px solid var(--stroke);
       background: linear-gradient(180deg, var(--glass1), var(--glass2));
       border-radius: 20px;
-      box-shadow: 0 24px 90px rgba(0,0,0,.58), inset 0 1px 0 rgba(255,255,255,.12);
+      box-shadow: 0 28px 100px rgba(0,0,0,.62), inset 0 1px 0 rgba(255,255,255,.12);
       backdrop-filter: blur(14px);
       pointer-events:auto;
       position:relative;
       overflow:hidden;
     }
-
     .kicker{
       font-size: 12px;
       letter-spacing:.28em;
@@ -134,18 +137,16 @@
       font-size: clamp(34px, 4.2vw, 60px);
       line-height:1.02;
       margin:0 0 10px 0;
-      font-weight: 780;
-      text-shadow: 0 10px 40px rgba(0,0,0,.55);
+      font-weight: 800;
+      text-shadow: 0 10px 46px rgba(0,0,0,.60);
     }
     h1 span{ font-weight: 420; color: rgba(233,238,247,.82); }
-
     .desc{
       margin: 0 0 18px 0;
       color: var(--muted);
       font-size: clamp(13px, 1.35vw, 16px);
       line-height: 1.55;
     }
-
     .actions{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
     .btn{
       border:none; cursor:pointer;
@@ -153,43 +154,34 @@
       border-radius: 14px;
       background: rgba(255,255,255,.90);
       color:#070c15;
-      font-weight: 720;
-      box-shadow: 0 18px 44px rgba(0,0,0,.45);
+      font-weight: 740;
+      box-shadow: 0 20px 50px rgba(0,0,0,.48);
       transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
       position:relative;
       overflow:hidden;
     }
     .btn:hover{
       transform: translateY(-1px) scale(1.015);
-      box-shadow: 0 28px 70px rgba(0,0,0,.58);
-      filter: brightness(1.05);
+      box-shadow: 0 30px 78px rgba(0,0,0,.62);
+      filter: brightness(1.06);
     }
     .hint{ font-size:12px; color: rgba(233,238,247,.45); user-select:none; }
 
-    /* Intro : cinematic blackout + scan */
+    /* Intro blackout */
     .intro{
       position:fixed; inset:0; z-index:20;
       pointer-events:none;
-      background: #000;
+      background:#000;
       opacity:1;
-      transition: opacity 1100ms ease;
+      transition: opacity 1200ms ease;
     }
     .intro.off{ opacity:0; }
-
-    .scan{
-      position:absolute; inset:-20%;
-      background: linear-gradient(115deg, rgba(255,255,255,0) 46%, rgba(255,255,255,.12) 50%, rgba(255,255,255,0) 54%);
-      filter: blur(14px);
-      transform: translateX(-35%) rotate(10deg);
-      opacity:.0;
-    }
-
     .introTitle{
       position:absolute; inset:0;
       display:grid; place-items:center;
       text-align:center;
       opacity:0;
-      transform: translateY(10px) scale(.98);
+      transform: translateY(10px) scale(.985);
     }
     .introTitle .sub{
       font-size: 12px;
@@ -207,9 +199,9 @@
     .introTitle h2{
       margin:0;
       font-size: clamp(26px, 4.2vw, 46px);
-      font-weight: 780;
+      font-weight: 820;
       color: rgba(233,238,247,.92);
-      text-shadow: 0 18px 60px rgba(0,0,0,.70);
+      text-shadow: 0 18px 70px rgba(0,0,0,.70);
     }
 
     @media (max-width: 900px){
@@ -237,8 +229,9 @@
 <body>
   <div id="stage"></div>
 
-  <div class="rays" id="rays"></div>
-  <div class="fog" id="fog"></div>
+  <!-- overlays -->
+  <div class="streaks" id="streaks"></div>
+  <div class="fogOverlay" id="fogOverlay"></div>
   <div class="vignette"></div>
   <div class="grain"></div>
 
@@ -247,9 +240,7 @@
     <section class="copy">
       <p class="kicker">CINEMATIC DROP</p>
       <h1>Luxury <span>product</span></h1>
-      <p class="desc">
-        Studio photo réaliste, reflets HDR, ombres douces, faisceaux lumineux et brume subtile.
-      </p>
+      <p class="desc">Éclairage studio intense, brume, profondeur et reflets premium sur le podium.</p>
       <div class="actions">
         <button class="btn" id="shop">Shop Now</button>
         <span class="hint">Souris / tactile pour parallax</span>
@@ -257,9 +248,7 @@
     </section>
   </div>
 
-  <!-- Intro -->
   <div class="intro" id="intro">
-    <div class="scan" id="scan"></div>
     <div class="introTitle" id="introTitle">
       <div>
         <div class="sub">REVEAL SEQUENCE</div>
@@ -281,13 +270,17 @@
     import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
     import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 
+    // Postprocessing (bloom)
+    import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+    import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+    import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
+
     const stage = document.getElementById("stage");
     const ui = document.getElementById("ui");
-    const fogEl = document.getElementById("fog");
-    const raysEl = document.getElementById("rays");
+    const streaksEl = document.getElementById("streaks");
+    const fogOverlayEl = document.getElementById("fogOverlay");
     const fallback = document.getElementById("fallback");
     const introEl = document.getElementById("intro");
-    const scanEl = document.getElementById("scan");
     const introTitleEl = document.getElementById("introTitle");
 
     // ✅ adapte si besoin
@@ -305,128 +298,166 @@
       throw new Error("WebGL not available");
     }
 
-    // Scene
-    const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x07101d, 0.055);
-
-    // Renderer (REALISTIC)
+    // ===== Renderer (ciné) =====
     const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:"high-performance" });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
-
-    // ✅ Cinematic tone mapping (makes it “photo/film”)
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
-
+    renderer.toneMappingExposure = 1.35; // + lumineux comme la ref
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     stage.appendChild(renderer.domElement);
 
-    // Camera (slightly longer focal feel)
-    const camera = new THREE.PerspectiveCamera(38, window.innerWidth/window.innerHeight, 0.1, 100);
-    camera.position.set(0, 1.45, 8.3);
+    // ===== Scene =====
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x07101d, 0.06);
 
-    // Group
+    // ===== Camera =====
+    const camera = new THREE.PerspectiveCamera(36, window.innerWidth/window.innerHeight, 0.1, 120);
+    camera.position.set(0, 1.45, 9.4);
+
+    // ===== Postprocessing (Bloom) =====
+    const composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    const bloom = new UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      1.25,   // strength
+      0.38,   // radius
+      0.20    // threshold (bas => beaucoup de bloom)
+    );
+    composer.addPass(bloom);
+
+    // ===== Environment HDR (reflets) =====
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    pmrem.compileEquirectangularShader();
+    const HDR_URL = "https://cdn.jsdelivr.net/gh/pmndrs/drei-assets@master/hdri/studio_small_09_1k.hdr";
+    new RGBELoader()
+      .setDataType(THREE.HalfFloatType)
+      .load(HDR_URL, (hdr) => {
+        const env = pmrem.fromEquirectangular(hdr).texture;
+        scene.environment = env;
+        hdr.dispose();
+        pmrem.dispose();
+      });
+
+    // ===== World =====
     const rig = new THREE.Group();
     scene.add(rig);
 
-    // Podium (more realistic material response)
+    // Podium plus proche ref (bords + glow)
     function makePodium(){
       const g = new THREE.Group();
+
       const metal = new THREE.MeshStandardMaterial({
-        color: 0x0a0f18,
+        color: 0x070b12,
         metalness: 1.0,
-        roughness: 0.20
+        roughness: 0.18
       });
 
-      const make = (r, h, y) => {
-        const body = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 160), metal);
+      const edgeMat = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        metalness: 1.0,
+        roughness: 0.06,
+        emissive: 0x101010
+      });
+
+      const ring = (r, h, y) => {
+        const body = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 200), metal);
         body.position.y = y;
         body.castShadow = true;
         body.receiveShadow = true;
 
-        const rim = new THREE.Mesh(
-          new THREE.TorusGeometry(r, 0.018, 14, 260),
-          new THREE.MeshStandardMaterial({
-            color: 0xffffff,
-            metalness: 1.0,
-            roughness: 0.06,
-            emissive: 0x050505
-          })
-        );
-        rim.rotation.x = Math.PI/2;
-        rim.position.y = y + h/2 - 0.02;
+        const edge = new THREE.Mesh(new THREE.TorusGeometry(r, 0.020, 14, 300), edgeMat);
+        edge.rotation.x = Math.PI/2;
+        edge.position.y = y + h/2 - 0.02;
 
-        g.add(body, rim);
+        g.add(body, edge);
       };
 
-      make(1.45, 0.30, 0.15);
-      make(1.10, 0.22, 0.40);
-      make(0.82, 0.18, 0.59);
+      ring(1.55, 0.30, 0.16);
+      ring(1.18, 0.22, 0.41);
+      ring(0.88, 0.18, 0.60);
 
       return g;
     }
     const podium = makePodium();
     rig.add(podium);
 
-    // Floor (darker + less “plastic”)
+    // Sol glossy + “profondeur”
+    // Petite texture procédurale (très légère) pour casser le “CAD”
+    function makeFloorTexture(){
+      const c = document.createElement("canvas");
+      c.width = c.height = 512;
+      const ctx = c.getContext("2d");
+      ctx.fillStyle = "#070a10";
+      ctx.fillRect(0,0,512,512);
+      ctx.strokeStyle = "rgba(255,255,255,0.06)";
+      ctx.lineWidth = 1;
+
+      // hex-ish grid soft
+      for(let y=0;y<512;y+=32){
+        for(let x=0;x<512;x+=32){
+          ctx.beginPath();
+          ctx.arc(x+16, y+16, 14, 0, Math.PI*2);
+          ctx.stroke();
+        }
+      }
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(2.2, 2.2);
+      tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+      return tex;
+    }
+
     const floor = new THREE.Mesh(
-      new THREE.CircleGeometry(9.0, 220),
-      new THREE.MeshStandardMaterial({ color: 0x04060b, metalness:0.55, roughness:0.42 })
+      new THREE.CircleGeometry(10.0, 240),
+      new THREE.MeshStandardMaterial({
+        color: 0x04060b,
+        metalness: 0.55,
+        roughness: 0.38,
+        map: makeFloorTexture()
+      })
     );
     floor.rotation.x = -Math.PI/2;
     floor.position.y = -0.01;
     floor.receiveShadow = true;
     scene.add(floor);
 
-    // HDR environment (huge improvement vs “CAD” look)
-    // NOTE: external HDRI - works on GitHub Pages
-    const pmrem = new THREE.PMREMGenerator(renderer);
-    pmrem.compileEquirectangularShader();
+    // ===== Lights (beaucoup + intense comme la ref) =====
+    scene.add(new THREE.AmbientLight(0xffffff, 0.05));
 
-    const HDR_URL = "https://cdn.jsdelivr.net/gh/pmndrs/drei-assets@master/hdri/studio_small_09_1k.hdr";
-
-    new RGBELoader()
-      .setDataType(THREE.HalfFloatType)
-      .load(HDR_URL, (hdr) => {
-        const envMap = pmrem.fromEquirectangular(hdr).texture;
-        scene.environment = envMap;
-        hdr.dispose();
-        pmrem.dispose();
-      });
-
-    // Lights (studio setup)
-    const ambient = new THREE.AmbientLight(0xffffff, 0.05);
-    scene.add(ambient);
-
-    // Key light (left spotlight) - slightly warm
-    const leftSpot = new THREE.SpotLight(0xfff2e6, 0.0, 45, Math.PI/8.5, 0.25, 1.25);
-    leftSpot.position.set(-4.2, 2.8, 3.1);
+    // Key/Fill projecteurs (chaud/froid)
+    const leftSpot  = new THREE.SpotLight(0xfff2e6, 0.0, 55, Math.PI/10, 0.22, 1.35);
+    leftSpot.position.set(-5.2, 3.0, 3.2);
     leftSpot.target = podium;
     leftSpot.castShadow = true;
-    leftSpot.shadow.mapSize.set(2048, 2048);
-    leftSpot.shadow.bias = -0.0002;
+    leftSpot.shadow.mapSize.set(2048,2048);
+    leftSpot.shadow.bias = -0.00015;
     scene.add(leftSpot, leftSpot.target);
 
-    // Fill light (right spotlight) - slightly cooler
-    const rightSpot = new THREE.SpotLight(0xe8f2ff, 0.0, 45, Math.PI/8.5, 0.25, 1.25);
-    rightSpot.position.set(4.2, 2.8, 3.1);
+    const rightSpot = new THREE.SpotLight(0xe8f2ff, 0.0, 55, Math.PI/10, 0.22, 1.35);
+    rightSpot.position.set(5.2, 3.0, 3.2);
     rightSpot.target = podium;
     rightSpot.castShadow = true;
-    rightSpot.shadow.mapSize.set(2048, 2048);
-    rightSpot.shadow.bias = -0.0002;
+    rightSpot.shadow.mapSize.set(2048,2048);
+    rightSpot.shadow.bias = -0.00015;
     scene.add(rightSpot, rightSpot.target);
+
+    // Gros “burst” central (comme l'image)
+    const centerBurst = new THREE.PointLight(0xffffff, 0.0, 18, 2);
+    centerBurst.position.set(0, 0.95, 0);
+    scene.add(centerBurst);
 
     // Rim/back light
     const rim = new THREE.DirectionalLight(0xffffff, 0.0);
-    rim.position.set(0.5, 3.8, -4.4);
+    rim.position.set(0.7, 4.0, -5.2);
     scene.add(rim);
 
-    // Volumetric beams (less “cone” look)
+    // ===== Volumetric beams (plus subtils, plus “réel”) =====
     function makeBeam(){
-      const geo = new THREE.ConeGeometry(1.05, 6.2, 60, 1, true);
-      geo.translate(0, -3.1, 0);
+      const geo = new THREE.ConeGeometry(1.25, 7.0, 80, 1, true);
+      geo.translate(0, -3.5, 0);
       const mat = new THREE.MeshBasicMaterial({
         color: 0xffffff,
         transparent: true,
@@ -435,61 +466,45 @@
         blending: THREE.AdditiveBlending,
         side: THREE.DoubleSide
       });
-      const m = new THREE.Mesh(geo, mat);
-      return m;
+      return new THREE.Mesh(geo, mat);
     }
-    const beamL = makeBeam();
-    beamL.position.copy(leftSpot.position);
-    beamL.rotation.x = -Math.PI/2.75;
-    scene.add(beamL);
+    const beamL = makeBeam(); beamL.position.copy(leftSpot.position); beamL.rotation.x = -Math.PI/2.85; scene.add(beamL);
+    const beamR = makeBeam(); beamR.position.copy(rightSpot.position); beamR.rotation.x = -Math.PI/2.85; scene.add(beamR);
 
-    const beamR = makeBeam();
-    beamR.position.copy(rightSpot.position);
-    beamR.rotation.x = -Math.PI/2.75;
-    scene.add(beamR);
-
-    // Dust (finer, less “cartoon”)
-    const dustCount = 1900;
+    // ===== Dust particles =====
+    const dustCount = 2200;
     const dustGeo = new THREE.BufferGeometry();
     const dustPos = new Float32Array(dustCount * 3);
     for(let i=0;i<dustCount;i++){
-      dustPos[i*3+0] = (Math.random()-0.5)*12;
-      dustPos[i*3+1] = Math.random()*4.8;
-      dustPos[i*3+2] = (Math.random()-0.5)*12;
+      dustPos[i*3+0] = (Math.random()-0.5)*14;
+      dustPos[i*3+1] = Math.random()*5.2;
+      dustPos[i*3+2] = (Math.random()-0.5)*14;
     }
     dustGeo.setAttribute("position", new THREE.BufferAttribute(dustPos, 3));
-    const dustMat = new THREE.PointsMaterial({
-      color:0xffffff,
-      size:0.010,
-      transparent:true,
-      opacity:0.13,
-      depthWrite:false
-    });
-    const dust = new THREE.Points(dustGeo, dustMat);
+    const dust = new THREE.Points(
+      dustGeo,
+      new THREE.PointsMaterial({ color:0xffffff, size:0.010, transparent:true, opacity:0.12, depthWrite:false })
+    );
     scene.add(dust);
 
-    // Model
+    // ===== Model load =====
     let model = null;
-    const loader = new GLTFLoader();
-    loader.load(
+    new GLTFLoader().load(
       MODEL_URL,
       (gltf) => {
         model = gltf.scene;
-
         model.traverse((o)=>{
           if(o.isMesh){
             o.castShadow = true;
             o.receiveShadow = true;
-
-            // Keep the artist materials, but nudge toward realism if they’re flat
+            // si matériau trop “plat”, on le pousse un peu vers le photoréaliste
             if(o.material && o.material.isMeshStandardMaterial){
-              o.material.metalness = Math.min(1, (o.material.metalness ?? 0.2) + 0.15);
-              o.material.roughness = Math.max(0.10, (o.material.roughness ?? 0.65) - 0.12);
+              o.material.metalness = Math.min(1, (o.material.metalness ?? 0.2) + 0.12);
+              o.material.roughness = Math.max(0.10, (o.material.roughness ?? 0.65) - 0.10);
             }
           }
         });
 
-        // Center & scale
         const box = new THREE.Box3().setFromObject(model);
         const size = new THREE.Vector3();
         const center = new THREE.Vector3();
@@ -498,8 +513,8 @@
         model.position.sub(center);
 
         const maxDim = Math.max(size.x, size.y, size.z) || 1;
-        model.scale.setScalar(1.22 / maxDim);
-        model.position.y = 0.86;
+        model.scale.setScalar(1.25 / maxDim);
+        model.position.y = 0.88;
 
         rig.add(model);
       },
@@ -507,7 +522,7 @@
       (err) => console.error("Erreur chargement GLTF:", err)
     );
 
-    // Input
+    // ===== Interaction =====
     const pointer = { x:0, y:0, tx:0, ty:0 };
     const onMove = (x,y)=>{
       pointer.tx = (x / window.innerWidth) * 2 - 1;
@@ -521,97 +536,102 @@
 
     document.getElementById("shop").addEventListener("click", ()=> alert("CTA: Shop Now (à brancher)"));
 
-    // Resize
+    // ===== Resize =====
     function resize(){
       camera.aspect = window.innerWidth/window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
+      composer.setSize(window.innerWidth, window.innerHeight);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     }
     window.addEventListener("resize", resize);
 
-    // Intro timeline (more cinematic)
+    // ===== Intro timeline (match ref) =====
     const t0 = performance.now();
-    const introDur = 4200;
+    const introDur = 5200;
 
+    const clamp01 = (t)=> Math.max(0, Math.min(1, t));
     const easeOut = (t)=> 1 - Math.pow(1 - t, 3);
     const easeInOut = (t)=> t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
-    const clamp01 = (t)=> Math.max(0, Math.min(1, t));
 
     function animate(now){
       const raw = clamp01((now - t0) / introDur);
       const e = easeOut(raw);
-      const cin = easeInOut(raw);
 
-      // Camera: slow push-in + tiny drift (no “cartoon shake”)
-      const driftX = Math.sin(now*0.00022)*0.025;
-      const driftY = Math.cos(now*0.00018)*0.016;
+      // Camera push-in + légère profondeur
+      const driftX = Math.sin(now*0.00018)*0.025;
+      const driftY = Math.cos(now*0.00014)*0.016;
 
-      camera.position.z = 9.2 - 2.25 * e;
-      camera.position.y = 1.62 - 0.18 * e + driftY;
+      camera.position.z = 10.1 - 2.65 * e;
+      camera.position.y = 1.68 - 0.22 * e + driftY;
       camera.position.x = 0.10 * (1 - e) + driftX;
-      camera.lookAt(0, 0.95, 0);
+      camera.lookAt(0, 0.96, 0);
 
-      // UI + overlays appear later (more cinematic)
-      const uiGate = clamp01((raw - 0.28) / 0.72);
+      // UI apparaît après l'allumage
+      const uiGate = clamp01((raw - 0.34) / 0.66);
       ui.style.opacity = (uiGate).toFixed(3);
       ui.style.transform = `translateY(${(16*(1-uiGate)).toFixed(2)}px)`;
 
-      fogEl.style.opacity = (0.62 * uiGate).toFixed(3);
-      raysEl.style.opacity = (0.55 * uiGate).toFixed(3);
+      // overlays (streaks + fog) comme l'image
+      fogOverlayEl.style.opacity = (0.70 * uiGate).toFixed(3);
+      streaksEl.style.opacity = (0.85 * uiGate).toFixed(3);
 
-      // Intro title reveal + scan pass
-      const titleGate = clamp01((raw - 0.08) / 0.30);
+      // intro title
+      const titleGate = clamp01((raw - 0.08) / 0.24);
       introTitleEl.style.opacity = (titleGate).toFixed(3);
-      introTitleEl.style.transform = `translateY(${(10*(1-titleGate)).toFixed(2)}px) scale(${(0.98 + 0.02*titleGate).toFixed(3)})`;
+      introTitleEl.style.transform =
+        `translateY(${(10*(1-titleGate)).toFixed(2)}px) scale(${(0.985 + 0.015*titleGate).toFixed(3)})`;
 
-      const scanGate = clamp01((raw - 0.18) / 0.26);
-      scanEl.style.opacity = (0.35 * scanGate).toFixed(3);
-      scanEl.style.transform = `translateX(${(-35 + 85*scanGate).toFixed(2)}%) rotate(10deg)`;
-
-      // Projector “flicker on” (realistic)
-      const flick = (raw < 0.35)
-        ? (0.65 + 0.35*Math.sin(now*0.02) * Math.sin(now*0.011))
+      // “flicker” projecteurs au démarrage (ciné)
+      const flick = (raw < 0.34)
+        ? (0.60 + 0.40*Math.sin(now*0.020) * Math.sin(now*0.011))
         : 1.0;
 
       // Lights ramp
-      const lightGate = clamp01((raw - 0.18) / 0.60);
-      const L = 12.5 * easeInOut(lightGate) * flick;
+      const lightGate = clamp01((raw - 0.16) / 0.56);
+      const L = 18.0 * easeInOut(lightGate) * flick;
 
-      leftSpot.intensity  = L * 0.98;
-      rightSpot.intensity = L * 0.95;
-      rim.intensity       = 1.35 * easeInOut(lightGate);
+      leftSpot.intensity  = L * 0.95;
+      rightSpot.intensity = L * 0.92;
+      rim.intensity       = 1.55 * easeInOut(lightGate);
 
-      // Volumetric beams (subtle)
-      const beamOp = 0.13 * easeInOut(lightGate);
+      // Central burst (gros halo)
+      const burstGate = clamp01((raw - 0.26) / 0.22);
+      const burst = 30.0 * easeInOut(burstGate);
+      centerBurst.intensity = burst;
+      bloom.strength = 1.10 + 0.85 * burstGate; // + bloom au reveal
+      bloom.radius = 0.42;
+      bloom.threshold = 0.14;
+
+      // Beams visibles
+      const beamOp = 0.18 * easeInOut(lightGate);
       beamL.material.opacity = beamOp;
       beamR.material.opacity = beamOp;
 
-      // Pointer smoothing
+      // Parallax (subtil)
       pointer.x += (pointer.tx - pointer.x) * 0.06;
       pointer.y += (pointer.ty - pointer.y) * 0.06;
-
-      // Parallax (subtle, realistic)
       rig.rotation.x = pointer.y * 0.10;
       rig.rotation.y = pointer.x * 0.18;
 
-      // Model slow rotation
+      // rotation modèle
       if(model){
-        model.rotation.y += 0.0042;
+        model.rotation.y += 0.0040;
         model.rotation.x = -pointer.y * 0.03;
       }
 
-      // Dust drift
+      // dust
       dust.rotation.y += 0.0009;
       dust.rotation.x += 0.00025;
 
-      // Fade intro to scene
-      if(raw > 0.58) introEl.classList.add("off");
-      if(raw > 0.92) introEl.style.display = "none";
+      // fade intro
+      if(raw > 0.62) introEl.classList.add("off");
+      if(raw > 0.94) introEl.style.display = "none";
 
-      renderer.render(scene, camera);
+      composer.render();
       requestAnimationFrame(animate);
     }
+
     requestAnimationFrame(animate);
   </script>
 </body>
