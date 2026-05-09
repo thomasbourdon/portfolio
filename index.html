@@ -331,35 +331,6 @@ section { position:relative; overflow:hidden; }
 .stl { font-size:.62rem; letter-spacing:.18em; text-transform:uppercase; color:var(--text-mu); margin-top:.3rem; display:block; }
 
 /* ════════════════════════════════════════════════════════
-   SHOWCASE 3D — loader overlay
-════════════════════════════════════════════════════════ */
-#sc-loader {
-  position:absolute; inset:0; z-index:10;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  pointer-events:none;
-  transition:opacity .8s ease;
-}
-#sc-loader.hidden { opacity:0; pointer-events:none; }
-.sc-loader-ring {
-  width:54px; height:54px; border-radius:50%;
-  border:1.5px solid rgba(201,168,76,.18);
-  border-top-color:var(--gold);
-  animation:spinRing 1.1s linear infinite;
-}
-@keyframes spinRing { to { transform:rotate(360deg); } }
-.sc-loader-label {
-  margin-top:1.2rem; font-size:.5rem; letter-spacing:.5em;
-  text-transform:uppercase; color:rgba(201,168,76,.7);
-}
-#sc-hint {
-  position:absolute; bottom:1.5rem; left:50%; transform:translateX(-50%);
-  font-size:.48rem; letter-spacing:.4em; text-transform:uppercase;
-  color:rgba(201,168,76,.45); z-index:5; pointer-events:none;
-  opacity:0; transition:opacity 1s .5s;
-}
-#sc-hint.show { opacity:1; }
-
-/* ════════════════════════════════════════════════════════
    3D SHOWCASE
 ════════════════════════════════════════════════════════ */
 #showcase {
@@ -403,28 +374,201 @@ section { position:relative; overflow:hidden; }
 .sc-fio-r { position:absolute;right:80px;top:50%;transform:translateY(-50%) scaleX(-1);pointer-events:none;z-index:4;overflow:visible; }
 
 /* ════════════════════════════════════════════════════════
-   SKILLS
+   SHOWCASE — Loader overlay & hint
 ════════════════════════════════════════════════════════ */
-#skills { padding:9rem 3rem 8rem; background:var(--cream); overflow:visible; }
-#skills .inner { max-width:1200px; margin:0 auto; }
-.sk-cats { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:4rem; }
-.sk-cat-card { background:var(--white); padding:2.8rem 2.5rem; border:1px solid rgba(201,168,76,.1); transition:border-color .4s,box-shadow .4s; }
-.sk-cat-card:hover { border-color:rgba(201,168,76,.35); box-shadow:0 12px 50px rgba(201,168,76,.06); }
-.sk-catname { font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:400; color:var(--text); display:flex; align-items:center; gap:.9rem; margin-bottom:2.4rem; padding-bottom:1.1rem; border-bottom:1px solid var(--gold-p); }
-.sk-catname::before { content:''; width:14px; height:1px; background:linear-gradient(90deg,var(--gold),var(--rose)); flex-shrink:0; }
-.sk-arc-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.8rem; }
-.sk-arc-item { display:flex; flex-direction:column; align-items:center; gap:.7rem; }
-.sk-arc-svg  { width:82px; height:82px; }
-.sk-bg  { fill:none; stroke:rgba(201,168,76,.1); stroke-width:3; }
-.sk-fg  { fill:none; stroke:url(#skGrad); stroke-width:3.2; stroke-linecap:round; stroke-dasharray:0 214; stroke-dashoffset:53.5; transform:rotate(-90deg); transform-origin:center; transition:stroke-dasharray 1.4s var(--eout); }
-.sk-fg.go { stroke-dasharray:var(--arc) 214; }
-.sk-pct-txt { font-family:'Cormorant Garamond',serif; font-size:1rem; font-weight:400; fill:var(--gold); }
-.sk-n { font-size:.68rem; letter-spacing:.1em; color:var(--text-m); text-align:center; line-height:1.3; }
-.sk-soft { margin-top:4rem; padding-top:2.5rem; border-top:1px solid var(--gold-p); text-align:center; }
-.sk-soft-label { display:block; font-size:.56rem; letter-spacing:.5em; text-transform:uppercase; color:var(--gold); margin-bottom:1.4rem; }
-.sk-soft-tags { display:flex; flex-wrap:wrap; gap:.8rem; justify-content:center; }
-.sk-tag { padding:.5rem 1.4rem; border:1px solid rgba(201,168,76,.25); font-size:.68rem; letter-spacing:.18em; text-transform:uppercase; color:var(--text-m); transition:border-color .3s,color .3s,background .3s; }
-.sk-tag:hover { border-color:var(--rose); color:var(--rose); background:var(--rose-p); }
+#sc-loader {
+  position:absolute; inset:0; z-index:10;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  pointer-events:none;
+  transition:opacity .8s ease;
+}
+.sc-loader-ring {
+  width:52px; height:52px; border-radius:50%;
+  border:1.5px solid rgba(201,168,76,.18);
+  border-top-color:#C9A84C;
+  animation:scSpin 1.1s linear infinite;
+}
+@keyframes scSpin { to { transform:rotate(360deg); } }
+.sc-loader-label {
+  margin-top:1.1rem; font-size:.5rem; letter-spacing:.5em;
+  text-transform:uppercase; color:rgba(201,168,76,.7);
+  font-family:'Raleway',sans-serif;
+}
+#sc-hint {
+  position:absolute; bottom:1.5rem; left:50%; transform:translateX(-50%);
+  font-size:.46rem; letter-spacing:.4em; text-transform:uppercase;
+  color:rgba(201,168,76,.4); z-index:5; pointer-events:none;
+  opacity:0; transition:opacity 1s;
+  white-space:nowrap;
+}
+
+/* ════════════════════════════════════════════════════════
+   TIMELINE — Mon Parcours
+════════════════════════════════════════════════════════ */
+#skills { padding:8rem 3rem 7rem; background:var(--cream); overflow:visible; position:relative; }
+.tl-wrap { max-width:900px; margin:0 auto; position:relative; }
+.tl-spine {
+  position:absolute; left:50%; top:0; bottom:0; width:1px;
+  background:linear-gradient(to bottom, transparent, var(--gold) 8%, var(--gold) 92%, transparent);
+  transform:translateX(-50%);
+}
+@media(max-width:700px){ .tl-spine { left:2.2rem; } }
+.tl-item {
+  display:flex; align-items:flex-start; gap:3rem;
+  margin-bottom:4.5rem; position:relative;
+}
+.tl-item:nth-child(even) { flex-direction:row-reverse; }
+.tl-side { width:calc(50% - 2.5rem); flex-shrink:0; }
+.tl-item:nth-child(even) .tl-side { text-align:right; }
+.tl-dot {
+  position:absolute; left:50%; top:.55rem;
+  transform:translateX(-50%);
+  width:11px; height:11px; border-radius:50%;
+  background:var(--gold); border:2px solid var(--cream);
+  box-shadow:0 0 0 2px var(--gold);
+  z-index:2;
+}
+@media(max-width:700px){
+  .tl-item, .tl-item:nth-child(even) { flex-direction:column; padding-left:4.5rem; }
+  .tl-side { width:100%; }
+  .tl-item:nth-child(even) .tl-side { text-align:left; }
+  .tl-dot { left:2.2rem; }
+}
+.tl-year {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:2.2rem; color:var(--gold); line-height:1; margin-bottom:.4rem;
+}
+.tl-title {
+  font-family:'Cormorant Garamond',serif; font-size:1.15rem;
+  font-weight:400; color:var(--text); margin-bottom:.5rem; line-height:1.3;
+}
+.tl-sub {
+  font-size:.58rem; letter-spacing:.32em; text-transform:uppercase;
+  color:var(--rose); margin-bottom:.7rem;
+}
+.tl-desc {
+  font-size:.72rem; line-height:1.75; color:var(--text-m);
+}
+.tl-tags {
+  display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.8rem;
+}
+.tl-item:nth-child(even) .tl-tags { justify-content:flex-end; }
+.tl-tag {
+  font-size:.48rem; letter-spacing:.22em; text-transform:uppercase;
+  padding:.3rem .8rem; border:1px solid rgba(201,168,76,.3);
+  color:var(--gold-dk); background:rgba(201,168,76,.05);
+}
+
+/* ════════════════════════════════════════════════════════
+   TETRIS TP — Grille paginée
+════════════════════════════════════════════════════════ */
+.tp-page { display:none; }
+.tp-page.active { display:grid; }
+.tp-grid {
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-rows: 80px;
+  gap: 10px;
+  max-width:1320px; margin:0 auto;
+}
+/* Formes Tetris — chaque card a une taille définie */
+.tp-card {
+  position:relative; overflow:hidden; cursor:pointer;
+  background:var(--cream-d);
+  transition:transform .35s var(--eout), box-shadow .35s;
+}
+.tp-card:hover { transform:translateY(-3px); box-shadow:0 16px 50px rgba(201,168,76,.14); }
+/* Variantes de taille pour effet tetris */
+.tp-s1 { grid-column:span 4; grid-row:span 3; }
+.tp-s2 { grid-column:span 3; grid-row:span 4; }
+.tp-s3 { grid-column:span 5; grid-row:span 2; }
+.tp-s4 { grid-column:span 4; grid-row:span 2; }
+.tp-s5 { grid-column:span 3; grid-row:span 3; }
+.tp-s6 { grid-column:span 6; grid-row:span 3; }
+.tp-s7 { grid-column:span 4; grid-row:span 4; }
+.tp-s8 { grid-column:span 5; grid-row:span 3; }
+
+/* Image gallery dans chaque card */
+.tp-gallery { position:absolute; inset:0; }
+.tp-gallery img {
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; opacity:0;
+  transition:opacity .5s ease;
+}
+.tp-gallery img.active { opacity:1; }
+/* Placeholder couleur si pas d'image */
+.tp-gallery-placeholder {
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+}
+/* Overlay texte */
+.tp-overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(to top, rgba(9,7,10,.92) 0%, rgba(9,7,10,.18) 55%, transparent 100%);
+  opacity:0; transition:opacity .38s var(--eout);
+  display:flex; flex-direction:column; justify-content:flex-end;
+  padding:1rem 1.1rem;
+}
+.tp-card:hover .tp-overlay { opacity:1; }
+.tp-border-hover {
+  position:absolute; inset:8px; border:1px solid var(--gold);
+  opacity:0; transition:opacity .38s, inset .38s var(--eout);
+  pointer-events:none;
+}
+.tp-card:hover .tp-border-hover { opacity:.4; inset:11px; }
+.tp-label-idle {
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:.85rem; color:rgba(201,168,76,.45); text-align:center;
+  padding:.8rem; pointer-events:none;
+  transition:opacity .3s;
+}
+.tp-card:hover .tp-label-idle { opacity:0; }
+.tp-title { font-family:'Cormorant Garamond',serif; font-size:1rem; font-weight:400; color:#fff; line-height:1.2; }
+.tp-cat   { font-size:.46rem; letter-spacing:.28em; text-transform:uppercase; color:var(--gold); margin-top:.25rem; }
+
+/* Effet reflet diagonale */
+.tp-sheen {
+  position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:5;
+}
+.tp-sheen::after {
+  content:'';
+  position:absolute; top:-100%; left:-60%;
+  width:45%; height:300%;
+  background:linear-gradient(105deg, transparent 30%, rgba(255,255,255,.22) 50%, transparent 70%);
+  transform:translateX(-100%);
+  transition:none;
+}
+.tp-card:hover .tp-sheen::after {
+  transform:translateX(500%);
+  transition:transform .55s ease;
+}
+
+/* Pagination */
+.tp-pagination {
+  display:flex; align-items:center; justify-content:center;
+  gap:1.2rem; margin-top:2.5rem;
+}
+.tp-btn {
+  width:36px; height:36px; border:1px solid rgba(201,168,76,.35);
+  background:transparent; cursor:pointer; color:rgba(201,168,76,.6);
+  font-size:.85rem; display:flex; align-items:center; justify-content:center;
+  transition:border-color .3s, color .3s, background .3s;
+}
+.tp-btn:hover { border-color:var(--gold); color:var(--gold); background:rgba(201,168,76,.06); }
+.tp-btn:disabled { opacity:.25; cursor:default; }
+.tp-dots { display:flex; gap:.6rem; }
+.tp-pdot {
+  width:8px; height:8px; border-radius:50%;
+  border:1px solid rgba(201,168,76,.4);
+  background:transparent; cursor:pointer;
+  transition:background .3s, border-color .3s;
+}
+.tp-pdot.on { background:var(--gold); border-color:var(--gold); }
+.tp-page-label {
+  font-size:.5rem; letter-spacing:.4em; text-transform:uppercase;
+  color:rgba(201,168,76,.45);
+}
 
 /* ════════════════════════════════════════════════════════
    SOFTWARE — DEUX NIVEAUX : Principal + Secondaire
@@ -520,53 +664,9 @@ section { position:relative; overflow:hidden; }
 .sw-secondary::after  { right:0; background:linear-gradient(-90deg,var(--charcoal),transparent); }
 
 /* ════════════════════════════════════════════════════════
-   PAST PROJECTS — GRILLE MASONRY ALÉATOIRE
+   PAST PROJECTS — TETRIS PAGINÉ
 ════════════════════════════════════════════════════════ */
-#past { padding:8rem 3rem 9rem; background:var(--white); }
-
-/* Masonry CSS columns */
-.pgrid-masonry {
-  columns:4; column-gap:1rem;
-  max-width:1320px; margin:0 auto;
-}
-@media(max-width:1100px){ .pgrid-masonry { columns:3; } }
-@media(max-width:750px){ .pgrid-masonry { columns:2; } }
-@media(max-width:480px){ .pgrid-masonry { columns:1; } }
-
-.ppc {
-  position:relative; overflow:hidden; cursor:pointer;
-  break-inside:avoid; margin-bottom:1rem;
-  display:block;
-}
-/* Hauteurs variées pour effet aléatoire */
-.ppc.h-sm  { aspect-ratio:4/3; }
-.ppc.h-md  { aspect-ratio:3/4; }
-.ppc.h-lg  { aspect-ratio:2/3; }
-.ppc.h-sq  { aspect-ratio:1/1; }
-.ppc.h-ws  { aspect-ratio:16/9; }
-
-.ppc-inner {
-  position:absolute; inset:0;
-  background:var(--cream-d);
-  display:flex; align-items:center; justify-content:center;
-}
-.ppp { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Cormorant Garamond',serif; font-style:italic; font-size:.9rem; color:rgba(201,168,76,.5); text-align:center; padding:1rem; }
-.ppov {
-  position:absolute; inset:0;
-  background:linear-gradient(to top,rgba(9,7,10,.88) 0%,rgba(9,7,10,.15) 55%,transparent 100%);
-  opacity:0; transition:opacity .4s var(--eout);
-  display:flex; flex-direction:column; justify-content:flex-end; padding:1.2rem;
-}
-.ppc:hover .ppov { opacity:1; }
-.ppbord { position:absolute; inset:10px; border:1px solid var(--gold); opacity:0; transition:opacity .4s,inset .4s var(--eout); pointer-events:none; }
-.ppc:hover .ppbord { opacity:.35; inset:13px; }
-.pptitle { font-family:'Cormorant Garamond',serif; font-size:1.1rem; font-weight:400; color:var(--white); line-height:1.2; }
-.ppcat   { font-size:.5rem; letter-spacing:.28em; text-transform:uppercase; color:var(--gold); margin-top:.3rem; line-height:1.5; }
-/* Couleur de fond légèrement variée par catégorie */
-.ppc.bg-a .ppc-inner { background:#EEE8DF; }
-.ppc.bg-b .ppc-inner { background:#E8E0D5; }
-.ppc.bg-c .ppc-inner { background:#F0E8E0; }
-.ppc.bg-d .ppc-inner { background:#EBE3D8; }
+#past { padding:8rem 3rem 9rem; background:var(--white); position:relative; }
 
 /* ════════════════════════════════════════════════════════
    CONTACT
@@ -1110,9 +1210,9 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         <p class="ap rv">Étudiant ingénieur aux Arts et Métiers, je développe des compétences en conception mécanique, fabrication industrielle et visualisation numérique.</p>
         <p class="ap rv d1">Je m'intéresse autant aux procédés industriels — usinage, soudure, forgeage ou métrologie — qu'aux outils numériques comme SolidWorks, Blender, Unreal Engine 5 et Python.</p>
         <div class="astats rv d2">
-          <div><span class="stn">?</span><span class="stl">...</span></div>
-          <div><span class="stn">?</span><span class="stl">...</span></div>
-          <div><span class="stn">?</span><span class="stl">...</span></div>
+          <div><span class="stn">2</span><span class="stl">Certifications SolidWorks</span></div>
+          <div><span class="stn">6+</span><span class="stl">Procédés industriels</span></div>
+          <div><span class="stn">3</span><span class="stl">Projets 3D actifs</span></div>
         </div>
       </div>
     </div>
@@ -1194,43 +1294,103 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
   <img src="Assets/paint-brush-black.png" alt="">
 </div>
 
-  <!-- ─────────── SKILLS ─────────── -->
-  
+  <!-- ─────────── TIMELINE — Mon Parcours ─────────── -->
+
 <section id="skills">
-
 <div class="sh rv">
-<span class="sl">Mon approche</span>
-<h2 class="st">Concevoir. <em>Fabriquer.</em> Expérimenter.</h2>
+  <span class="sl">Mon parcours</span>
+  <h2 class="st">Formation &amp; <em>Expériences</em></h2>
+  <svg class="sh-orn" viewBox="0 0 440 32" width="320" height="32" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+    <g fill="none" stroke-width="1" opacity=".7">
+      <path d="M218,16 L222,10 L226,16 L222,22 Z" fill="#C9A84C" stroke="none" opacity="1"/>
+      <path d="M218,16 C206,16 188,11 168,14 C148,17 134,18 118,15 C102,12 92,10 80,11" stroke="#C9A84C"/>
+      <path d="M226,16 C238,16 256,11 276,14 C296,17 310,18 326,15 C342,12 352,10 364,11" stroke="#C9A84C"/>
+    </g>
+  </svg>
 </div>
 
-<div class="skills-modern-grid">
+<div class="tl-wrap rv">
+  <div class="tl-spine"></div>
 
-<div class="skill-panel">
-<span>01</span>
-<h3>Conception mécanique</h3>
-<p>CAO, assemblages complexes, simulations et optimisation mécanique.</p>
+  <!-- 1 -->
+  <div class="tl-item rv">
+    <div class="tl-side">
+      <div class="tl-year">2022</div>
+      <div class="tl-sub">Baccalauréat</div>
+      <div class="tl-title">Bac Scientifique — Mention Très Bien</div>
+      <div class="tl-desc">Spécialités Mathématiques &amp; Sciences de l'Ingénieur. Première approche de la conception mécanique et de la modélisation.</div>
+      <div class="tl-tags"><span class="tl-tag">Maths</span><span class="tl-tag">Sciences de l'ingénieur</span></div>
+    </div>
+    <div class="tl-dot"></div>
+    <div class="tl-side"></div>
+  </div>
+
+  <!-- 2 -->
+  <div class="tl-item rv d1">
+    <div class="tl-side"></div>
+    <div class="tl-dot"></div>
+    <div class="tl-side">
+      <div class="tl-year">2022–24</div>
+      <div class="tl-sub">Classes Préparatoires</div>
+      <div class="tl-title">MPSI / MP — Lycée de Cornouaille</div>
+      <div class="tl-desc">Formation intensive en mathématiques, physique et sciences de l'ingénieur. Développement de la rigueur analytique et de la résolution de problèmes complexes.</div>
+      <div class="tl-tags"><span class="tl-tag">Mathématiques</span><span class="tl-tag">Physique</span><span class="tl-tag">SI</span></div>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="tl-item rv d2">
+    <div class="tl-side">
+      <div class="tl-year">2024</div>
+      <div class="tl-sub">Entrée Grande École</div>
+      <div class="tl-title">Arts et Métiers — ENSAM</div>
+      <div class="tl-desc">Intégration du cursus ingénieur généraliste. Spécialisation progressive en conception mécanique, procédés industriels et systèmes numériques.</div>
+      <div class="tl-tags"><span class="tl-tag">Génie mécanique</span><span class="tl-tag">Conception</span><span class="tl-tag">Fabrication</span></div>
+    </div>
+    <div class="tl-dot"></div>
+    <div class="tl-side"></div>
+  </div>
+
+  <!-- 4 -->
+  <div class="tl-item rv d3">
+    <div class="tl-side"></div>
+    <div class="tl-dot"></div>
+    <div class="tl-side">
+      <div class="tl-year">2024</div>
+      <div class="tl-sub">Certification officielle</div>
+      <div class="tl-title">CSWA &amp; CSWP — SolidWorks</div>
+      <div class="tl-desc">Obtention des deux certifications officielles Dassault Systèmes : Associate et Professional. Maîtrise de la CAO paramétrique et des assemblages complexes.</div>
+      <div class="tl-tags"><span class="tl-tag">SolidWorks</span><span class="tl-tag">CAO</span><span class="tl-tag">Certifié</span></div>
+    </div>
+  </div>
+
+  <!-- 5 -->
+  <div class="tl-item rv d4">
+    <div class="tl-side">
+      <div class="tl-year">2024–25</div>
+      <div class="tl-sub">Projet étudiant</div>
+      <div class="tl-title">Équipe BFS — Formula Student</div>
+      <div class="tl-desc">Conception et modélisation 3D d'un monoplace de compétition au sein de l'équipe formula student ENSAM. Travail pluridisciplinaire entre mécanique, aérodynamique et fabrication.</div>
+      <div class="tl-tags"><span class="tl-tag">Formula Student</span><span class="tl-tag">Assemblage 3D</span><span class="tl-tag">Travail d'équipe</span></div>
+    </div>
+    <div class="tl-dot"></div>
+    <div class="tl-side"></div>
+  </div>
+
+  <!-- 6 -->
+  <div class="tl-item rv d5">
+    <div class="tl-side"></div>
+    <div class="tl-dot"></div>
+    <div class="tl-side">
+      <div class="tl-year">2025–26</div>
+      <div class="tl-sub">En cours</div>
+      <div class="tl-title">Spécialisation &amp; Projets Numériques</div>
+      <div class="tl-desc">Approfondissement en visualisation 3D avec Blender et Unreal Engine 5, développement Python, et maîtrise des procédés de fabrication avancés (composites, additive).</div>
+      <div class="tl-tags"><span class="tl-tag">Blender</span><span class="tl-tag">Unreal Engine 5</span><span class="tl-tag">Python</span><span class="tl-tag">Composites</span></div>
+    </div>
+  </div>
+
 </div>
-
-<div class="skill-panel">
-<span>02</span>
-<h3>Fabrication</h3>
-<p>Usinage, procédés industriels, atelier et compréhension terrain.</p>
-</div>
-
-<div class="skill-panel">
-<span>03</span>
-<h3>Visualisation 3D</h3>
-<p>Rendus premium, Unreal Engine 5 et mise en valeur technique.</p>
-</div>
-
-<div class="skill-panel">
-<span>04</span>
-<h3>Développement</h3>
-<p>Python, automatisation et outils d'ingénierie interactifs.</p>
-</div>
-
-</div>
-
 </section>
 
 
@@ -1274,7 +1434,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
   <!-- wave software → past -->
   <div class="gradient-fade-bottom"></div>
 
-  <!-- ─────────── PAST PROJECTS — MASONRY ─────────── -->
+  <!-- ─────────── PAST PROJECTS — TETRIS PAGINÉ ─────────── -->
   <section id="past" style="overflow:visible;">
     <svg style="position:absolute;top:2rem;left:2rem;pointer-events:none;z-index:3;opacity:.2;overflow:visible" viewBox="0 0 70 70" width="60" height="60" xmlns="http://www.w3.org/2000/svg">
       <path d="M3,67 L3,14 Q3,3 14,3 L67,3" fill="none" stroke="#C49A8A" stroke-width="1"/>
@@ -1296,81 +1456,231 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
       </svg>
     </div>
 
-    <!-- GRILLE MASONRY -->
-    <div class="pgrid-masonry">
-      <div class="ppc rv d1 h-lg bg-a">
-        <div class="ppc-inner"></div>
-        <div class="ppp">Transformation des matériaux</div>
-        <div class="ppbord"></div>
-        <div class="ppov"><div class="pptitle">Forgeage</div><div class="ppcat">Mise en forme de pièces métalliques par déformation à chaud.</div></div>
+    <!-- PAGE 1 -->
+    <div class="tp-page active tp-grid" id="tpPage0">
+
+      <!-- Forgeage — grande -->
+      <div class="tp-card tp-s1 rv" style="background:#EEE8DF;">
+        <div class="tp-gallery">
+          <!-- Ajoute tes images ici : <img src="Images/forgeage1.jpg" class="active" alt=""> <img src="Images/forgeage2.jpg" alt=""> -->
+        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E8E0D5,#D8CEBC);">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><rect x="8" y="18" width="24" height="14" rx="1" stroke="#C9A84C" stroke-width="1.2"/><path d="M14 18V14a6 6 0 0 1 12 0v4" stroke="#C9A84C" stroke-width="1.2"/></svg>
+        </div>
+        <div class="tp-label-idle">Transformation des matériaux</div>
+        <div class="tp-sheen"></div>
+        <div class="tp-border-hover"></div>
+        <div class="tp-overlay">
+          <div class="tp-title">Forgeage</div>
+          <div class="tp-cat">Mise en forme de pièces métalliques par déformation à chaud</div>
+        </div>
       </div>
-      <div class="ppc rv d2 h-sm bg-b">
-        <div class="ppc-inner"></div>
-        <div class="ppp">Assemblage industriel</div>
-        <div class="ppbord"></div>
-        <div class="ppov"><div class="pptitle">Soudage TIG / MIG</div><div class="ppcat">Réalisation d'assemblages métalliques.</div></div>
+
+      <!-- Soudage TIG/MIG -->
+      <div class="tp-card tp-s3 rv d1" style="background:#E8E0D5;">
+        <div class="tp-gallery">
+          <!-- <img src="Images/soudage1.jpg" class="active" alt=""> -->
+        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#DDD5C8,#C8BFB0);">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><circle cx="20" cy="20" r="12" stroke="#C9A84C" stroke-width="1.2"/><path d="M20 8v24M8 20h24" stroke="#C9A84C" stroke-width="1"/></svg>
+        </div>
+        <div class="tp-label-idle">Assemblage industriel</div>
+        <div class="tp-sheen"></div>
+        <div class="tp-border-hover"></div>
+        <div class="tp-overlay">
+          <div class="tp-title">Soudage TIG / MIG</div>
+          <div class="tp-cat">Réalisation d'assemblages métalliques</div>
+        </div>
       </div>
-      <div class="ppc rv d1 h-md bg-c">
-        <div class="ppc-inner"></div>
-        <div class="ppp">Procédés industriels</div>
-        <div class="ppbord"></div>
-        <div class="ppov"><div class="pptitle">Fonderie sable &amp; coque</div><div class="ppcat">Réalisation de pièces moulées.</div></div>
+
+      <!-- Fonderie -->
+      <div class="tp-card tp-s4 rv d2" style="background:#F0E8E0;">
+        <div class="tp-gallery">
+          <!-- <img src="Images/fonderie1.jpg" class="active" alt=""> -->
+        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E8DDD5,#D5C8BC);">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><path d="M10 30 L20 10 L30 30 Z" stroke="#C9A84C" stroke-width="1.2" fill="none"/></svg>
+        </div>
+        <div class="tp-label-idle">Procédés industriels</div>
+        <div class="tp-sheen"></div>
+        <div class="tp-border-hover"></div>
+        <div class="tp-overlay">
+          <div class="tp-title">Fonderie sable &amp; coque</div>
+          <div class="tp-cat">Réalisation de pièces moulées</div>
+        </div>
       </div>
-      <div class="ppc rv d3 h-ws bg-d">
-        <div class="ppc-inner"></div>
-        <div class="ppp">Usinage de précision</div>
-        <div class="ppbord"></div>
-        <div class="ppov"><div class="pptitle">Fraisage CNC</div><div class="ppcat">Usinage de pièces mécaniques et contrôle dimensionnel.</div></div>
+
+      <!-- Fraisage CNC — tall -->
+      <div class="tp-card tp-s2 rv d1" style="background:#EBE3D8;">
+        <div class="tp-gallery">
+          <!-- <img src="Images/fraisage1.jpg" class="active" alt=""> -->
+        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E3D8CC,#D0C5B8);">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><rect x="12" y="12" width="16" height="16" stroke="#C9A84C" stroke-width="1.2"/><path d="M20 4v8M20 28v8M4 20h8M28 20h8" stroke="#C9A84C" stroke-width="1"/></svg>
+        </div>
+        <div class="tp-label-idle">Usinage de précision</div>
+        <div class="tp-sheen"></div>
+        <div class="tp-border-hover"></div>
+        <div class="tp-overlay">
+          <div class="tp-title">Fraisage CNC</div>
+          <div class="tp-cat">Usinage de pièces mécaniques et contrôle dimensionnel</div>
+        </div>
       </div>
-      <div class="ppc rv d2 h-sm bg-a">
-        <div class="ppc-inner"></div>
-        <div class="ppp">Usinage de précision</div>
-        <div class="ppbord"></div>
-        <div class="ppov"><div class="pptitle">Tournage</div><div class="ppcat">Fabrication de pièces cylindriques par tournage conventionnel.</div></div>
+
+      <!-- Tournage -->
+      <div class="tp-card tp-s4 rv d2" style="background:#EEE8DF;">
+        <div class="tp-gallery">
+          <!-- <img src="Images/tournage1.jpg" class="active" alt=""> -->
+        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E5DDD0,#D5CBBC);">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><circle cx="20" cy="20" r="10" stroke="#C9A84C" stroke-width="1.2"/><circle cx="20" cy="20" r="4" stroke="#C9A84C" stroke-width="1"/></svg>
+        </div>
+        <div class="tp-label-idle">Usinage de précision</div>
+        <div class="tp-sheen"></div>
+        <div class="tp-border-hover"></div>
+        <div class="tp-overlay">
+          <div class="tp-title">Tournage</div>
+          <div class="tp-cat">Fabrication de pièces cylindriques par tournage conventionnel</div>
+        </div>
       </div>
-      <div class="ppc rv d4 h-md bg-b">
-        <div class="ppc-inner"></div>
-        <div class="ppp">Contrôle &amp; mesure</div>
-        <div class="ppbord"></div>
-        <div class="ppov"><div class="pptitle">Métrologie dimensionnelle</div><div class="ppcat">Validation géométrique de pièces mécaniques.</div></div>
+
+      <!-- Métrologie -->
+      <div class="tp-card tp-s5 rv d3" style="background:#E8E0D5;">
+        <div class="tp-gallery">
+          <!-- <img src="Images/metro1.jpg" class="active" alt=""> -->
+        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#DDD5C8,#CBBFB2);">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><path d="M8 32 L32 8" stroke="#C9A84C" stroke-width="1.2"/><path d="M8 8h24v24" stroke="#C9A84C" stroke-width="1" fill="none"/></svg>
+        </div>
+        <div class="tp-label-idle">Contrôle &amp; mesure</div>
+        <div class="tp-sheen"></div>
+        <div class="tp-border-hover"></div>
+        <div class="tp-overlay">
+          <div class="tp-title">Métrologie dimensionnelle</div>
+          <div class="tp-cat">Validation géométrique de pièces mécaniques</div>
+        </div>
       </div>
-      <div class="ppc rv d1 h-sq bg-c">
-        <div class="ppc-inner"></div>
-        <div class="ppp">Fabrication additive</div>
-        <div class="ppbord"></div>
-        <div class="ppov"><div class="pptitle">Prototypage rapide</div><div class="ppcat">Fabrication de pièces techniques par impression 3D.</div></div>
+
+    </div><!-- /page 1 -->
+
+    <!-- PAGE 2 -->
+    <div class="tp-page tp-grid" id="tpPage1">
+
+      <!-- Prototypage rapide — large -->
+      <div class="tp-card tp-s6 rv" style="background:#F0E8E0;">
+        <div class="tp-gallery">
+          <!-- <img src="Images/proto1.jpg" class="active" alt=""> -->
+        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E8DED5,#D8CEBC);">
+          <svg width="48" height="48" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><path d="M10 30V20l10-10 10 10v10H10z" stroke="#C9A84C" stroke-width="1.2" fill="none"/></svg>
+        </div>
+        <div class="tp-label-idle">Fabrication additive</div>
+        <div class="tp-sheen"></div>
+        <div class="tp-border-hover"></div>
+        <div class="tp-overlay">
+          <div class="tp-title">Prototypage rapide</div>
+          <div class="tp-cat">Fabrication de pièces techniques par impression 3D</div>
+        </div>
       </div>
-      <div class="ppc rv d3 h-lg bg-d">
-        <div class="ppc-inner"></div>
-        <div class="ppp">Matériaux avancés</div>
-        <div class="ppbord"></div>
-        <div class="ppov"><div class="pptitle">Structures composites</div><div class="ppcat">Procédés de fabrication des matériaux composites.</div></div>
+
+      <!-- Composites — tall -->
+      <div class="tp-card tp-s7 rv d1" style="background:#EBE3D8;">
+        <div class="tp-gallery">
+          <!-- <img src="Images/composites1.jpg" class="active" alt=""> <img src="Images/composites2.jpg" alt=""> -->
+        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E3D8CC,#D0C5B8);">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><path d="M8 20 Q20 8 32 20 Q20 32 8 20Z" stroke="#C9A84C" stroke-width="1.2" fill="none"/></svg>
+        </div>
+        <div class="tp-label-idle">Matériaux avancés</div>
+        <div class="tp-sheen"></div>
+        <div class="tp-border-hover"></div>
+        <div class="tp-overlay">
+          <div class="tp-title">Structures composites</div>
+          <div class="tp-cat">Procédés de fabrication des matériaux composites</div>
+        </div>
       </div>
-      <div class="ppc rv d2 h-sm bg-a">
-        <div class="ppc-inner"></div>
-        <div class="ppp">Science des matériaux</div>
-        <div class="ppbord"></div>
-        <div class="ppov"><div class="pptitle">Matériaux polymères</div><div class="ppcat">Propriétés mécaniques et thermiques des polymères.</div></div>
+
+      <!-- Polymères -->
+      <div class="tp-card tp-s3 rv d2" style="background:#EEE8DF;">
+        <div class="tp-gallery">
+          <!-- <img src="Images/polymeres1.jpg" class="active" alt=""> -->
+        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E5DDD0,#D5CBBC);">
+          <svg width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><circle cx="20" cy="20" r="12" stroke="#C9A84C" stroke-width="1.2"/><path d="M14 20h12" stroke="#C9A84C" stroke-width="1"/></svg>
+        </div>
+        <div class="tp-label-idle">Science des matériaux</div>
+        <div class="tp-sheen"></div>
+        <div class="tp-border-hover"></div>
+        <div class="tp-overlay">
+          <div class="tp-title">Matériaux polymères</div>
+          <div class="tp-cat">Propriétés mécaniques et thermiques des polymères</div>
+        </div>
       </div>
-      <div class="ppc rv d4 h-md bg-b">
-        <div class="ppc-inner"></div>
-        <div class="ppp">Science des matériaux</div>
-        <div class="ppbord"></div>
-        <div class="ppov"><div class="pptitle">Sélection des matériaux</div><div class="ppcat">Étude comparative selon les contraintes de conception.</div></div>
+
+      <!-- Sélection matériaux -->
+      <div class="tp-card tp-s4 rv d1" style="background:#E8E0D5;">
+        <div class="tp-gallery">
+          <!-- <img src="Images/selection1.jpg" class="active" alt=""> -->
+        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#DDD5C8,#CBBFB2);">
+          <svg width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><rect x="8" y="8" width="10" height="10" stroke="#C9A84C" stroke-width="1"/><rect x="22" y="22" width="10" height="10" stroke="#C9A84C" stroke-width="1"/><path d="M18 13h4m-4 14h4" stroke="#C9A84C" stroke-width="1"/></svg>
+        </div>
+        <div class="tp-label-idle">Science des matériaux</div>
+        <div class="tp-sheen"></div>
+        <div class="tp-border-hover"></div>
+        <div class="tp-overlay">
+          <div class="tp-title">Sélection des matériaux</div>
+          <div class="tp-cat">Étude comparative selon les contraintes de conception</div>
+        </div>
       </div>
-      <div class="ppc rv d1 h-ws bg-c">
-        <div class="ppc-inner"></div>
-        <div class="ppp">Mise en forme</div>
-        <div class="ppbord"></div>
-        <div class="ppov"><div class="pptitle">Emboutissage de tôle</div><div class="ppcat">Déformation plastique de pièces métalliques minces.</div></div>
+
+      <!-- Emboutissage -->
+      <div class="tp-card tp-s8 rv d3" style="background:#F0E8E0;">
+        <div class="tp-gallery">
+          <!-- <img src="Images/emboutissage1.jpg" class="active" alt=""> -->
+        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E5DDD0,#D8CEBC);">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><path d="M8 28 Q20 16 32 28" stroke="#C9A84C" stroke-width="1.2" fill="none"/><path d="M8 32h24" stroke="#C9A84C" stroke-width="1"/></svg>
+        </div>
+        <div class="tp-label-idle">Mise en forme</div>
+        <div class="tp-sheen"></div>
+        <div class="tp-border-hover"></div>
+        <div class="tp-overlay">
+          <div class="tp-title">Emboutissage de tôle</div>
+          <div class="tp-cat">Déformation plastique de pièces métalliques minces</div>
+        </div>
       </div>
-      <div class="ppc rv d3 h-sq bg-d">
-        <div class="ppc-inner"></div>
-        <div class="ppp">Conception mécanique</div>
-        <div class="ppbord"></div>
-        <div class="ppov"><div class="pptitle">Dessin industriel</div><div class="ppcat">Lecture et production de plans techniques normalisés.</div></div>
+
+      <!-- Dessin industriel -->
+      <div class="tp-card tp-s5 rv d2" style="background:#EBE3D8;">
+        <div class="tp-gallery">
+          <!-- <img src="Images/dessin1.jpg" class="active" alt=""> -->
+        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E3D8CC,#D0C5B8);">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><rect x="8" y="8" width="24" height="24" stroke="#C9A84C" stroke-width="1.2" fill="none"/><path d="M14 14h12M14 20h8M14 26h10" stroke="#C9A84C" stroke-width="1"/></svg>
+        </div>
+        <div class="tp-label-idle">Conception mécanique</div>
+        <div class="tp-sheen"></div>
+        <div class="tp-border-hover"></div>
+        <div class="tp-overlay">
+          <div class="tp-title">Dessin industriel</div>
+          <div class="tp-cat">Lecture et production de plans techniques normalisés</div>
+        </div>
       </div>
+
+    </div><!-- /page 2 -->
+
+    <!-- Pagination -->
+    <div class="tp-pagination rv">
+      <button class="tp-btn" id="tpPrev">&#8592;</button>
+      <div class="tp-dots" id="tpDots">
+        <div class="tp-pdot on" data-p="0"></div>
+        <div class="tp-pdot" data-p="1"></div>
+      </div>
+      <span class="tp-page-label" id="tpLabel">PAGE 1 / 2</span>
+      <button class="tp-btn" id="tpNext">&#8594;</button>
     </div>
+
   </section>
 
   <!-- wave past → contact (propre, sobre) -->
@@ -1731,34 +2041,6 @@ function initHero() {
 /* ══════════════════════════════
    SHOWCASE 3D — Assemblage Monoplace SolidWorks (GLB)
 ══════════════════════════════ */
-
-/* Indicateur de chargement dans le showcase */
-#sc-loader {
-  position:absolute; inset:0; z-index:10;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  pointer-events:none;
-  transition:opacity .8s ease;
-}
-#sc-loader.hidden { opacity:0; pointer-events:none; }
-.sc-loader-ring {
-  width:54px; height:54px; border-radius:50%;
-  border:1.5px solid rgba(201,168,76,.18);
-  border-top-color:var(--gold);
-  animation:spinRing 1.1s linear infinite;
-}
-@keyframes spinRing { to { transform:rotate(360deg); } }
-.sc-loader-label {
-  margin-top:1.2rem; font-size:.5rem; letter-spacing:.5em;
-  text-transform:uppercase; color:rgba(201,168,76,.7);
-}
-#sc-hint {
-  position:absolute; bottom:1.5rem; left:50%; transform:translateX(-50%);
-  font-size:.48rem; letter-spacing:.4em; text-transform:uppercase;
-  color:rgba(201,168,76,.45); z-index:5; pointer-events:none;
-  opacity:0; transition:opacity 1s .5s;
-}
-#sc-hint.show { opacity:1; }
-
 function initShowcase() {
   const canvas = document.getElementById('sc3d');
   if (!canvas) return;
@@ -1769,7 +2051,7 @@ function initShowcase() {
   /* ── Injecter loader + hint dans le DOM ── */
   const loaderEl = document.createElement('div');
   loaderEl.id = 'sc-loader';
-  loaderEl.innerHTML = `<div class="sc-loader-ring"></div><div class="sc-loader-label">Chargement du modèle…</div>`;
+  loaderEl.innerHTML = '<div class="sc-loader-ring"></div><div class="sc-loader-label">Chargement du modèle…</div>';
   sec.appendChild(loaderEl);
 
   const hintEl = document.createElement('div');
@@ -1790,31 +2072,22 @@ function initShowcase() {
   const camera = new THREE.PerspectiveCamera(45, W()/H(), 0.01, 500);
   camera.position.set(0, 1.2, 5.5);
 
-  /* ── Éclairage ambiant et directionnel ── */
+  /* ── Éclairage ── */
   scene.add(new THREE.AmbientLight(0xffffff, 0.45));
-
   const lKey = new THREE.DirectionalLight(0xE8D5A3, 2.5);
-  lKey.position.set(4, 6, 5);
-  lKey.castShadow = true;
+  lKey.position.set(4, 6, 5); lKey.castShadow = true;
   scene.add(lKey);
-
   const lFill = new THREE.PointLight(0xC9A84C, 3.5, 40);
-  lFill.position.set(-5, 2, 3);
-  scene.add(lFill);
-
+  lFill.position.set(-5, 2, 3); scene.add(lFill);
   const lRim = new THREE.PointLight(0xC49A8A, 2.5, 30);
-  lRim.position.set(0, -3, -4);
-  scene.add(lRim);
-
+  lRim.position.set(0, -3, -4); scene.add(lRim);
   const lTop = new THREE.SpotLight(0xffffff, 4, 50, Math.PI/6, 0.4);
-  lTop.position.set(0, 10, 0);
-  lTop.target.position.set(0, 0, 0);
+  lTop.position.set(0, 10, 0); lTop.target.position.set(0, 0, 0);
   scene.add(lTop, lTop.target);
 
-  /* ── Rotation orbitale via drag ── */
+  /* ── Contrôles drag + zoom ── */
   let isDrag=false, tRX=0, tRY=0, rotX=0, rotY=0;
   const prev={x:0,y:0};
-  /* Zoom */
   let camDist = 5.5;
   canvas.style.cursor='grab';
 
@@ -1829,10 +2102,7 @@ function initShowcase() {
     e.preventDefault();
   };
   const onUp = () => { isDrag=false; canvas.style.cursor='grab'; };
-  const onWheel = e => {
-    camDist = Math.max(1.5, Math.min(14, camDist + e.deltaY * 0.01));
-    e.preventDefault();
-  };
+  const onWheel = e => { camDist = Math.max(1.5, Math.min(14, camDist + e.deltaY * 0.01)); e.preventDefault(); };
   canvas.addEventListener('mousedown', onDown);
   canvas.addEventListener('mousemove', onMove);
   canvas.addEventListener('mouseup',   onUp);
@@ -1842,26 +2112,54 @@ function initShowcase() {
   canvas.addEventListener('touchend',   onUp);
   canvas.addEventListener('wheel', onWheel, {passive:false});
 
-  /* ── Grille de sol dorée ── */
+  /* ── Grille de sol ── */
   const gridHelper = new THREE.GridHelper(12, 20, 0xC9A84C, 0x2a2015);
   gridHelper.position.y = -1.2;
   scene.add(gridHelper);
 
-  /* ── Chargement du modèle GLB ── */
   const master = new THREE.Group();
   scene.add(master);
 
-  /* Three.js r128 : GLTFLoader via CDN unpkg */
+  /* ── Fallback monoplace stylisée ── */
+  function buildFallback() {
+    const shape = new THREE.Group();
+    const body = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.28, 0.38, 2.4, 6),
+      new THREE.MeshStandardMaterial({ color:0xC9A84C, metalness:.9, roughness:.1, emissive:0xC9A84C, emissiveIntensity:.12 })
+    );
+    body.rotation.z = Math.PI/2; shape.add(body);
+    [-1,-0.3,0.3,1].forEach((xPos, i) => {
+      const wheel = new THREE.Mesh(
+        new THREE.TorusGeometry(0.32, 0.1, 8, 24),
+        new THREE.MeshStandardMaterial({ color:0x1a1208, metalness:.6, roughness:.3 })
+      );
+      wheel.position.set(xPos * 0.9, -0.28, i<2 ? 0.42 : -0.42);
+      shape.add(wheel);
+    });
+    const cockpit = new THREE.Mesh(
+      new THREE.SphereGeometry(0.22, 8, 6, 0, Math.PI*2, 0, Math.PI/2),
+      new THREE.MeshStandardMaterial({ color:0x1a1208, metalness:.5, roughness:.2 })
+    );
+    cockpit.position.set(0.1, 0.26, 0); shape.add(cockpit);
+    const mWire = new THREE.MeshBasicMaterial({ color:0xC9A84C, wireframe:true, transparent:true, opacity:.18 });
+    const wBody = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.4, 2.5, 6), mWire);
+    wBody.rotation.z = Math.PI/2; shape.add(wBody);
+    master.add(shape);
+    loaderEl.style.opacity='0'; loaderEl.style.pointerEvents='none';
+    hintEl.style.opacity='1';
+    setTimeout(() => { hintEl.style.opacity='0'; }, 4000);
+  }
+
+  /* ── Chargement GLB via GLTFLoader (unpkg CDN) ── */
   const loaderScript = document.createElement('script');
-  loaderScript.src = 'https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js';
+  loaderScript.src = 'https://unpkg.com/three@0.162.0/examples/js/loaders/GLTFLoader.js';
   loaderScript.onload = () => {
+    if (!THREE.GLTFLoader) { buildFallback(); return; }
     const gltfLoader = new THREE.GLTFLoader();
     gltfLoader.load(
       'Assets/Monoplace.glb',
       (gltf) => {
         const model = gltf.scene;
-
-        /* Centrer et mettre à l'échelle automatiquement */
         const box = new THREE.Box3().setFromObject(model);
         const center = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3());
@@ -1869,74 +2167,31 @@ function initShowcase() {
         const scale = 2.8 / maxDim;
         model.scale.setScalar(scale);
         model.position.sub(center.multiplyScalar(scale));
-
-        /* Matériau métal doré pour les pièces sans texture */
         model.traverse(child => {
           if (child.isMesh) {
-            child.castShadow = true;
-            child.receiveShadow = true;
+            child.castShadow = true; child.receiveShadow = true;
             if (!child.material.map) {
               child.material.metalness = Math.max(child.material.metalness || 0, 0.6);
               child.material.roughness = Math.min(child.material.roughness ?? 1, 0.35);
             }
           }
         });
-
         master.add(model);
-
-        /* Masquer le loader */
-        loaderEl.classList.add('hidden');
-        hintEl.classList.add('show');
-        setTimeout(() => { hintEl.style.opacity = '0'; }, 4000);
+        loaderEl.style.opacity='0'; loaderEl.style.pointerEvents='none';
+        hintEl.style.opacity='1';
+        setTimeout(() => { hintEl.style.opacity='0'; }, 4000);
       },
       (xhr) => {
-        /* Progression */
         if (xhr.total) {
           const pct = Math.round(xhr.loaded / xhr.total * 100);
-          loaderEl.querySelector('.sc-loader-label').textContent = `Chargement… ${pct}%`;
+          const lbl = loaderEl.querySelector('.sc-loader-label');
+          if (lbl) lbl.textContent = 'Chargement… ' + pct + '%';
         }
       },
-      (err) => {
-        console.warn('GLB non trouvé – affichage du placeholder :', err);
-        /* Fallback : silhouette monoplace stylisée si le fichier GLB est absent */
-        loaderEl.querySelector('.sc-loader-label').textContent = 'Assets/Monoplace.glb introuvable';
-        const shape = new THREE.Group();
-        /* Carrosserie */
-        const body = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.28, 0.38, 2.4, 6),
-          new THREE.MeshStandardMaterial({ color:0xC9A84C, metalness:.9, roughness:.1, emissive:0xC9A84C, emissiveIntensity:.12 })
-        );
-        body.rotation.z = Math.PI/2;
-        shape.add(body);
-        /* Roues */
-        [-1,-0.3,0.3,1].forEach((xPos, i) => {
-          const wheel = new THREE.Mesh(
-            new THREE.TorusGeometry(0.32, 0.1, 8, 24),
-            new THREE.MeshStandardMaterial({ color:0x1a1208, metalness:.6, roughness:.3 })
-          );
-          wheel.position.set(xPos * 0.9, -0.28, i<2 ? 0.42 : -0.42);
-          shape.add(wheel);
-        });
-        /* Cockpit */
-        const cockpit = new THREE.Mesh(
-          new THREE.SphereGeometry(0.22, 8, 6, 0, Math.PI*2, 0, Math.PI/2),
-          new THREE.MeshStandardMaterial({ color:0x1a1208, metalness:.5, roughness:.2 })
-        );
-        cockpit.position.set(0.1, 0.26, 0);
-        shape.add(cockpit);
-
-        const mWire = new THREE.MeshBasicMaterial({ color:0xC9A84C, wireframe:true, transparent:true, opacity:.18 });
-        const wBody = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.4, 2.5, 6), mWire);
-        wBody.rotation.z = Math.PI/2;
-        shape.add(wBody);
-
-        master.add(shape);
-        loaderEl.classList.add('hidden');
-        hintEl.classList.add('show');
-        setTimeout(() => { hintEl.style.opacity = '0'; }, 4000);
-      }
+      () => { buildFallback(); }
     );
   };
+  loaderScript.onerror = () => buildFallback();
   document.head.appendChild(loaderScript);
 
   /* ── Boucle de rendu ── */
@@ -1946,19 +2201,14 @@ function initShowcase() {
     rotX += (tRX - rotX) * .05;
     rotY += (tRY - rotY) * .05;
     if (!isDrag) tRY += .003;
-
     master.rotation.y = rotY;
     master.rotation.x = rotX;
-
-    /* Caméra orbitale */
     camera.position.x = Math.sin(rotY) * camDist;
     camera.position.z = Math.cos(rotY) * camDist;
     camera.position.y = rotX * 2 + 1.2;
     camera.lookAt(0, 0, 0);
-
     lFill.intensity = 3 + Math.sin(t*1.4)*.6;
     lRim.intensity  = 2 + Math.sin(t*1.8+1)*.5;
-
     renderer.render(scene, camera);
     requestAnimationFrame(tick);
   })();
@@ -2590,6 +2840,64 @@ document.querySelectorAll('.sk-fg').forEach(el=>ioSk.observe(el));
 
 /* ════ 12. INIT SPOTLIGHT ═══════════════════════════ */
 window.addEventListener('load',initSpotlight);
+
+/* ════ 13. TETRIS PAGINATION ════════════════════════ */
+(function(){
+  const pages = document.querySelectorAll('.tp-page');
+  const dots  = document.querySelectorAll('.tp-pdot');
+  const label = document.getElementById('tpLabel');
+  const btnPrev = document.getElementById('tpPrev');
+  const btnNext = document.getElementById('tpNext');
+  if(!pages.length) return;
+
+  let cur = 0;
+  const total = pages.length;
+
+  function goTo(n) {
+    pages[cur].classList.remove('active');
+    dots[cur] && dots[cur].classList.remove('on');
+    cur = (n + total) % total;
+    pages[cur].classList.add('active');
+    dots[cur] && dots[cur].classList.add('on');
+    if(label) label.textContent = 'PAGE ' + (cur+1) + ' / ' + total;
+    if(btnPrev) btnPrev.disabled = false;
+    if(btnNext) btnNext.disabled = false;
+  }
+
+  if(btnPrev) btnPrev.addEventListener('click', () => goTo(cur-1));
+  if(btnNext) btnNext.addEventListener('click', () => goTo(cur+1));
+  dots.forEach((d,i) => d.addEventListener('click', () => goTo(i)));
+  goTo(0);
+})();
+
+/* ════ 14. GALLERY HOVER ════════════════════════════ */
+(function(){
+  document.querySelectorAll('.tp-card').forEach(card => {
+    const gallery = card.querySelector('.tp-gallery');
+    if (!gallery) return;
+    const imgs = gallery.querySelectorAll('img');
+    if (!imgs.length) return;
+
+    // Init first image active
+    imgs[0].classList.add('active');
+    let current = 0;
+    let interval = null;
+
+    card.addEventListener('mouseenter', () => {
+      if (imgs.length < 2) return;
+      interval = setInterval(() => {
+        imgs[current].classList.remove('active');
+        current = (current + 1) % imgs.length;
+        imgs[current].classList.add('active');
+      }, 900);
+    });
+
+    card.addEventListener('mouseleave', () => {
+      clearInterval(interval);
+      interval = null;
+    });
+  });
+})();
 
 })();
 </script>
