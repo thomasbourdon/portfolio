@@ -491,99 +491,127 @@ section { position:relative; overflow:hidden; }
 }
 
 /* ════════════════════════════════════════════════════════
-   TETRIS TP — Grille paginée
+   TETRIS TP — Grille parfaitement rectangulaire
 ════════════════════════════════════════════════════════ */
 .tp-page { display:none; }
 .tp-page.active { display:grid; }
+
+/* Les deux pages partagent la même hauteur totale = 6 row-units × 90px = 540px */
 .tp-grid {
   grid-template-columns: repeat(12, 1fr);
-  grid-auto-rows: 80px;
-  gap: 10px;
+  grid-template-rows: repeat(6, 90px);
+  gap: 8px;
   max-width:1320px; margin:0 auto;
+  /* Hauteur fixe = 6×90 + 5×8 = 540+40 = 580px */
+  height: calc(6 * 90px + 5 * 8px);
 }
-/* Formes Tetris — chaque card a une taille définie */
+
+/* ── PAGE 1 : disposition Tetris précise ── */
+/* Forgeage      : col 1-5 , row 1-4  */
+#tpPage0 .tp-c1  { grid-column:1/5;  grid-row:1/5;  }
+/* Soudage       : col 5-9 , row 1-3  */
+#tpPage0 .tp-c2  { grid-column:5/9;  grid-row:1/3;  }
+/* Fonderie      : col 9-13, row 1-3  */
+#tpPage0 .tp-c3  { grid-column:9/13; grid-row:1/4;  }
+/* Fraisage CNC  : col 5-9 , row 3-5  */
+#tpPage0 .tp-c4  { grid-column:5/9;  grid-row:3/6;  }
+/* Tournage      : col 9-13, row 4-7  */
+#tpPage0 .tp-c5  { grid-column:9/13; grid-row:4/7;  }
+/* Métrologie    : col 1-5 , row 5-7  */
+#tpPage0 .tp-c6  { grid-column:1/5;  grid-row:5/7;  }
+/* Sécurité      : col 5-9 , row 6-7  */
+#tpPage0 .tp-c7  { grid-column:5/9;  grid-row:6/7;  }
+
+/* ── PAGE 2 : disposition Tetris précise ── */
+/* Prototypage   : col 1-7 , row 1-4  */
+#tpPage1 .tp-c1  { grid-column:1/7;  grid-row:1/4;  }
+/* Composites    : col 7-13, row 1-3  */
+#tpPage1 .tp-c2  { grid-column:7/13; grid-row:1/3;  }
+/* Polymères     : col 7-10, row 3-5  */
+#tpPage1 .tp-c3  { grid-column:7/10; grid-row:3/5;  }
+/* Sélection mat : col 10-13,row 3-5  */
+#tpPage1 .tp-c4  { grid-column:10/13;grid-row:3/6;  }
+/* Emboutissage  : col 1-5 , row 4-7  */
+#tpPage1 .tp-c5  { grid-column:1/5;  grid-row:4/7;  }
+/* Dessin indus  : col 5-10, row 5-7  */
+#tpPage1 .tp-c6  { grid-column:5/10; grid-row:5/7;  }
+/* Thermique     : col 7-13, row 5-7  */
+#tpPage1 .tp-c7  { grid-column:10/13;grid-row:6/7;  }
+
+/* ── Card base ── */
 .tp-card {
   position:relative; overflow:hidden; cursor:pointer;
-  background:var(--cream-d);
   transition:transform .35s var(--eout), box-shadow .35s;
+  min-height:0; min-width:0;
 }
-.tp-card:hover { transform:translateY(-3px); box-shadow:0 16px 50px rgba(201,168,76,.14); }
-/* Variantes de taille pour effet tetris */
-.tp-s1 { grid-column:span 4; grid-row:span 3; }
-.tp-s2 { grid-column:span 3; grid-row:span 4; }
-.tp-s3 { grid-column:span 5; grid-row:span 2; }
-.tp-s4 { grid-column:span 4; grid-row:span 2; }
-.tp-s5 { grid-column:span 3; grid-row:span 3; }
-.tp-s6 { grid-column:span 6; grid-row:span 3; }
-.tp-s7 { grid-column:span 4; grid-row:span 4; }
-.tp-s8 { grid-column:span 5; grid-row:span 3; }
+.tp-card:hover { transform:translateY(-2px); box-shadow:0 12px 40px rgba(0,0,0,.15); }
 
-/* Image gallery dans chaque card */
+/* Gallery */
 .tp-gallery { position:absolute; inset:0; }
 .tp-gallery img {
   position:absolute; inset:0; width:100%; height:100%;
-  object-fit:cover; opacity:0;
-  transition:opacity .5s ease;
+  object-fit:cover; opacity:0; transition:opacity .5s ease;
 }
 .tp-gallery img.active { opacity:1; }
-/* Placeholder couleur si pas d'image */
+
 .tp-gallery-placeholder {
   position:absolute; inset:0;
   display:flex; align-items:center; justify-content:center;
 }
-/* Overlay texte */
-.tp-overlay {
-  position:absolute; inset:0;
-  background:linear-gradient(to top, rgba(9,7,10,.92) 0%, rgba(9,7,10,.18) 55%, transparent 100%);
-  opacity:0; transition:opacity .38s var(--eout);
-  display:flex; flex-direction:column; justify-content:flex-end;
-  padding:1rem 1.1rem;
-}
-.tp-card:hover .tp-overlay { opacity:1; }
-.tp-border-hover {
-  position:absolute; inset:8px; border:1px solid var(--gold);
-  opacity:0; transition:opacity .38s, inset .38s var(--eout);
-  pointer-events:none;
-}
-.tp-card:hover .tp-border-hover { opacity:.4; inset:11px; }
+
+/* Label repos */
 .tp-label-idle {
   position:absolute; inset:0;
   display:flex; align-items:center; justify-content:center;
   font-family:'Cormorant Garamond',serif; font-style:italic;
-  font-size:.85rem; color:rgba(201,168,76,.45); text-align:center;
+  font-size:.82rem; color:rgba(120,90,60,.4); text-align:center;
   padding:.8rem; pointer-events:none;
   transition:opacity .3s;
 }
 .tp-card:hover .tp-label-idle { opacity:0; }
+
+/* Overlay */
+.tp-overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(to top, rgba(9,7,10,.9) 0%, rgba(9,7,10,.15) 55%, transparent 100%);
+  opacity:0; transition:opacity .35s var(--eout);
+  display:flex; flex-direction:column; justify-content:flex-end;
+  padding:.9rem 1rem;
+}
+.tp-card:hover .tp-overlay { opacity:1; }
 .tp-title { font-family:'Cormorant Garamond',serif; font-size:1rem; font-weight:400; color:#fff; line-height:1.2; }
-.tp-cat   { font-size:.46rem; letter-spacing:.28em; text-transform:uppercase; color:var(--gold); margin-top:.25rem; }
+.tp-cat   { font-size:.44rem; letter-spacing:.26em; text-transform:uppercase; color:var(--gold); margin-top:.2rem; line-height:1.5; }
+
+/* Bordure hover */
+.tp-border-hover {
+  position:absolute; inset:8px; border:1px solid var(--gold);
+  opacity:0; transition:opacity .35s, inset .35s var(--eout);
+  pointer-events:none;
+}
+.tp-card:hover .tp-border-hover { opacity:.4; inset:11px; }
 
 /* Effet reflet diagonale */
-.tp-sheen {
-  position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:5;
-}
+.tp-sheen { position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:5; }
 .tp-sheen::after {
-  content:'';
-  position:absolute; top:-100%; left:-60%;
-  width:45%; height:300%;
-  background:linear-gradient(105deg, transparent 30%, rgba(255,255,255,.22) 50%, transparent 70%);
+  content:''; position:absolute; top:-100%; left:-60%;
+  width:40%; height:300%;
+  background:linear-gradient(105deg, transparent 30%, rgba(255,255,255,.25) 50%, transparent 70%);
   transform:translateX(-100%);
-  transition:none;
 }
 .tp-card:hover .tp-sheen::after {
-  transform:translateX(500%);
-  transition:transform .55s ease;
+  transform:translateX(520%);
+  transition:transform .52s ease;
 }
 
 /* Pagination */
 .tp-pagination {
   display:flex; align-items:center; justify-content:center;
-  gap:1.2rem; margin-top:2.5rem;
+  gap:1.2rem; margin-top:2rem;
 }
 .tp-btn {
-  width:36px; height:36px; border:1px solid rgba(201,168,76,.35);
+  width:34px; height:34px; border:1px solid rgba(201,168,76,.35);
   background:transparent; cursor:pointer; color:rgba(201,168,76,.6);
-  font-size:.85rem; display:flex; align-items:center; justify-content:center;
+  font-size:.8rem; display:flex; align-items:center; justify-content:center;
   transition:border-color .3s, color .3s, background .3s;
 }
 .tp-btn:hover { border-color:var(--gold); color:var(--gold); background:rgba(201,168,76,.06); }
@@ -591,15 +619,11 @@ section { position:relative; overflow:hidden; }
 .tp-dots { display:flex; gap:.6rem; }
 .tp-pdot {
   width:8px; height:8px; border-radius:50%;
-  border:1px solid rgba(201,168,76,.4);
-  background:transparent; cursor:pointer;
+  border:1px solid rgba(201,168,76,.4); background:transparent; cursor:pointer;
   transition:background .3s, border-color .3s;
 }
 .tp-pdot.on { background:var(--gold); border-color:var(--gold); }
-.tp-page-label {
-  font-size:.5rem; letter-spacing:.4em; text-transform:uppercase;
-  color:rgba(201,168,76,.45);
-}
+.tp-page-label { font-size:.5rem; letter-spacing:.4em; text-transform:uppercase; color:rgba(201,168,76,.45); }
 
 /* ════════════════════════════════════════════════════════
    SOFTWARE — DEUX NIVEAUX : Principal + Secondaire
@@ -802,97 +826,6 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
 }
   
 
-/* ========================================================
-   CINEMATIC HERO REWORK
-======================================================== */
-
-#hero{
-  position:relative;
-  overflow:hidden;
-  background:
-  radial-gradient(circle at top left, rgba(201,168,76,.12), transparent 40%),
-  radial-gradient(circle at bottom right, rgba(196,154,138,.18), transparent 45%),
-  #f8f4ef;
-}
-
-#hero::before{
-  content:'';
-  position:absolute;
-  inset:0;
-  background:
-  linear-gradient(135deg,
-  rgba(255,255,255,0) 0%,
-  rgba(255,255,255,.18) 25%,
-  rgba(255,255,255,0) 50%,
-  rgba(255,255,255,.18) 75%,
-  rgba(255,255,255,0) 100%);
-  mix-blend-mode:soft-light;
-  animation:paintMove 14s ease-in-out infinite alternate;
-}
-
-@keyframes paintMove{
-  from{transform:translateX(-4%) scale(1.05)}
-  to{transform:translateX(4%) scale(1)}
-}
-
-.hero-orb{
-  position:absolute;
-  border-radius:50%;
-  filter:blur(90px);
-  opacity:.35;
-}
-
-.hero-orb.one{
-  width:500px;
-  height:500px;
-  background:#C9A84C;
-  top:-120px;
-  right:-120px;
-}
-
-.hero-orb.two{
-  width:400px;
-  height:400px;
-  background:#C49A8A;
-  bottom:-120px;
-  left:-120px;
-}
-
-/* ========================================================
-   ENSAM GALLERY
-======================================================== */
-
-.tp-page-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-  gap:2rem;
-}
-
-.tp-gallery-card{
-  border:1px solid rgba(201,168,76,.18);
-  overflow:hidden;
-  background:white;
-}
-
-.tp-gallery{
-  position:relative;
-  height:260px;
-  overflow:hidden;
-}
-
-.tp-gallery img{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  opacity:0;
-  transition:opacity .45s ease;
-}
-
-.tp-gallery img.active{
-  opacity:1;
-}
 
 /* ========================================================
    PAINT TRANSITIONS
@@ -1563,17 +1496,16 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
       </svg>
     </div>
 
-    <!-- PAGE 1 -->
+    <!-- ════ PAGE 1 ════ -->
     <div class="tp-page active tp-grid" id="tpPage0">
 
-      <!-- Forgeage — grande -->
-      <div class="tp-card tp-s1 rv" style="background:#EEE8DF;">
+      <!-- Forgeage  col 1-5 row 1-5 -->
+      <div class="tp-card tp-c1 rv" style="background:#EDE5DA;">
         <div class="tp-gallery">
-          <!-- Ajoute tes images ici : <img src="Images/forgeage1.jpg" class="active" alt=""> <img src="Images/forgeage2.jpg" alt=""> -->
+          <!-- <img src="Images/forgeage1.jpg" class="active" alt=""> -->
+          <!-- <img src="Images/forgeage2.jpg" alt=""> -->
         </div>
-        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E8E0D5,#D8CEBC);">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><rect x="8" y="18" width="24" height="14" rx="1" stroke="#C9A84C" stroke-width="1.2"/><path d="M14 18V14a6 6 0 0 1 12 0v4" stroke="#C9A84C" stroke-width="1.2"/></svg>
-        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E8DFD2,#D5C9B8);"></div>
         <div class="tp-label-idle">Transformation des matériaux</div>
         <div class="tp-sheen"></div>
         <div class="tp-border-hover"></div>
@@ -1583,14 +1515,12 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         </div>
       </div>
 
-      <!-- Soudage TIG/MIG -->
-      <div class="tp-card tp-s3 rv d1" style="background:#E8E0D5;">
+      <!-- Soudage TIG/MIG  col 5-9 row 1-3 -->
+      <div class="tp-card tp-c2 rv d1" style="background:#E5DDD0;">
         <div class="tp-gallery">
           <!-- <img src="Images/soudage1.jpg" class="active" alt=""> -->
         </div>
-        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#DDD5C8,#C8BFB0);">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><circle cx="20" cy="20" r="12" stroke="#C9A84C" stroke-width="1.2"/><path d="M20 8v24M8 20h24" stroke="#C9A84C" stroke-width="1"/></svg>
-        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#DDD5C5,#CAC0AD);"></div>
         <div class="tp-label-idle">Assemblage industriel</div>
         <div class="tp-sheen"></div>
         <div class="tp-border-hover"></div>
@@ -1600,14 +1530,12 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         </div>
       </div>
 
-      <!-- Fonderie -->
-      <div class="tp-card tp-s4 rv d2" style="background:#F0E8E0;">
+      <!-- Fonderie  col 9-13 row 1-4 -->
+      <div class="tp-card tp-c3 rv d2" style="background:#EDE5D8;">
         <div class="tp-gallery">
           <!-- <img src="Images/fonderie1.jpg" class="active" alt=""> -->
         </div>
-        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E8DDD5,#D5C8BC);">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><path d="M10 30 L20 10 L30 30 Z" stroke="#C9A84C" stroke-width="1.2" fill="none"/></svg>
-        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E5DDD0,#D0C5B2);"></div>
         <div class="tp-label-idle">Procédés industriels</div>
         <div class="tp-sheen"></div>
         <div class="tp-border-hover"></div>
@@ -1617,14 +1545,12 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         </div>
       </div>
 
-      <!-- Fraisage CNC — tall -->
-      <div class="tp-card tp-s2 rv d1" style="background:#EBE3D8;">
+      <!-- Fraisage CNC  col 5-9 row 3-6 -->
+      <div class="tp-card tp-c4 rv d1" style="background:#E8E0D3;">
         <div class="tp-gallery">
           <!-- <img src="Images/fraisage1.jpg" class="active" alt=""> -->
         </div>
-        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E3D8CC,#D0C5B8);">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><rect x="12" y="12" width="16" height="16" stroke="#C9A84C" stroke-width="1.2"/><path d="M20 4v8M20 28v8M4 20h8M28 20h8" stroke="#C9A84C" stroke-width="1"/></svg>
-        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E0D8C8,#CEC4B0);"></div>
         <div class="tp-label-idle">Usinage de précision</div>
         <div class="tp-sheen"></div>
         <div class="tp-border-hover"></div>
@@ -1634,14 +1560,12 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         </div>
       </div>
 
-      <!-- Tournage -->
-      <div class="tp-card tp-s4 rv d2" style="background:#EEE8DF;">
+      <!-- Tournage  col 9-13 row 4-7 -->
+      <div class="tp-card tp-c5 rv d2" style="background:#EBE3D6;">
         <div class="tp-gallery">
           <!-- <img src="Images/tournage1.jpg" class="active" alt=""> -->
         </div>
-        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E5DDD0,#D5CBBC);">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><circle cx="20" cy="20" r="10" stroke="#C9A84C" stroke-width="1.2"/><circle cx="20" cy="20" r="4" stroke="#C9A84C" stroke-width="1"/></svg>
-        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E3DBCb,#D0C8B5);"></div>
         <div class="tp-label-idle">Usinage de précision</div>
         <div class="tp-sheen"></div>
         <div class="tp-border-hover"></div>
@@ -1651,14 +1575,12 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         </div>
       </div>
 
-      <!-- Métrologie -->
-      <div class="tp-card tp-s5 rv d3" style="background:#E8E0D5;">
+      <!-- Métrologie  col 1-5 row 5-7 -->
+      <div class="tp-card tp-c6 rv d3" style="background:#E5DDD0;">
         <div class="tp-gallery">
           <!-- <img src="Images/metro1.jpg" class="active" alt=""> -->
         </div>
-        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#DDD5C8,#CBBFB2);">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><path d="M8 32 L32 8" stroke="#C9A84C" stroke-width="1.2"/><path d="M8 8h24v24" stroke="#C9A84C" stroke-width="1" fill="none"/></svg>
-        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#DDD5C5,#CAC0AD);"></div>
         <div class="tp-label-idle">Contrôle &amp; mesure</div>
         <div class="tp-sheen"></div>
         <div class="tp-border-hover"></div>
@@ -1668,19 +1590,32 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         </div>
       </div>
 
+      <!-- Sécurité industrielle  col 5-9 row 6-7 -->
+      <div class="tp-card tp-c7 rv d4" style="background:#EDE5D8;">
+        <div class="tp-gallery">
+          <!-- <img src="Images/securite1.jpg" class="active" alt=""> -->
+        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E5DDD0,#D0C5B2);"></div>
+        <div class="tp-label-idle">Sécurité au travail</div>
+        <div class="tp-sheen"></div>
+        <div class="tp-border-hover"></div>
+        <div class="tp-overlay">
+          <div class="tp-title">Sécurité industrielle</div>
+          <div class="tp-cat">Règles et pratiques de sécurité en atelier</div>
+        </div>
+      </div>
+
     </div><!-- /page 1 -->
 
-    <!-- PAGE 2 -->
+    <!-- ════ PAGE 2 ════ -->
     <div class="tp-page tp-grid" id="tpPage1">
 
-      <!-- Prototypage rapide — large -->
-      <div class="tp-card tp-s6 rv" style="background:#F0E8E0;">
+      <!-- Prototypage rapide  col 1-7 row 1-4 -->
+      <div class="tp-card tp-c1 rv" style="background:#EDE5DA;">
         <div class="tp-gallery">
           <!-- <img src="Images/proto1.jpg" class="active" alt=""> -->
         </div>
-        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E8DED5,#D8CEBC);">
-          <svg width="48" height="48" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><path d="M10 30V20l10-10 10 10v10H10z" stroke="#C9A84C" stroke-width="1.2" fill="none"/></svg>
-        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E8DFD2,#D5C9B8);"></div>
         <div class="tp-label-idle">Fabrication additive</div>
         <div class="tp-sheen"></div>
         <div class="tp-border-hover"></div>
@@ -1690,14 +1625,13 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         </div>
       </div>
 
-      <!-- Composites — tall -->
-      <div class="tp-card tp-s7 rv d1" style="background:#EBE3D8;">
+      <!-- Composites  col 7-13 row 1-3 -->
+      <div class="tp-card tp-c2 rv d1" style="background:#E8E0D3;">
         <div class="tp-gallery">
-          <!-- <img src="Images/composites1.jpg" class="active" alt=""> <img src="Images/composites2.jpg" alt=""> -->
+          <!-- <img src="Images/composites1.jpg" class="active" alt=""> -->
+          <!-- <img src="Images/composites2.jpg" alt=""> -->
         </div>
-        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E3D8CC,#D0C5B8);">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><path d="M8 20 Q20 8 32 20 Q20 32 8 20Z" stroke="#C9A84C" stroke-width="1.2" fill="none"/></svg>
-        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E0D8C8,#CEC4B0);"></div>
         <div class="tp-label-idle">Matériaux avancés</div>
         <div class="tp-sheen"></div>
         <div class="tp-border-hover"></div>
@@ -1707,14 +1641,12 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         </div>
       </div>
 
-      <!-- Polymères -->
-      <div class="tp-card tp-s3 rv d2" style="background:#EEE8DF;">
+      <!-- Polymères  col 7-10 row 3-5 -->
+      <div class="tp-card tp-c3 rv d2" style="background:#E5DDD0;">
         <div class="tp-gallery">
           <!-- <img src="Images/polymeres1.jpg" class="active" alt=""> -->
         </div>
-        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E5DDD0,#D5CBBC);">
-          <svg width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><circle cx="20" cy="20" r="12" stroke="#C9A84C" stroke-width="1.2"/><path d="M14 20h12" stroke="#C9A84C" stroke-width="1"/></svg>
-        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#DDD5C5,#CAC0AD);"></div>
         <div class="tp-label-idle">Science des matériaux</div>
         <div class="tp-sheen"></div>
         <div class="tp-border-hover"></div>
@@ -1724,14 +1656,12 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         </div>
       </div>
 
-      <!-- Sélection matériaux -->
-      <div class="tp-card tp-s4 rv d1" style="background:#E8E0D5;">
+      <!-- Sélection matériaux  col 10-13 row 3-6 -->
+      <div class="tp-card tp-c4 rv d1" style="background:#EBE3D6;">
         <div class="tp-gallery">
           <!-- <img src="Images/selection1.jpg" class="active" alt=""> -->
         </div>
-        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#DDD5C8,#CBBFB2);">
-          <svg width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><rect x="8" y="8" width="10" height="10" stroke="#C9A84C" stroke-width="1"/><rect x="22" y="22" width="10" height="10" stroke="#C9A84C" stroke-width="1"/><path d="M18 13h4m-4 14h4" stroke="#C9A84C" stroke-width="1"/></svg>
-        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E3DBCB,#D0C8B5);"></div>
         <div class="tp-label-idle">Science des matériaux</div>
         <div class="tp-sheen"></div>
         <div class="tp-border-hover"></div>
@@ -1741,15 +1671,13 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         </div>
       </div>
 
-      <!-- Emboutissage -->
-      <div class="tp-card tp-s8 rv d3" style="background:#F0E8E0;">
+      <!-- Emboutissage  col 1-5 row 4-7 -->
+      <div class="tp-card tp-c5 rv d2" style="background:#EDE5D8;">
         <div class="tp-gallery">
           <!-- <img src="Images/emboutissage1.jpg" class="active" alt=""> -->
         </div>
-        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E5DDD0,#D8CEBC);">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><path d="M8 28 Q20 16 32 28" stroke="#C9A84C" stroke-width="1.2" fill="none"/><path d="M8 32h24" stroke="#C9A84C" stroke-width="1"/></svg>
-        </div>
-        <div class="tp-label-idle">Mise en forme</div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E5DDD0,#D0C5B2);"></div>
+        <div class="tp-label-idle">Mise en forme des métaux</div>
         <div class="tp-sheen"></div>
         <div class="tp-border-hover"></div>
         <div class="tp-overlay">
@@ -1758,20 +1686,33 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         </div>
       </div>
 
-      <!-- Dessin industriel -->
-      <div class="tp-card tp-s5 rv d2" style="background:#EBE3D8;">
+      <!-- Dessin industriel  col 5-10 row 5-7 -->
+      <div class="tp-card tp-c6 rv d3" style="background:#E8E0D3;">
         <div class="tp-gallery">
           <!-- <img src="Images/dessin1.jpg" class="active" alt=""> -->
         </div>
-        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E3D8CC,#D0C5B8);">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" opacity=".3"><rect x="8" y="8" width="24" height="24" stroke="#C9A84C" stroke-width="1.2" fill="none"/><path d="M14 14h12M14 20h8M14 26h10" stroke="#C9A84C" stroke-width="1"/></svg>
-        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#E0D8C8,#CEC4B0);"></div>
         <div class="tp-label-idle">Conception mécanique</div>
         <div class="tp-sheen"></div>
         <div class="tp-border-hover"></div>
         <div class="tp-overlay">
           <div class="tp-title">Dessin industriel</div>
           <div class="tp-cat">Lecture et production de plans techniques normalisés</div>
+        </div>
+      </div>
+
+      <!-- Thermique  col 10-13 row 6-7 -->
+      <div class="tp-card tp-c7 rv d4" style="background:#E5DDD0;">
+        <div class="tp-gallery">
+          <!-- <img src="Images/thermique1.jpg" class="active" alt=""> -->
+        </div>
+        <div class="tp-gallery-placeholder" style="background:linear-gradient(135deg,#DDD5C5,#CAC0AD);"></div>
+        <div class="tp-label-idle">Transferts thermiques</div>
+        <div class="tp-sheen"></div>
+        <div class="tp-border-hover"></div>
+        <div class="tp-overlay">
+          <div class="tp-title">Thermique industrielle</div>
+          <div class="tp-cat">Conduction, convection et rayonnement thermique</div>
         </div>
       </div>
 
@@ -1922,230 +1863,6 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
 import * as THREE from 'three';
 
 /* ══════════════════════════════
-   HERO — SPHÈRE FEM LUMINEUSE
-   Fond crème/blanc, wireframe doré fin,
-   effet chaleur/froid selon souris
-══════════════════════════════ */
-function initHero() {
-  const canvas = document.getElementById('hero-3d-canvas');
-  if (!canvas) return;
-  const hero = document.getElementById('hero');
-
-  const W = () => hero.offsetWidth;
-  const H = () => hero.offsetHeight;
-
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  renderer.setSize(W(), H());
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.25;
-
-  const scene  = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(42, W()/H(), 0.1, 60);
-  camera.position.set(0, 0, 5.2);
-
-  // ── Mouse tracking (normalized -1 to 1) ──
-  const mouse = { x:0, y:0, inside:false };
-  let smoothX = 0, smoothY = 0;
-
-  hero.addEventListener('mousemove', e => {
-    const r = hero.getBoundingClientRect();
-    mouse.x = ((e.clientX - r.left) / r.width  - .5) * 2;
-    mouse.y = ((e.clientY - r.top)  / r.height - .5) * 2;
-    mouse.inside = true;
-  });
-  hero.addEventListener('mouseleave', () => { mouse.inside = false; });
-
-  // ── Icosphere geometry ──
-  const geo = new THREE.IcosahedronGeometry(1.38, 3);
-  const pos = geo.attributes.position;
-  const N   = pos.count;
-  const base   = new Float32Array(N * 3);
-  const phases = new Float32Array(N);
-  for (let i = 0; i < N * 3; i++) base[i] = pos.array[i];
-  for (let i = 0; i < N; i++) phases[i] = Math.random() * Math.PI * 2;
-
-  // ── Color array for FEM heatmap effect ──
-  const colors = new Float32Array(N * 3);
-  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-  // Palette FEM douce : bleu-lavande → blanc → or/abricot
-  function femColor(t) {
-    // t: 0 = froid (loin souris), 1 = chaud (proche souris)
-    // Couleurs pastel : bleu lavande → blanc chaud → abricot doré
-    if (t < 0.5) {
-      // lavande → blanc
-      const s = t * 2;
-      return {
-        r: 0.62 + s * (1.0 - 0.62),
-        g: 0.68 + s * (0.97 - 0.68),
-        b: 0.92 + s * (0.90 - 0.92)
-      };
-    } else {
-      // blanc → abricot doré
-      const s = (t - 0.5) * 2;
-      return {
-        r: 1.0,
-        g: 0.97 - s * (0.97 - 0.72),
-        b: 0.90 - s * (0.90 - 0.45)
-      };
-    }
-  }
-
-  // Solid body — très translucide, laisse passer la lumière
-  const solidMat = new THREE.MeshStandardMaterial({
-    vertexColors: true,
-    metalness: 0.08,
-    roughness: 0.55,
-    transparent: true,
-    opacity: 0.82
-  });
-
-  // Wireframe — doré très fin
-  const wireMat = new THREE.MeshBasicMaterial({
-    color: 0xC9A84C,
-    wireframe: true,
-    transparent: true,
-    opacity: 0.14
-  });
-
-  const solidMesh = new THREE.Mesh(geo, solidMat);
-  const wireMesh  = new THREE.Mesh(geo, wireMat);
-
-  // Outer wireframe plus large et encore plus fin
-  const outerGeo = new THREE.IcosahedronGeometry(1.50, 3);
-  const outerMat = new THREE.MeshBasicMaterial({
-    color: 0xC9A84C, wireframe:true, transparent:true, opacity:0.04
-  });
-  const outerMesh = new THREE.Mesh(outerGeo, outerMat);
-
-  const group = new THREE.Group();
-  group.add(solidMesh, wireMesh, outerMesh);
-  scene.add(group);
-
-  // Anneau orbital or
-  const ring1 = new THREE.Mesh(
-    new THREE.TorusGeometry(2.05, 0.005, 6, 110),
-    new THREE.MeshBasicMaterial({ color:0xC9A84C, transparent:true, opacity:0.28 })
-  );
-  ring1.rotation.x = Math.PI / 2.3;
-  group.add(ring1);
-
-  // Anneau orbital rose
-  const ring2 = new THREE.Mesh(
-    new THREE.TorusGeometry(1.75, 0.004, 6, 90),
-    new THREE.MeshBasicMaterial({ color:0xC49A8A, transparent:true, opacity:0.18 })
-  );
-  ring2.rotation.x = Math.PI / 3;
-  ring2.rotation.z = Math.PI / 6;
-  group.add(ring2);
-
-  // ── Lumières lumineuses pour fond clair ──
-  scene.add(new THREE.AmbientLight(0xffffff, 1.2));
-
-  const lKey = new THREE.DirectionalLight(0xF5F0E8, 1.8);
-  lKey.position.set(3, 4, 5);
-  scene.add(lKey);
-
-  const lFill = new THREE.DirectionalLight(0xE8D5C0, 0.8);
-  lFill.position.set(-4, -2, 3);
-  scene.add(lFill);
-
-  const lTop = new THREE.DirectionalLight(0xFFFBF5, 1.0);
-  lTop.position.set(0, 6, 2);
-  scene.add(lTop);
-
-  // ── Clock ──
-  const clock = new THREE.Clock();
-
-  // ── Raycaster pour distance souris / sphère ──
-  const raycaster = new THREE.Raycaster();
-  const mouseVec  = new THREE.Vector2();
-
-  function tick() {
-    requestAnimationFrame(tick);
-    const t = clock.getElapsedTime();
-
-    // Smooth mouse
-    const targetX = mouse.inside ? mouse.x : 0;
-    const targetY = mouse.inside ? mouse.y : 0;
-    smoothX += (targetX - smoothX) * 0.04;
-    smoothY += (targetY - smoothY) * 0.04;
-
-    // Rotation douce
-    group.rotation.y = t * 0.07 + smoothX * 0.28;
-    group.rotation.x = smoothY * (-0.18);
-
-    // Respiration vertex + coloration FEM
-    // Point chaud = là où pointe la souris en espace monde
-    // On projette le point souris sur la sphère unitaire
-    const hotX = smoothX * 1.38;
-    const hotY = -smoothY * 1.38;
-    const hotZ = Math.sqrt(Math.max(0, 1.38*1.38 - hotX*hotX - hotY*hotY));
-
-    // Vecteur chaud en espace local du groupe
-    const hotLocal = new THREE.Vector3(hotX, hotY, hotZ).applyEuler(
-      new THREE.Euler(-group.rotation.x, -group.rotation.y, 0)
-    ).normalize().multiplyScalar(1.38);
-
-    const maxDist = 2.76; // diamètre
-
-    for (let i = 0; i < N; i++) {
-      const ph  = phases[i];
-      const amp = 0.022 + 0.01 * Math.sin(ph * 2.3);
-      const disp = Math.sin(t * 0.55 + ph) * amp;
-      const bx = base[i*3], by = base[i*3+1], bz = base[i*3+2];
-      const len = Math.sqrt(bx*bx + by*by + bz*bz);
-      pos.array[i*3]   = bx + (bx/len) * disp;
-      pos.array[i*3+1] = by + (by/len) * disp;
-      pos.array[i*3+2] = bz + (bz/len) * disp;
-
-      // Distance au point chaud
-      const dx = pos.array[i*3]   - hotLocal.x;
-      const dy = pos.array[i*3+1] - hotLocal.y;
-      const dz = pos.array[i*3+2] - hotLocal.z;
-      const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
-
-      // Si souris pas sur le hero → tout blanc chaud
-      let heat;
-      if (!mouse.inside) {
-        heat = 0.5 + 0.08 * Math.sin(t * 0.4 + ph); // légère variation ambiante
-      } else {
-        heat = Math.max(0, 1 - dist / (maxDist * 0.6));
-        // Zone blanche autour du point très proche
-        if (dist < 0.3) heat = 1;
-        else heat = Math.pow(heat, 1.8);
-      }
-
-      const col = femColor(heat);
-      colors[i*3]   = col.r;
-      colors[i*3+1] = col.g;
-      colors[i*3+2] = col.b;
-    }
-    pos.needsUpdate = true;
-    geo.attributes.color.needsUpdate = true;
-    geo.computeVertexNormals();
-
-    // Rings
-    ring1.rotation.z = t * 0.13;
-    ring2.rotation.y = t * 0.09;
-
-    // Breathe
-    const scale = 1 + Math.sin(t * 0.5) * 0.010;
-    group.scale.setScalar(scale);
-
-    renderer.render(scene, camera);
-  }
-  tick();
-
-  window.addEventListener('resize', () => {
-    renderer.setSize(W(), H());
-    camera.aspect = W() / H();
-    camera.updateProjectionMatrix();
-  });
-}
-
-/* ══════════════════════════════
    SHOWCASE 3D — Assemblage Monoplace SolidWorks (GLB)
 ══════════════════════════════ */
 function initShowcase() {
@@ -2155,7 +1872,6 @@ function initShowcase() {
   const W = () => sec.offsetWidth;
   const H = () => sec.offsetHeight;
 
-  /* ── Loader ── */
   const loaderEl = document.createElement('div');
   loaderEl.id = 'sc-loader';
   loaderEl.innerHTML = '<div class="sc-loader-ring"></div><div class="sc-loader-label">Chargement de la pièce…</div>';
@@ -2166,7 +1882,6 @@ function initShowcase() {
   hintEl.textContent = 'Cliquer–glisser pour faire pivoter';
   sec.appendChild(hintEl);
 
-  /* ── Renderer ── */
   const renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.setSize(W(), H());
@@ -2179,7 +1894,6 @@ function initShowcase() {
   const camera = new THREE.PerspectiveCamera(45, W()/H(), 0.01, 500);
   camera.position.set(0, 1.2, 5.5);
 
-  /* ── Éclairage ── */
   scene.add(new THREE.AmbientLight(0xffffff, 0.45));
   const lKey = new THREE.DirectionalLight(0xE8D5A3, 2.5);
   lKey.position.set(4, 6, 5); lKey.castShadow = true; scene.add(lKey);
@@ -2191,28 +1905,12 @@ function initShowcase() {
   lTop.position.set(0, 10, 0); lTop.target.position.set(0,0,0);
   scene.add(lTop, lTop.target);
 
-  /* ── Drag rotation UNIQUEMENT (pas de zoom, pas de scroll block) ── */
   let isDrag=false, tRX=0, tRY=0, rotX=0, rotY=0;
   const prev={x:0,y:0};
   canvas.style.cursor='grab';
-
-  const onDown = e => {
-    isDrag=true;
-    const s=e.touches?e.touches[0]:e;
-    prev.x=s.clientX; prev.y=s.clientY;
-    canvas.style.cursor='grabbing';
-  };
-  const onMove = e => {
-    if(!isDrag) return;
-    const s=e.touches?e.touches[0]:e;
-    tRY += (s.clientX-prev.x)*.012;
-    tRX += (s.clientY-prev.y)*.009;
-    tRX = Math.max(-1.2, Math.min(1.2, tRX));
-    prev.x=s.clientX; prev.y=s.clientY;
-    /* NE PAS preventDefault → le scroll reste possible */
-  };
-  const onUp = () => { isDrag=false; canvas.style.cursor='grab'; };
-
+  const onDown = e => { isDrag=true; const s=e.touches?e.touches[0]:e; prev.x=s.clientX; prev.y=s.clientY; canvas.style.cursor='grabbing'; };
+  const onMove = e => { if(!isDrag) return; const s=e.touches?e.touches[0]:e; tRY+=(s.clientX-prev.x)*.012; tRX+=(s.clientY-prev.y)*.009; tRX=Math.max(-1.2,Math.min(1.2,tRX)); prev.x=s.clientX; prev.y=s.clientY; };
+  const onUp   = () => { isDrag=false; canvas.style.cursor='grab'; };
   canvas.addEventListener('mousedown', onDown);
   canvas.addEventListener('mousemove', onMove);
   canvas.addEventListener('mouseup',   onUp);
@@ -2220,36 +1918,22 @@ function initShowcase() {
   canvas.addEventListener('touchstart', onDown, {passive:true});
   canvas.addEventListener('touchmove',  onMove, {passive:true});
   canvas.addEventListener('touchend',   onUp);
-  /* Pas d'écouteur wheel → scroll libre */
 
   const master = new THREE.Group();
   scene.add(master);
 
-  /* ── Afficher message "pièce non disponible" ── */
   function showUnavailable() {
-    loaderEl.style.opacity = '0';
-    loaderEl.style.pointerEvents = 'none';
+    loaderEl.style.opacity='0'; loaderEl.style.pointerEvents='none';
     const msg = document.createElement('div');
-    msg.style.cssText = `
-      position:absolute;inset:0;display:flex;flex-direction:column;
-      align-items:center;justify-content:center;z-index:8;
-      pointer-events:none;
-    `;
-    msg.innerHTML = `
-      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:1.5rem;opacity:.5">
-        <rect x="8" y="14" width="32" height="24" rx="1" stroke="#C9A84C" stroke-width="1.2"/>
-        <path d="M18 14V10a6 6 0 0 1 12 0v4" stroke="#C9A84C" stroke-width="1.2"/>
-        <line x1="24" y1="24" x2="24" y2="30" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round"/>
-        <circle cx="24" cy="22" r="1.2" fill="#C9A84C"/>
-      </svg>
-      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.5rem;color:rgba(201,168,76,.7);margin-bottom:.6rem">Pièce non disponible</div>
-      <div style="font-family:'Raleway',sans-serif;font-size:.5rem;letter-spacing:.4em;text-transform:uppercase;color:rgba(201,168,76,.35)">Assets/Monoplace.glb introuvable</div>
-      <div style="font-family:'Raleway',sans-serif;font-size:.48rem;letter-spacing:.25em;color:rgba(255,255,255,.18);margin-top:.5rem">Exporter depuis SolidWorks en .glb puis déposer dans Assets/</div>
+    msg.style.cssText='position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:8;pointer-events:none;';
+    msg.innerHTML=`
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.6rem;color:rgba(201,168,76,.65);margin-bottom:.6rem">Pièce non disponible</div>
+      <div style="font-family:'Raleway',sans-serif;font-size:.5rem;letter-spacing:.4em;text-transform:uppercase;color:rgba(201,168,76,.3)">Assets/Monoplace.glb introuvable</div>
+      <div style="font-family:'Raleway',sans-serif;font-size:.44rem;letter-spacing:.2em;color:rgba(255,255,255,.15);margin-top:.5rem;padding:0 2rem;text-align:center">Exporter depuis SolidWorks → GLB et déposer dans Assets/</div>
     `;
     sec.appendChild(msg);
   }
 
-  /* ── Chargement GLB ── */
   const loaderScript = document.createElement('script');
   loaderScript.src = 'https://unpkg.com/three@0.162.0/examples/js/loaders/GLTFLoader.js';
   loaderScript.onload = () => {
@@ -2259,10 +1943,10 @@ function initShowcase() {
       'Assets/Monoplace.glb',
       (gltf) => {
         const model = gltf.scene;
-        const box   = new THREE.Box3().setFromObject(model);
+        const box = new THREE.Box3().setFromObject(model);
         const center = box.getCenter(new THREE.Vector3());
-        const size   = box.getSize(new THREE.Vector3());
-        const scale  = 2.8 / Math.max(size.x, size.y, size.z);
+        const size = box.getSize(new THREE.Vector3());
+        const scale = 2.8 / Math.max(size.x, size.y, size.z);
         model.scale.setScalar(scale);
         model.position.sub(center.multiplyScalar(scale));
         model.traverse(child => {
@@ -2280,11 +1964,7 @@ function initShowcase() {
         setTimeout(()=>{ hintEl.style.transition='opacity 1.5s'; hintEl.style.opacity='0'; }, 3500);
       },
       (xhr) => {
-        if(xhr.total){
-          const pct=Math.round(xhr.loaded/xhr.total*100);
-          const lbl=loaderEl.querySelector('.sc-loader-label');
-          if(lbl) lbl.textContent='Chargement… '+pct+'%';
-        }
+        if(xhr.total){ const pct=Math.round(xhr.loaded/xhr.total*100); const lbl=loaderEl.querySelector('.sc-loader-label'); if(lbl) lbl.textContent='Chargement… '+pct+'%'; }
       },
       () => { showUnavailable(); }
     );
@@ -2292,7 +1972,6 @@ function initShowcase() {
   loaderScript.onerror = () => showUnavailable();
   document.head.appendChild(loaderScript);
 
-  /* ── Boucle de rendu ── */
   const clk = new THREE.Clock();
   const camDist = 5.5;
   (function tick() {
@@ -2302,7 +1981,6 @@ function initShowcase() {
     if (!isDrag) tRY += .003;
     master.rotation.y = rotY;
     master.rotation.x = rotX;
-    /* Caméra fixe en distance, pas de zoom */
     camera.position.x = Math.sin(rotY) * camDist;
     camera.position.z = Math.cos(rotY) * camDist;
     camera.position.y = rotX * 2 + 1.2;
@@ -2313,17 +1991,10 @@ function initShowcase() {
     requestAnimationFrame(tick);
   })();
 
-  window.addEventListener('resize', () => {
-    renderer.setSize(W(), H());
-    camera.aspect = W()/H();
-    camera.updateProjectionMatrix();
-  });
+  window.addEventListener('resize', () => { renderer.setSize(W(), H()); camera.aspect=W()/H(); camera.updateProjectionMatrix(); });
 }
 
-window.addEventListener('load', () => {
-  initHero();
-  initShowcase();
-});
+window.addEventListener('load', () => { initShowcase(); });
 </script>
 
 <!-- ══════════════════════════════════════════════
@@ -2513,7 +2184,7 @@ function startCinematic(){
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
-    setTimeout(()=>{ sweeping=true; sweepStart=performance.now(); },3600);
+    setTimeout(()=>{ sweeping=true; sweepStart=performance.now(); },2800);
   });
 }
 
@@ -2762,84 +2433,52 @@ document.querySelectorAll('.sk-fg').forEach(el=>ioSk.observe(el));
   render();
 })();
 
-/* ════ 10. SOFTWARE — DEFILEMENT SECONDAIRE ══════════ */
+/* ════ 10. SOFTWARE — DÉFILEMENT SECONDAIRE (CSS pur) ═ */
 (function(){
+  const track = document.getElementById('swSecTrack');
+  if(!track) return;
 
-  const track=document.getElementById('swSecTrack');
-
-  if(!track)return;
-
-  // Triple duplication pour flux totalement continu
-  const allItems=[
-    ...SOFTS_SEC,
-    ...SOFTS_SEC,
-    ...SOFTS_SEC
-  ];
-
-  allItems.forEach(s=>{
-
-    const el=document.createElement('div');
-    el.className='sw-sec-item';
-
-    const ico=document.createElement('div');
-    ico.className='sw-sec-ico';
-
+  // Construire les items une seule fois, puis dupliquer via CSS
+  const items = [...SOFTS_SEC, ...SOFTS_SEC]; // 2x suffit avec CSS infinite
+  items.forEach(s => {
+    const el = document.createElement('div');
+    el.className = 'sw-sec-item';
+    const ico = document.createElement('div');
+    ico.className = 'sw-sec-ico';
     if(s.logo){
-
-      const img=document.createElement('img');
-
-      img.src=s.logo;
-      img.alt=s.name;
-
-      img.onerror=()=>{
-        img.replaceWith(
-          Object.assign(document.createElement('span'),{
-            textContent:s.abbr
-          })
-        );
-      };
-
+      const img = document.createElement('img');
+      img.src = s.logo; img.alt = s.name;
+      img.onerror = () => img.replaceWith(Object.assign(document.createElement('span'),{textContent:s.abbr}));
       ico.appendChild(img);
-
     } else {
-
-      ico.appendChild(
-        Object.assign(document.createElement('span'),{
-          textContent:s.abbr
-        })
-      );
+      ico.appendChild(Object.assign(document.createElement('span'),{textContent:s.abbr}));
     }
-
-    const nm=document.createElement('div');
-    nm.className='sw-sec-name';
-    nm.textContent=s.name;
-
-    el.append(ico,nm);
-
+    const nm = document.createElement('div');
+    nm.className = 'sw-sec-name';
+    nm.textContent = s.name;
+    el.append(ico, nm);
     track.appendChild(el);
   });
 
-  // Largeur réelle du flux
-  const originalWidth=track.scrollWidth/3;
-
-  // Animation ultra fluide
-  let pos=0;
-
-  function animate(){
-
-    pos-=0.45;
-
-    if(Math.abs(pos)>=originalWidth){
-      pos=0;
-    }
-
-    track.style.transform=`translate3d(${pos}px,0,0)`;
-
-    requestAnimationFrame(animate);
-  }
-
-  animate();
-
+  // Mesure la largeur d'un set, injecte la CSS keyframe dynamiquement
+  requestAnimationFrame(() => {
+    const totalW = track.scrollWidth;
+    const halfW  = totalW / 2;
+    const style  = document.createElement('style');
+    style.textContent = `
+      @keyframes swMarquee {
+        0%   { transform: translateX(0); }
+        100% { transform: translateX(-${halfW}px); }
+      }
+      #swSecTrack {
+        animation: swMarquee ${Math.round(halfW / 40)}s linear infinite;
+        width: max-content;
+        display: flex;
+      }
+      #swSecTrack:hover { animation-play-state: paused; }
+    `;
+    document.head.appendChild(style);
+  });
 })();
 
 /* ════ 11. SECTION NAV BUBBLES ══════════════════════ */
