@@ -148,34 +148,43 @@ section { position:relative; overflow:hidden; }
 .btn-ghost:hover { border-color:var(--rose); color:var(--rose); }
 
 /* ════════════════════════════════════════════════════════
-   HERO — FOND LUMINEUX + THREE.JS FEM SPHERE
+   HERO — BLURS DORÉS + TITRE PORTFOLIO AVEC ENGRENAGE
 ════════════════════════════════════════════════════════ */
 #hero {
   position:relative; min-height:100vh;
   display:flex; flex-direction:column;
   align-items:center; justify-content:center;
-  background:#FDFAF6; overflow:hidden;
+  background:#0C0A0E; overflow:hidden;
 }
-/* Three.js canvas for hero — absolute behind content */
-#hero-3d-canvas {
-  position:absolute; inset:0; width:100%; height:100%;
-  pointer-events:all; z-index:1;
+/* Blobs flous dorés / rosés */
+.h-orb {
+  position:absolute; border-radius:50%;
+  pointer-events:none; z-index:0;
+  filter:blur(90px);
 }
-/* Blobs derrière */
-.h-blob { position:absolute; border-radius:50%; pointer-events:none; z-index:0; }
-.h-blob-1 {
-  width:clamp(340px,50vw,620px); height:clamp(340px,50vw,620px);
-  top:50%; left:58%; transform:translate(-30%,-54%);
-  background:radial-gradient(circle at 38% 40%,rgba(201,168,76,.07) 0%,rgba(196,154,138,.04) 45%,transparent 70%);
-  filter:blur(55px);
+.h-orb-1 {
+  width:clamp(420px,55vw,750px); height:clamp(420px,55vw,750px);
+  top:50%; left:20%; transform:translate(-50%,-55%);
+  background:radial-gradient(circle at 40% 40%, rgba(201,168,76,.38) 0%, rgba(196,154,138,.12) 55%, transparent 75%);
+  animation:orbDrift1 9s ease-in-out infinite alternate;
 }
-.h-blob-2 {
-  width:clamp(240px,36vw,460px); height:clamp(240px,36vw,460px);
-  top:20%; left:30%; transform:translate(-50%,-35%);
-  background:radial-gradient(circle at 55% 50%,rgba(232,200,180,.09) 0%,rgba(201,168,76,.03) 55%,transparent 75%);
-  filter:blur(65px);
+.h-orb-2 {
+  width:clamp(320px,42vw,580px); height:clamp(320px,42vw,580px);
+  bottom:10%; right:12%; transform:translate(25%,30%);
+  background:radial-gradient(circle at 60% 55%, rgba(196,154,138,.32) 0%, rgba(201,168,76,.08) 60%, transparent 80%);
+  animation:orbDrift2 11s ease-in-out infinite alternate;
 }
-/* Overlay text above canvas */
+.h-orb-3 {
+  width:clamp(180px,25vw,340px); height:clamp(180px,25vw,340px);
+  top:15%; right:30%;
+  background:radial-gradient(circle, rgba(232,213,163,.22) 0%, transparent 70%);
+  animation:orbDrift3 7s ease-in-out infinite alternate;
+}
+@keyframes orbDrift1 { from{transform:translate(-50%,-55%)} to{transform:translate(-42%,-48%)} }
+@keyframes orbDrift2 { from{transform:translate(25%,30%)} to{transform:translate(18%,22%)} }
+@keyframes orbDrift3 { from{transform:none} to{transform:translate(8%,12%)} }
+
+/* Overlay contenu */
 .h-overlay {
   position:relative; z-index:2;
   display:flex; flex-direction:column; align-items:center;
@@ -184,55 +193,77 @@ section { position:relative; overflow:hidden; }
 }
 .h-sup {
   font-size:.52rem; letter-spacing:.7em; text-transform:uppercase;
-  color:rgba(196,154,138,.7); margin-bottom:2rem; display:block;
+  color:rgba(201,168,76,.55); margin-bottom:2.8rem; display:block;
   opacity:0; animation:fadeIn .8s .2s forwards;
 }
+/* PORTFOLIO title with gear */
+.h-portfolio-wrap {
+  display:flex; align-items:center; justify-content:center;
+  gap:0; line-height:1;
+  opacity:0; animation:fadeUp 1s .4s forwards;
+  pointer-events:none;
+  user-select:none;
+}
+.h-port-text {
+  font-family:'Cormorant Garamond',serif; font-weight:300; font-style:italic;
+  font-size:clamp(4.5rem,10vw,9.5rem);
+  background:linear-gradient(135deg,#9A7630 0%,#C9A84C 38%,#F5EDD8 60%,#C9A84C 80%,#9A7630 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  letter-spacing:.04em;
+}
+/* Gear SVG replaces the O */
+.h-gear-wrap {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:clamp(3.8rem,8.5vw,8rem); height:clamp(3.8rem,8.5vw,8rem);
+}
+.h-gear-svg { width:100%; height:100%; overflow:visible; }
+.h-gear-body { fill:none; stroke:url(#heroGearGrad); stroke-width:2.5; }
+.h-gear-spin { animation:gearSpin 4s linear infinite; transform-origin:50% 50%; }
+.h-gear-spin2 { animation:gearSpin 6s linear infinite reverse; transform-origin:50% 50%; }
+@keyframes gearSpin { to { transform:rotate(360deg); } }
+
 .h-name {
   font-family:'Cormorant Garamond',serif; font-weight:300; font-style:italic;
-  font-size:clamp(4.2rem,8.5vw,8rem); line-height:1;
-  color:var(--text); text-align:center;
-  opacity:0; animation:fadeUp 1s .45s forwards;
+  font-size:clamp(2rem,4.5vw,3.8rem); line-height:1;
+  color:rgba(255,255,255,.75); text-align:center;
+  opacity:0; animation:fadeUp .9s .9s forwards;
+  letter-spacing:.12em; margin-top:.6rem;
 }
 .h-name em {
   font-style:normal; font-weight:400;
   background:linear-gradient(135deg,#9A7630 0%,#C9A84C 42%,#E8D5A3 68%,#C9A84C 100%);
   -webkit-background-clip:text; background-clip:text; color:transparent;
 }
-.h-rule { display:flex; align-items:center; gap:1.2rem; margin:1.4rem 0 1.2rem; opacity:0; animation:fadeIn .8s .85s forwards; }
+.h-rule { display:flex; align-items:center; gap:1.2rem; margin:1.6rem 0 1rem; opacity:0; animation:fadeIn .8s 1.15s forwards; }
 .h-rule-line { width:48px; height:1px; background:linear-gradient(90deg,transparent,rgba(201,168,76,.5)); }
 .h-rule-line.r { background:linear-gradient(90deg,rgba(201,168,76,.5),transparent); }
 .h-rule-diamond { width:5px; height:5px; background:var(--gold); transform:rotate(45deg); opacity:.6; }
 .h-tagline {
   font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:300;
-  font-size:clamp(1rem,2vw,1.4rem); color:var(--rose);
-  letter-spacing:.06em; text-align:center;
-  opacity:0; animation:fadeIn .9s .95s forwards;
+  font-size:clamp(.85rem,1.8vw,1.2rem); color:rgba(196,154,138,.8);
+  letter-spacing:.08em; text-align:center;
+  opacity:0; animation:fadeIn .9s 1.35s forwards;
 }
-/* Spacer for the 3D sphere zone between text and CTA */
-.h-sphere-space { height:clamp(180px,28vw,280px); pointer-events:none; }
-
 .h-cta-wrap {
-  text-align:center; opacity:0; animation:fadeUp .7s 1.55s forwards;
-  pointer-events:all;
+  text-align:center; opacity:0; animation:fadeUp .7s 1.7s forwards;
+  pointer-events:all; margin-top:3.2rem;
 }
 .h-btn {
-  display:inline-block; padding:.72rem 2.2rem;
-  border:1px solid rgba(196,154,138,.45); color:#9A6D60;
-  text-decoration:none; font-size:.55rem; font-family:'Raleway',sans-serif;
+  display:inline-block; padding:.8rem 2.6rem;
+  border:1px solid rgba(201,168,76,.4); color:rgba(201,168,76,.85);
+  text-decoration:none; font-size:.56rem; font-family:'Raleway',sans-serif;
   font-weight:400; letter-spacing:.46em; text-transform:uppercase;
-  transition:border-color .3s, color .3s, background .3s;
+  transition:border-color .3s, color .3s, background .3s, box-shadow .3s;
 }
-.h-btn:hover { border-color:var(--rose); color:var(--white); background:var(--rose); }
-
+.h-btn:hover { border-color:var(--gold); color:var(--dark); background:var(--gold); box-shadow:0 0 30px rgba(201,168,76,.3); }
 .hscr {
   position:absolute; bottom:2.2rem; left:50%; transform:translateX(-50%);
   display:flex; flex-direction:column; align-items:center; gap:.5rem;
-  opacity:0; animation:fadeIn 1s 2s forwards; z-index:5;
+  opacity:0; animation:fadeIn 1s 2.2s forwards; z-index:5;
   pointer-events:none;
 }
-.hscr span { font-size:.5rem; letter-spacing:.48em; text-transform:uppercase; color:var(--text-mu); }
-.scrbar { width:1px; height:36px; background:linear-gradient(to bottom,var(--rose),transparent); animation:scrollD 2.2s ease-in-out infinite; }
-@keyframes scrollD { 0%{transform:scaleY(0);transform-origin:top;opacity:1} 45%{transform:scaleY(1);transform-origin:top;opacity:1} 55%{transform:scaleY(1);transform-origin:bottom;opacity:1} 100%{transform:scaleY(0);transform-origin:bottom;opacity:0} }
+.hscr span { font-size:.5rem; letter-spacing:.48em; text-transform:uppercase; color:rgba(201,168,76,.4); }
+.scrbar { width:1px; height:36px; background:linear-gradient(to bottom,var(--gold),transparent); animation:scrollD 2.2s ease-in-out infinite; }
 
 /* ════════════════════════════════════════════════════════
    SECTION TRANSITIONS
@@ -1069,27 +1100,103 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
 <main id="main" style="opacity:1;">
 
   <!-- ─────────── HERO ─────────── -->
-  <section id="hero"><div class="hero-orb one"></div><div class="hero-orb two"></div>
-    <canvas id="hero-3d-canvas"></canvas>
-    <div class="h-blob h-blob-1"></div>
-    <div class="h-blob h-blob-2"></div>
+  <section id="hero">
+    <div class="h-orb h-orb-1"></div>
+    <div class="h-orb h-orb-2"></div>
+    <div class="h-orb h-orb-3"></div>
+
+    <!-- Grain texture subtil -->
+    <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:.04;pointer-events:none;z-index:1" xmlns="http://www.w3.org/2000/svg">
+      <filter id="heroNoise"><feTurbulence type="fractalNoise" baseFrequency=".65" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+      <rect width="100%" height="100%" filter="url(#heroNoise)"/>
+    </svg>
 
     <div class="h-overlay">
-      <!-- <span class="h-sup">ENSAM Arts et Métiers · Portfolio</span> -->
+      <span class="h-sup">ENSAM · Arts et Métiers · Portfolio</span>
+
+      <!-- PORTF O LIO avec engrenage à la place du 2e O -->
+      <div class="h-portfolio-wrap" aria-label="Portfolio">
+        <!-- Gradient pour l'engrenage -->
+        <svg width="0" height="0" style="position:absolute">
+          <defs>
+            <linearGradient id="heroGearGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#9A7630"/>
+              <stop offset="50%" stop-color="#E8D5A3"/>
+              <stop offset="100%" stop-color="#C9A84C"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="h-port-text">P</span>
+        <span class="h-port-text">O</span>
+        <span class="h-port-text">R</span>
+        <span class="h-port-text">T</span>
+        <span class="h-port-text">F</span>
+        <!-- Engrenage = le O -->
+        <span class="h-gear-wrap" title="O">
+          <svg class="h-gear-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="gG" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#9A7630"/>
+                <stop offset="50%" stop-color="#E8D5A3"/>
+                <stop offset="100%" stop-color="#C9A84C"/>
+              </linearGradient>
+            </defs>
+            <!-- Grand engrenage animé -->
+            <g class="h-gear-spin" style="transform-origin:50px 50px">
+              <path d="
+                M50 14 L53 6 L47 6 Z
+                M50 86 L47 94 L53 94 Z
+                M14 50 L6 53 L6 47 Z
+                M86 50 L94 47 L94 53 Z
+                M26 21 L20 15 L16 22 Z
+                M74 79 L80 85 L84 78 Z
+                M21 74 L15 80 L22 84 Z
+                M79 26 L85 20 L78 16 Z
+              " fill="url(#gG)"/>
+              <circle cx="50" cy="50" r="32" fill="none" stroke="url(#gG)" stroke-width="7"/>
+              <circle cx="50" cy="50" r="18" fill="none" stroke="url(#gG)" stroke-width="3"/>
+            </g>
+            <!-- Intérieur fixe -->
+            <circle cx="50" cy="50" r="10" fill="url(#gG)" opacity=".7"/>
+          </svg>
+        </span>
+        <span class="h-port-text">L</span>
+        <span class="h-port-text">I</span>
+        <!-- Deuxième engrenage = le O final, tourne dans l'autre sens -->
+        <span class="h-gear-wrap" title="O">
+          <svg class="h-gear-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <g class="h-gear-spin2" style="transform-origin:50px 50px">
+              <path d="
+                M50 18 L53 8 L47 8 Z
+                M50 82 L47 92 L53 92 Z
+                M18 50 L8 53 L8 47 Z
+                M82 50 L92 47 L92 53 Z
+                M28 24 L22 16 L17 23 Z
+                M72 76 L78 84 L83 77 Z
+                M24 72 L16 78 L23 83 Z
+                M76 28 L84 22 L77 17 Z
+              " fill="url(#gG)" opacity=".7"/>
+              <circle cx="50" cy="50" r="28" fill="none" stroke="url(#gG)" stroke-width="5" opacity=".8"/>
+              <circle cx="50" cy="50" r="15" fill="none" stroke="url(#gG)" stroke-width="2.5"/>
+            </g>
+            <circle cx="50" cy="50" r="8" fill="url(#gG)" opacity=".6"/>
+          </svg>
+        </span>
+      </div>
+
       <h1 class="h-name">Thomas <em>Bourdon</em></h1>
       <div class="h-rule">
         <div class="h-rule-line"></div>
         <div class="h-rule-diamond"></div>
         <div class="h-rule-line r"></div>
       </div>
-      <p class="h-tagline">Etudiant-ingénieur des Arts &amp; Métiers</p>
-      <div class="h-sphere-space"></div>
+      <p class="h-tagline">Étudiant-ingénieur des Arts &amp; Métiers</p>
       <div class="h-cta-wrap">
         <a href="#feat" class="h-btn">Explorer le portfolio</a>
       </div>
     </div>
 
-    <!-- <div class="hscr"><span>Défiler</span><div class="scrbar"></div></div> -->
+    <div class="hscr"><span>Défiler</span><div class="scrbar"></div></div>
   </section>
 
   <!-- wave hero → feat -->
@@ -2048,15 +2155,15 @@ function initShowcase() {
   const W = () => sec.offsetWidth;
   const H = () => sec.offsetHeight;
 
-  /* ── Injecter loader + hint dans le DOM ── */
+  /* ── Loader ── */
   const loaderEl = document.createElement('div');
   loaderEl.id = 'sc-loader';
-  loaderEl.innerHTML = '<div class="sc-loader-ring"></div><div class="sc-loader-label">Chargement du modèle…</div>';
+  loaderEl.innerHTML = '<div class="sc-loader-ring"></div><div class="sc-loader-label">Chargement de la pièce…</div>';
   sec.appendChild(loaderEl);
 
   const hintEl = document.createElement('div');
   hintEl.id = 'sc-hint';
-  hintEl.textContent = 'Cliquer–glisser pour faire pivoter · Molette pour zoomer';
+  hintEl.textContent = 'Cliquer–glisser pour faire pivoter';
   sec.appendChild(hintEl);
 
   /* ── Renderer ── */
@@ -2075,23 +2182,26 @@ function initShowcase() {
   /* ── Éclairage ── */
   scene.add(new THREE.AmbientLight(0xffffff, 0.45));
   const lKey = new THREE.DirectionalLight(0xE8D5A3, 2.5);
-  lKey.position.set(4, 6, 5); lKey.castShadow = true;
-  scene.add(lKey);
+  lKey.position.set(4, 6, 5); lKey.castShadow = true; scene.add(lKey);
   const lFill = new THREE.PointLight(0xC9A84C, 3.5, 40);
   lFill.position.set(-5, 2, 3); scene.add(lFill);
   const lRim = new THREE.PointLight(0xC49A8A, 2.5, 30);
   lRim.position.set(0, -3, -4); scene.add(lRim);
   const lTop = new THREE.SpotLight(0xffffff, 4, 50, Math.PI/6, 0.4);
-  lTop.position.set(0, 10, 0); lTop.target.position.set(0, 0, 0);
+  lTop.position.set(0, 10, 0); lTop.target.position.set(0,0,0);
   scene.add(lTop, lTop.target);
 
-  /* ── Contrôles drag + zoom ── */
+  /* ── Drag rotation UNIQUEMENT (pas de zoom, pas de scroll block) ── */
   let isDrag=false, tRX=0, tRY=0, rotX=0, rotY=0;
   const prev={x:0,y:0};
-  let camDist = 5.5;
   canvas.style.cursor='grab';
 
-  const onDown = e => { isDrag=true; const s=e.touches?e.touches[0]:e; prev.x=s.clientX; prev.y=s.clientY; canvas.style.cursor='grabbing'; };
+  const onDown = e => {
+    isDrag=true;
+    const s=e.touches?e.touches[0]:e;
+    prev.x=s.clientX; prev.y=s.clientY;
+    canvas.style.cursor='grabbing';
+  };
   const onMove = e => {
     if(!isDrag) return;
     const s=e.touches?e.touches[0]:e;
@@ -2099,103 +2209,92 @@ function initShowcase() {
     tRX += (s.clientY-prev.y)*.009;
     tRX = Math.max(-1.2, Math.min(1.2, tRX));
     prev.x=s.clientX; prev.y=s.clientY;
-    e.preventDefault();
+    /* NE PAS preventDefault → le scroll reste possible */
   };
   const onUp = () => { isDrag=false; canvas.style.cursor='grab'; };
-  const onWheel = e => { camDist = Math.max(1.5, Math.min(14, camDist + e.deltaY * 0.01)); e.preventDefault(); };
+
   canvas.addEventListener('mousedown', onDown);
   canvas.addEventListener('mousemove', onMove);
   canvas.addEventListener('mouseup',   onUp);
   canvas.addEventListener('mouseleave', onUp);
-  canvas.addEventListener('touchstart', onDown, {passive:false});
-  canvas.addEventListener('touchmove',  onMove, {passive:false});
+  canvas.addEventListener('touchstart', onDown, {passive:true});
+  canvas.addEventListener('touchmove',  onMove, {passive:true});
   canvas.addEventListener('touchend',   onUp);
-  canvas.addEventListener('wheel', onWheel, {passive:false});
-
-  /* ── Grille de sol ── */
-  const gridHelper = new THREE.GridHelper(12, 20, 0xC9A84C, 0x2a2015);
-  gridHelper.position.y = -1.2;
-  scene.add(gridHelper);
+  /* Pas d'écouteur wheel → scroll libre */
 
   const master = new THREE.Group();
   scene.add(master);
 
-  /* ── Fallback monoplace stylisée ── */
-  function buildFallback() {
-    const shape = new THREE.Group();
-    const body = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.28, 0.38, 2.4, 6),
-      new THREE.MeshStandardMaterial({ color:0xC9A84C, metalness:.9, roughness:.1, emissive:0xC9A84C, emissiveIntensity:.12 })
-    );
-    body.rotation.z = Math.PI/2; shape.add(body);
-    [-1,-0.3,0.3,1].forEach((xPos, i) => {
-      const wheel = new THREE.Mesh(
-        new THREE.TorusGeometry(0.32, 0.1, 8, 24),
-        new THREE.MeshStandardMaterial({ color:0x1a1208, metalness:.6, roughness:.3 })
-      );
-      wheel.position.set(xPos * 0.9, -0.28, i<2 ? 0.42 : -0.42);
-      shape.add(wheel);
-    });
-    const cockpit = new THREE.Mesh(
-      new THREE.SphereGeometry(0.22, 8, 6, 0, Math.PI*2, 0, Math.PI/2),
-      new THREE.MeshStandardMaterial({ color:0x1a1208, metalness:.5, roughness:.2 })
-    );
-    cockpit.position.set(0.1, 0.26, 0); shape.add(cockpit);
-    const mWire = new THREE.MeshBasicMaterial({ color:0xC9A84C, wireframe:true, transparent:true, opacity:.18 });
-    const wBody = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.4, 2.5, 6), mWire);
-    wBody.rotation.z = Math.PI/2; shape.add(wBody);
-    master.add(shape);
-    loaderEl.style.opacity='0'; loaderEl.style.pointerEvents='none';
-    hintEl.style.opacity='1';
-    setTimeout(() => { hintEl.style.opacity='0'; }, 4000);
+  /* ── Afficher message "pièce non disponible" ── */
+  function showUnavailable() {
+    loaderEl.style.opacity = '0';
+    loaderEl.style.pointerEvents = 'none';
+    const msg = document.createElement('div');
+    msg.style.cssText = `
+      position:absolute;inset:0;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;z-index:8;
+      pointer-events:none;
+    `;
+    msg.innerHTML = `
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:1.5rem;opacity:.5">
+        <rect x="8" y="14" width="32" height="24" rx="1" stroke="#C9A84C" stroke-width="1.2"/>
+        <path d="M18 14V10a6 6 0 0 1 12 0v4" stroke="#C9A84C" stroke-width="1.2"/>
+        <line x1="24" y1="24" x2="24" y2="30" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="24" cy="22" r="1.2" fill="#C9A84C"/>
+      </svg>
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.5rem;color:rgba(201,168,76,.7);margin-bottom:.6rem">Pièce non disponible</div>
+      <div style="font-family:'Raleway',sans-serif;font-size:.5rem;letter-spacing:.4em;text-transform:uppercase;color:rgba(201,168,76,.35)">Assets/Monoplace.glb introuvable</div>
+      <div style="font-family:'Raleway',sans-serif;font-size:.48rem;letter-spacing:.25em;color:rgba(255,255,255,.18);margin-top:.5rem">Exporter depuis SolidWorks en .glb puis déposer dans Assets/</div>
+    `;
+    sec.appendChild(msg);
   }
 
-  /* ── Chargement GLB via GLTFLoader (unpkg CDN) ── */
+  /* ── Chargement GLB ── */
   const loaderScript = document.createElement('script');
   loaderScript.src = 'https://unpkg.com/three@0.162.0/examples/js/loaders/GLTFLoader.js';
   loaderScript.onload = () => {
-    if (!THREE.GLTFLoader) { buildFallback(); return; }
+    if (!THREE.GLTFLoader) { showUnavailable(); return; }
     const gltfLoader = new THREE.GLTFLoader();
     gltfLoader.load(
       'Assets/Monoplace.glb',
       (gltf) => {
         const model = gltf.scene;
-        const box = new THREE.Box3().setFromObject(model);
+        const box   = new THREE.Box3().setFromObject(model);
         const center = box.getCenter(new THREE.Vector3());
-        const size = box.getSize(new THREE.Vector3());
-        const maxDim = Math.max(size.x, size.y, size.z);
-        const scale = 2.8 / maxDim;
+        const size   = box.getSize(new THREE.Vector3());
+        const scale  = 2.8 / Math.max(size.x, size.y, size.z);
         model.scale.setScalar(scale);
         model.position.sub(center.multiplyScalar(scale));
         model.traverse(child => {
           if (child.isMesh) {
             child.castShadow = true; child.receiveShadow = true;
             if (!child.material.map) {
-              child.material.metalness = Math.max(child.material.metalness || 0, 0.6);
-              child.material.roughness = Math.min(child.material.roughness ?? 1, 0.35);
+              child.material.metalness = Math.max(child.material.metalness||0, 0.6);
+              child.material.roughness = Math.min(child.material.roughness??1, 0.35);
             }
           }
         });
         master.add(model);
         loaderEl.style.opacity='0'; loaderEl.style.pointerEvents='none';
         hintEl.style.opacity='1';
-        setTimeout(() => { hintEl.style.opacity='0'; }, 4000);
+        setTimeout(()=>{ hintEl.style.transition='opacity 1.5s'; hintEl.style.opacity='0'; }, 3500);
       },
       (xhr) => {
-        if (xhr.total) {
-          const pct = Math.round(xhr.loaded / xhr.total * 100);
-          const lbl = loaderEl.querySelector('.sc-loader-label');
-          if (lbl) lbl.textContent = 'Chargement… ' + pct + '%';
+        if(xhr.total){
+          const pct=Math.round(xhr.loaded/xhr.total*100);
+          const lbl=loaderEl.querySelector('.sc-loader-label');
+          if(lbl) lbl.textContent='Chargement… '+pct+'%';
         }
       },
-      () => { buildFallback(); }
+      () => { showUnavailable(); }
     );
   };
-  loaderScript.onerror = () => buildFallback();
+  loaderScript.onerror = () => showUnavailable();
   document.head.appendChild(loaderScript);
 
   /* ── Boucle de rendu ── */
   const clk = new THREE.Clock();
+  const camDist = 5.5;
   (function tick() {
     const t = clk.getElapsedTime();
     rotX += (tRX - rotX) * .05;
@@ -2203,6 +2302,7 @@ function initShowcase() {
     if (!isDrag) tRY += .003;
     master.rotation.y = rotY;
     master.rotation.x = rotX;
+    /* Caméra fixe en distance, pas de zoom */
     camera.position.x = Math.sin(rotY) * camDist;
     camera.position.z = Math.cos(rotY) * camDist;
     camera.position.y = rotX * 2 + 1.2;
