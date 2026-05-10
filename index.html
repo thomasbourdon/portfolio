@@ -1350,7 +1350,51 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
   .sc-fio-l,.sc-fio-r { display:none; }
 }
   
+.profile-img{
+    position:absolute;
+    inset:0;
 
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+    object-position:center top;
+
+    z-index:2;
+
+    filter:
+    contrast(1.02)
+    brightness(.92);
+
+    transition:1s;
+}
+
+/* léger zoom au hover */
+
+.aph:hover .profile-img{
+    transform:scale(1.03);
+}
+
+/* overlay cinématique */
+
+.aph::after{
+    content:"";
+
+    position:absolute;
+    inset:0;
+
+    background:
+    linear-gradient(
+        to top,
+        rgba(0,0,0,.45),
+        rgba(0,0,0,.05) 35%,
+        transparent 60%
+    );
+
+    z-index:3;
+
+    pointer-events:none;
+}
 
 /* ========================================================
    PAINT TRANSITIONS
@@ -1752,7 +1796,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
       <div class="aphw rv">
         <div class="aph">
           <div class="abeam"></div>
-          <span class="aphtxt">Votre Photo</span>
+          <img src="Images/Profil.png" alt="Photo de profil" class="profile-img">
 
           <!-- Badge CSWA -->
           <a class="cert-badge cswa"
