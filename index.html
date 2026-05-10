@@ -2055,6 +2055,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
 </script>
 <script type="module">
 import * as THREE from 'three';
+import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/loaders/GLTFLoader.js';
 
 /* ══════════════════════════════
    SHOWCASE 3D — Assemblage Monoplace SolidWorks (GLB)
@@ -2126,57 +2127,50 @@ function initShowcase() {
     sec.appendChild(msg);
   }
 
-  const loaderScript = document.createElement('script');
-  loaderScript.src = 'https://unpkg.com/three@0.162.0/examples/js/loaders/GLTFLoader.js';
-  loaderScript.onload = () => {
-    if (!THREE.GLTFLoader) { showUnavailable(); return; }
-    const gltfLoader = new THREE.GLTFLoader();
+  const gltfLoader = new GLTFLoader();
 
-    /* Essaie .glb d'abord, puis .glf (même format GLTF binaire) */
-    const paths = ['Monoplace/Monoplace.gltf', 'Assets/Monoplace.glb', 'Assets/Monoplace.glf'];
-    let tried = 0;
+  /* Essaie d'abord le chemin principal, puis les variantes */
+  const paths = ['Monoplace/Monoplace.gltf', 'Monoplace/Monoplace.glb', 'Assets/Monoplace.glb', 'Assets/Monoplace.gltf'];
+  let tried = 0;
 
-    function tryNext() {
-      if (tried >= paths.length) { showUnavailable(); return; }
-      const path = paths[tried++];
-      gltfLoader.load(
-        path,
-        (gltf) => {
-          console.log('✅ Modèle chargé depuis :', path);
-          const model = gltf.scene;
-          const box = new THREE.Box3().setFromObject(model);
-          const center = box.getCenter(new THREE.Vector3());
-          const size = box.getSize(new THREE.Vector3());
-          const scale = 2.8 / Math.max(size.x, size.y, size.z);
-          model.scale.setScalar(scale);
-          model.position.sub(center.multiplyScalar(scale));
-          model.traverse(child => {
-            if (child.isMesh) {
-              child.castShadow = true; child.receiveShadow = true;
-              if (!child.material.map) {
-                child.material.metalness = Math.max(child.material.metalness||0, 0.6);
-                child.material.roughness = Math.min(child.material.roughness??1, 0.35);
-              }
+  function tryNext() {
+    if (tried >= paths.length) { showUnavailable(); return; }
+    const path = paths[tried++];
+    gltfLoader.load(
+      path,
+      (gltf) => {
+        console.log('✅ Modèle chargé depuis :', path);
+        const model = gltf.scene;
+        const box = new THREE.Box3().setFromObject(model);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+        const scale = 2.8 / Math.max(size.x, size.y, size.z);
+        model.scale.setScalar(scale);
+        model.position.sub(center.multiplyScalar(scale));
+        model.traverse(child => {
+          if (child.isMesh) {
+            child.castShadow = true; child.receiveShadow = true;
+            if (!child.material.map) {
+              child.material.metalness = Math.max(child.material.metalness||0, 0.6);
+              child.material.roughness = Math.min(child.material.roughness??1, 0.35);
             }
-          });
-          master.add(model);
-          loaderEl.style.opacity='0'; loaderEl.style.pointerEvents='none';
-          hintEl.style.opacity='1';
-          setTimeout(()=>{ hintEl.style.transition='opacity 1.5s'; hintEl.style.opacity='0'; }, 3500);
-        },
-        (xhr) => {
-          if(xhr.total){ const pct=Math.round(xhr.loaded/xhr.total*100); const lbl=loaderEl.querySelector('.sc-loader-label'); if(lbl) lbl.textContent='Chargement… '+pct+'%'; }
-        },
-        (err) => {
-          console.warn('❌ Échec chargement :', path, err.message||err);
-          tryNext();
-        }
-      );
-    }
-    tryNext();
-  };
-  loaderScript.onerror = () => showUnavailable();
-  document.head.appendChild(loaderScript);
+          }
+        });
+        master.add(model);
+        loaderEl.style.opacity='0'; loaderEl.style.pointerEvents='none';
+        hintEl.style.opacity='1';
+        setTimeout(()=>{ hintEl.style.transition='opacity 1.5s'; hintEl.style.opacity='0'; }, 3500);
+      },
+      (xhr) => {
+        if(xhr.total){ const pct=Math.round(xhr.loaded/xhr.total*100); const lbl=loaderEl.querySelector('.sc-loader-label'); if(lbl) lbl.textContent='Chargement… '+pct+'%'; }
+      },
+      (err) => {
+        console.warn('❌ Échec chargement :', path, err.message||err);
+        tryNext();
+      }
+    );
+  }
+  tryNext();
 
   const clk = new THREE.Clock();
   const camDist = 5.5;
