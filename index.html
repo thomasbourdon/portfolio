@@ -2214,12 +2214,20 @@ function initShowcase() {
   lTop.position.set(0, 10, 0); lTop.target.position.set(0,0,0);
   scene.add(lTop, lTop.target);
 
+  /* Glisser droite → tourne à droite, haut → tourne vers le haut */
   let isDrag=false, tRX=0, tRY=0, rotX=0, rotY=0;
   const prev={x:0,y:0};
   canvas.style.cursor='grab';
   const onDown = e => { isDrag=true; const s=e.touches?e.touches[0]:e; prev.x=s.clientX; prev.y=s.clientY; canvas.style.cursor='grabbing'; };
-  const onMove = e => { if(!isDrag) return; const s=e.touches?e.touches[0]:e; tRY+=(s.clientX-prev.x)*.012; tRX+=(s.clientY-prev.y)*.009; tRX=Math.max(-1.2,Math.min(1.2,tRX)); prev.x=s.clientX; prev.y=s.clientY; };
-  const onUp   = () => { isDrag=false; canvas.style.cursor='grab'; };
+  const onMove = e => {
+    if(!isDrag) return;
+    const s=e.touches?e.touches[0]:e;
+    tRY -= (s.clientX - prev.x) * .012; /* droite → rotation Y négative = tourne vers la droite */
+    tRX -= (s.clientY - prev.y) * .008; /* bas    → rotation X négative = tourne vers le bas   */
+    tRX  = Math.max(-0.9, Math.min(0.9, tRX));
+    prev.x=s.clientX; prev.y=s.clientY;
+  };
+  const onUp = () => { isDrag=false; canvas.style.cursor='grab'; };
   canvas.addEventListener('mousedown', onDown);
   canvas.addEventListener('mousemove', onMove);
   canvas.addEventListener('mouseup',   onUp);
@@ -2287,20 +2295,27 @@ function initShowcase() {
   tryNext();
 
   const clk = new THREE.Clock();
-  const camDist = 5.5;
+  /* Caméra fixe — seul le modèle tourne */
+  camera.position.set(0, 1.2, 5.5);
+  camera.lookAt(0, 0, 0);
+
   (function tick() {
     const t = clk.getElapsedTime();
-    rotX += (tRX - rotX) * .05;
-    rotY += (tRY - rotY) * .05;
-    if (!isDrag) tRY += .003;
+
+    /* Auto-rotation lente quand personne ne touche */
+    if (!isDrag) tRY -= 0.0018;
+
+    /* Lissage inertiel */
+    rotX += (tRX - rotX) * .06;
+    rotY += (tRY - rotY) * .06;
+
     master.rotation.y = rotY;
     master.rotation.x = rotX;
-    camera.position.x = Math.sin(rotY) * camDist;
-    camera.position.z = Math.cos(rotY) * camDist;
-    camera.position.y = rotX * 2 + 1.2;
-    camera.lookAt(0, 0, 0);
+
+    /* Lumières animées */
     lFill.intensity = 3 + Math.sin(t*1.4)*.6;
     lRim.intensity  = 2 + Math.sin(t*1.8+1)*.5;
+
     renderer.render(scene, camera);
     requestAnimationFrame(tick);
   })();
