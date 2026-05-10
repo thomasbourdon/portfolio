@@ -618,9 +618,184 @@ section { position:relative; overflow:hidden; }
 .sc-corner.tr { top:24px; right:28px; transform:scaleX(-1); }
 .sc-corner.bl { bottom:24px; left:28px; transform:scaleY(-1); }
 .sc-corner.br { bottom:24px; right:28px; transform:scale(-1); }
-/* Side fioritures */
-.sc-fio-l { position:absolute;left:80px;top:50%;transform:translateY(-50%);pointer-events:none;z-index:4;overflow:visible; }
-.sc-fio-r { position:absolute;right:80px;top:50%;transform:translateY(-50%) scaleX(-1);pointer-events:none;z-index:4;overflow:visible; }
+/* Side fioritures — masquées, remplacées par les overlays */
+.sc-fio-l { display:none; }
+.sc-fio-r { display:none; }
+
+/* ════════════════════════════════════════════════════════
+   SHOWCASE — Overlays HUD (specs, annotations, bottom)
+════════════════════════════════════════════════════════ */
+
+/* ── Fiche technique gauche ── */
+.sc-specs {
+  position:absolute; left:3.5rem; top:50%; transform:translateY(-50%);
+  z-index:5; pointer-events:none;
+  display:flex; flex-direction:column; gap:0;
+}
+.sc-specs-header {
+  font-family:'Raleway',sans-serif; font-size:.42rem; font-weight:500;
+  letter-spacing:.52em; text-transform:uppercase; color:rgba(201,168,76,.38);
+  margin-bottom:1.6rem; display:flex; align-items:center; gap:.7rem;
+}
+.sc-specs-header::before {
+  content:''; display:block; width:20px; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,168,76,.4));
+}
+.sc-spec-wrap { display:flex; gap:.9rem; align-items:stretch; }
+.sc-spine {
+  width:1px; flex-shrink:0;
+  background:linear-gradient(to bottom,
+    transparent 0%,
+    rgba(201,168,76,.4) 12%,
+    rgba(201,168,76,.4) 88%,
+    transparent 100%);
+}
+.sc-specs-list { display:flex; flex-direction:column; gap:1.8rem; padding:.3rem 0; }
+.sc-spec-item {
+  padding-left:.9rem; position:relative;
+  opacity:0; transform:translateX(-14px);
+  transition:opacity .7s var(--eout), transform .7s var(--eout);
+}
+.sc-spec-item::before {
+  content:''; position:absolute; left:0; top:.55rem;
+  width:7px; height:1px; background:rgba(201,168,76,.45);
+}
+.sc-spec-item.sc-vis { opacity:1; transform:none; }
+.sc-spec-item:nth-child(1) { transition-delay:.08s; }
+.sc-spec-item:nth-child(2) { transition-delay:.18s; }
+.sc-spec-item:nth-child(3) { transition-delay:.28s; }
+.sc-spec-item:nth-child(4) { transition-delay:.38s; }
+.sc-spec-label {
+  font-family:'Raleway',sans-serif; font-size:.42rem; font-weight:500;
+  letter-spacing:.42em; text-transform:uppercase; color:rgba(201,168,76,.55);
+  display:block; margin-bottom:.22rem;
+}
+.sc-spec-val {
+  font-family:'Cormorant Garamond',serif; font-weight:300; font-style:italic;
+  font-size:1.05rem; color:rgba(255,255,255,.82); display:block; line-height:1.2;
+}
+.sc-spec-sub {
+  font-family:'Raleway',sans-serif; font-size:.4rem; letter-spacing:.18em;
+  color:rgba(255,255,255,.25); display:block; margin-top:.15rem;
+}
+
+/* ── Annotations composants droite ── */
+.sc-annots {
+  position:absolute; right:3.5rem; top:50%; transform:translateY(-50%);
+  z-index:5; pointer-events:none;
+  display:flex; flex-direction:column; gap:2.6rem;
+}
+.sc-annot {
+  display:flex; align-items:center; justify-content:flex-end; gap:.7rem;
+  opacity:0; transform:translateX(14px);
+  transition:opacity .7s var(--eout), transform .7s var(--eout);
+}
+.sc-annot.sc-vis { opacity:1; transform:none; }
+.sc-annot:nth-child(1) { transition-delay:.12s; }
+.sc-annot:nth-child(2) { transition-delay:.26s; }
+.sc-annot:nth-child(3) { transition-delay:.40s; }
+.sc-annot-text { text-align:right; }
+.sc-annot-name {
+  font-family:'Cormorant Garamond',serif; font-weight:400; font-style:italic;
+  font-size:1rem; color:rgba(255,255,255,.75); display:block; line-height:1.25;
+}
+.sc-annot-desc {
+  font-family:'Raleway',sans-serif; font-size:.4rem; letter-spacing:.22em;
+  text-transform:uppercase; color:rgba(201,168,76,.42); display:block; margin-top:.2rem;
+}
+.sc-annot-connector { display:flex; align-items:center; gap:.35rem; flex-shrink:0; }
+.sc-annot-line {
+  height:1px;
+  background:linear-gradient(to right,rgba(201,168,76,.12),rgba(201,168,76,.55));
+  transition:width .8s var(--eout);
+  width:0;
+}
+.sc-annot.sc-vis .sc-annot-line { width:36px; }
+.sc-annot:nth-child(1).sc-vis .sc-annot-line { transition-delay:.5s; }
+.sc-annot:nth-child(2).sc-vis .sc-annot-line { transition-delay:.64s; }
+.sc-annot:nth-child(3).sc-vis .sc-annot-line { transition-delay:.78s; }
+.sc-annot-dot {
+  width:5px; height:5px; border-radius:50%; flex-shrink:0;
+  border:1px solid rgba(201,168,76,.65);
+  background:rgba(201,168,76,.15);
+  box-shadow:0 0 6px rgba(201,168,76,.3);
+}
+
+/* ── Barre basse ── */
+.sc-bottom-bar {
+  position:absolute; bottom:3rem; left:0; right:0;
+  z-index:5; pointer-events:none;
+  display:flex; align-items:flex-end; justify-content:space-between;
+  padding:0 3.5rem;
+  opacity:0; transform:translateY(10px);
+  transition:opacity .9s .55s var(--eout), transform .9s .55s var(--eout);
+}
+.sc-bottom-bar.sc-vis { opacity:1; transform:none; }
+
+/* Séparateur horizontal */
+.sc-bottom-bar::before {
+  content:'';
+  position:absolute; top:-1.2rem; left:3.5rem; right:3.5rem; height:1px;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(201,168,76,.15) 20%,
+    rgba(201,168,76,.15) 80%,
+    transparent 100%);
+}
+
+.sc-bottom-left { display:flex; flex-direction:column; gap:.3rem; }
+.sc-bfs-name {
+  font-family:'Cormorant Garamond',serif; font-weight:300; font-style:italic;
+  font-size:1.05rem; color:rgba(255,255,255,.45); display:block;
+}
+.sc-bfs-sub {
+  font-family:'Raleway',sans-serif; font-size:.4rem; letter-spacing:.36em;
+  text-transform:uppercase; color:rgba(201,168,76,.3); display:block;
+}
+.sc-bottom-center {
+  text-align:center; display:flex; flex-direction:column;
+  align-items:center; gap:.5rem; position:absolute; left:50%; transform:translateX(-50%);
+}
+.sc-drag-icon { display:flex; gap:.5rem; align-items:center; }
+.sc-drag-arr {
+  width:20px; height:1px; background:rgba(201,168,76,.28); position:relative;
+}
+.sc-drag-arr::after {
+  content:''; position:absolute; right:-1px; top:-2.5px;
+  border-left:5px solid rgba(201,168,76,.35);
+  border-top:2.5px solid transparent; border-bottom:2.5px solid transparent;
+}
+.sc-drag-arr.rev { transform:scaleX(-1); }
+.sc-drag-hint {
+  font-family:'Raleway',sans-serif; font-size:.4rem; letter-spacing:.36em;
+  text-transform:uppercase; color:rgba(255,255,255,.18); white-space:nowrap;
+}
+.sc-bottom-right { text-align:right; display:flex; flex-direction:column; gap:.2rem; align-items:flex-end; }
+.sc-season {
+  font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:300;
+  color:rgba(201,168,76,.16); line-height:1; letter-spacing:.06em; display:block;
+}
+.sc-event {
+  font-family:'Raleway',sans-serif; font-size:.4rem; letter-spacing:.36em;
+  text-transform:uppercase; color:rgba(255,255,255,.18); display:block;
+}
+
+/* Responsive */
+@media (max-width:1100px) {
+  .sc-specs { left:2rem; }
+  .sc-annots { right:2rem; }
+  .sc-bottom-bar { padding:0 2rem; }
+  .sc-bottom-bar::before { left:2rem; right:2rem; }
+}
+@media (max-width:959px) {
+  .sc-specs,.sc-annots { display:none; }
+  .sc-bottom-left,.sc-bottom-right { display:none; }
+  .sc-bottom-bar { padding:0 1.5rem; bottom:2rem; }
+  .sc-bottom-bar::before { display:none; }
+}
+@media (max-width:600px) {
+  .sc-bottom-bar { display:none; }
+}
 
 /* ════════════════════════════════════════════════════════
    SHOWCASE — Loader overlay & hint
@@ -1581,16 +1756,91 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
       <p class="sc-eyebrow">Mon projet actuel :</p>
       <h2 class="sc-title">Participation à la Formula Student dans notre équipe BFS</h2>
     </div>
-    <svg class="sc-fio-l" viewBox="0 0 30 160" width="26" height="140" xmlns="http://www.w3.org/2000/svg" opacity=".25">
-      <path d="M15,5 C8,25 22,45 15,65 C8,85 22,105 15,125 C8,145 15,155 15,155" fill="none" stroke="#C9A84C" stroke-width="1"/>
-      <circle cx="15" cy="5" r="2" fill="#C9A84C"/>
-      <circle cx="15" cy="155" r="2" fill="#C49A8A"/>
-    </svg>
-    <svg class="sc-fio-r" viewBox="0 0 30 160" width="26" height="140" xmlns="http://www.w3.org/2000/svg" opacity=".25">
-      <path d="M15,5 C8,25 22,45 15,65 C8,85 22,105 15,125 C8,145 15,155 15,155" fill="none" stroke="#C9A84C" stroke-width="1"/>
-      <circle cx="15" cy="5" r="2" fill="#C9A84C"/>
-      <circle cx="15" cy="155" r="2" fill="#C49A8A"/>
-    </svg>
+    <svg class="sc-fio-l" style="display:none"></svg>
+    <svg class="sc-fio-r" style="display:none"></svg>
+
+    <!-- ── Fiche technique gauche ── -->
+    <div class="sc-specs" id="scSpecs">
+      <div class="sc-specs-header">Fiche technique</div>
+      <div class="sc-spec-wrap">
+        <div class="sc-spine"></div>
+        <div class="sc-specs-list">
+          <div class="sc-spec-item">
+            <span class="sc-spec-label">Châssis</span>
+            <span class="sc-spec-val">Treillis tubulaire</span>
+            <span class="sc-spec-sub">Acier 25CrMo4 · TIG soudé</span>
+          </div>
+          <div class="sc-spec-item">
+            <span class="sc-spec-label">Moteur</span>
+            <span class="sc-spec-val">Honda CBR 600RR</span>
+            <span class="sc-spec-sub">599 cm³ · ~80 ch</span>
+          </div>
+          <div class="sc-spec-item">
+            <span class="sc-spec-label">Suspension</span>
+            <span class="sc-spec-val">Double triangulation</span>
+            <span class="sc-spec-sub">Push-rod · 4 roues indép.</span>
+          </div>
+          <div class="sc-spec-item">
+            <span class="sc-spec-label">Aérodynamique</span>
+            <span class="sc-spec-val">Aileron AV + AR</span>
+            <span class="sc-spec-sub">Diffuseur intégré · NACA 2412</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Annotations composants droite ── -->
+    <div class="sc-annots" id="scAnnots">
+      <div class="sc-annot">
+        <div class="sc-annot-text">
+          <span class="sc-annot-name">Aileron avant</span>
+          <span class="sc-annot-desc">Downforce · appui aérodynamique</span>
+        </div>
+        <div class="sc-annot-connector">
+          <div class="sc-annot-line"></div>
+          <div class="sc-annot-dot"></div>
+        </div>
+      </div>
+      <div class="sc-annot">
+        <div class="sc-annot-text">
+          <span class="sc-annot-name">Monocoque</span>
+          <span class="sc-annot-desc">Structure portante intégrée</span>
+        </div>
+        <div class="sc-annot-connector">
+          <div class="sc-annot-line"></div>
+          <div class="sc-annot-dot"></div>
+        </div>
+      </div>
+      <div class="sc-annot">
+        <div class="sc-annot-text">
+          <span class="sc-annot-name">Diffuseur</span>
+          <span class="sc-annot-desc">Extraction du flux sous caisse</span>
+        </div>
+        <div class="sc-annot-connector">
+          <div class="sc-annot-line"></div>
+          <div class="sc-annot-dot"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Barre basse ── -->
+    <div class="sc-bottom-bar" id="scBottom">
+      <div class="sc-bottom-left">
+        <span class="sc-bfs-name">BFS — Bourges Formula Student</span>
+        <span class="sc-bfs-sub">ENSAM Bourges · Équipe de compétition</span>
+      </div>
+      <div class="sc-bottom-center">
+        <div class="sc-drag-icon">
+          <div class="sc-drag-arr rev"></div>
+          <div class="sc-drag-arr"></div>
+        </div>
+        <span class="sc-drag-hint">Glisser pour faire pivoter</span>
+      </div>
+      <div class="sc-bottom-right">
+        <span class="sc-season">2024</span>
+        <span class="sc-event">Formula Student Germany</span>
+      </div>
+    </div>
   </section>
 
 <!-- paint transition showcase → skills -->
@@ -2186,10 +2436,7 @@ function initShowcase() {
   loaderEl.innerHTML = '<div class="sc-loader-ring"></div><div class="sc-loader-label">Chargement de la pièce…</div>';
   sec.appendChild(loaderEl);
 
-  const hintEl = document.createElement('div');
-  hintEl.id = 'sc-hint';
-  hintEl.textContent = 'Cliquer–glisser pour faire pivoter';
-  sec.appendChild(hintEl);
+  /* hint géré par la barre basse statique */
 
   const renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -2280,8 +2527,6 @@ function initShowcase() {
         });
         master.add(model);
         loaderEl.style.opacity='0'; loaderEl.style.pointerEvents='none';
-        hintEl.style.opacity='1';
-        setTimeout(()=>{ hintEl.style.transition='opacity 1.5s'; hintEl.style.opacity='0'; }, 3500);
       },
       (xhr) => {
         if(xhr.total){ const pct=Math.round(xhr.loaded/xhr.total*100); const lbl=loaderEl.querySelector('.sc-loader-label'); if(lbl) lbl.textContent='Chargement… '+pct+'%'; }
@@ -2575,6 +2820,26 @@ document.querySelectorAll('a,button,.pc,.ppc,.swi,.cert-badge,.n-burger').forEac
   el.addEventListener('mouseenter',()=>ring.classList.add('h'));
   el.addEventListener('mouseleave',()=>ring.classList.remove('h'));
 });
+
+/* ════ 5b. SHOWCASE OVERLAYS — animation au scroll ═══ */
+(function(){
+  const sec      = document.getElementById('showcase');
+  const specItems = document.querySelectorAll('.sc-spec-item');
+  const annots   = document.querySelectorAll('.sc-annot');
+  const bottom   = document.getElementById('scBottom');
+  if(!sec) return;
+
+  function revealAll() {
+    specItems.forEach(el => el.classList.add('sc-vis'));
+    annots.forEach(el   => el.classList.add('sc-vis'));
+    if(bottom) bottom.classList.add('sc-vis');
+  }
+
+  const obs = new IntersectionObserver(entries => {
+    if(entries[0].isIntersecting) { revealAll(); obs.disconnect(); }
+  }, { threshold: 0.25 });
+  obs.observe(sec);
+})();
 
 /* ════ 6. NAV — scroll, active, burger, progress ════ */
 (function(){
