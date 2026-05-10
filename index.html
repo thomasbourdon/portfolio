@@ -607,31 +607,36 @@ section { position:relative; overflow:hidden; }
 .sc-bubbles-wrap {
   position:absolute; inset:0; z-index:2; pointer-events:none;
 }
-.sc-bubble-lines {
-  position:absolute; inset:0; width:100%; height:100%;
-  pointer-events:none;
-}
 .sc-bubble {
   position:absolute;
-  display:flex; flex-direction:column; align-items:center; gap:.6rem;
+  display:flex; flex-direction:column; align-items:center; gap:.65rem;
   pointer-events:none;
   opacity:0;
-  transition:opacity 1.2s var(--eout);
+  transition:opacity 1.4s var(--eout);
 }
 .sc-bubble.sc-vis { opacity:1; }
 
 /* Conteneur circulaire — image ou SVG icon */
 .sc-bubble-inner {
-  width:100px; height:100px;
+  width:130px; height:130px;
   border-radius:50%;
-  border:1px solid rgba(201,168,76,.28);
-  background:rgba(0,0,0,.45);
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
+  border:1px solid rgba(201,168,76,.32);
+  background:rgba(0,0,0,.5);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
   overflow:hidden;
   display:flex; align-items:center; justify-content:center;
-  box-shadow:0 0 28px rgba(201,168,76,.12), 0 0 0 1px rgba(201,168,76,.08), inset 0 0 20px rgba(0,0,0,.3);
+  box-shadow:0 0 36px rgba(201,168,76,.14), 0 0 0 1px rgba(201,168,76,.07), inset 0 0 24px rgba(0,0,0,.35);
   flex-shrink:0;
+  position:relative;
+}
+/* Anneau intérieur fin */
+.sc-bubble-inner::after {
+  content:'';
+  position:absolute; inset:6px;
+  border-radius:50%;
+  border:1px solid rgba(201,168,76,.15);
+  pointer-events:none;
 }
 /* Image — scale automatique cover */
 .sc-bubble-img {
@@ -640,48 +645,53 @@ section { position:relative; overflow:hidden; }
   display:block;
   border-radius:50%;
 }
-/* Icône SVG fallback — remplie dans le cercle */
+/* Icône SVG fallback */
 .sc-bubble-icon {
-  width:62px; height:62px;
+  width:76px; height:76px;
   display:flex; align-items:center; justify-content:center;
   flex-shrink:0;
 }
 .sc-bubble-label {
   font-family:'Raleway',sans-serif; font-size:.4rem;
-  letter-spacing:.36em; text-transform:uppercase;
-  color:rgba(201,168,76,.45); white-space:nowrap;
+  letter-spacing:.38em; text-transform:uppercase;
+  color:rgba(201,168,76,.42); white-space:nowrap;
 }
 
+/* SVG des traits de connexion — plein écran */
+.sc-bubble-lines {
+  position:absolute; inset:0; width:100%; height:100%;
+  pointer-events:none; z-index:1;
+  opacity:0; transition:opacity 1.8s var(--eout) .4s;
+}
+.sc-bubble-lines.sc-vis { opacity:1; }
+
 /* ─ Quinconce : 2 bulles à gauche (décalées), 1 à droite centrée ─ */
-/* Gauche haute */
 .sc-bubble--a {
-  left: 6%;
-  top: 22%;
+  left: 5%;
+  top: 20%;
   animation: bubbleFloat1 7s ease-in-out infinite;
 }
-/* Gauche basse */
 .sc-bubble--b {
-  left: 9%;
-  top: 55%;
+  left: 8%;
+  top: 56%;
   animation: bubbleFloat2 8.5s ease-in-out infinite;
 }
-/* Droite centrée verticalement */
 .sc-bubble--c {
-  right: 6%;
+  right: 5%;
   top: 50%;
   transform: translateY(-50%);
   animation: bubbleFloat3 7.5s ease-in-out infinite;
 }
 
-@keyframes bubbleFloat1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(5px,-9px)} }
-@keyframes bubbleFloat2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(7px,-6px)} }
-@keyframes bubbleFloat3 { 0%,100%{transform:translateY(-50%)} 50%{transform:translateY(calc(-50% - 8px))} }
+@keyframes bubbleFloat1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(5px,-10px)} }
+@keyframes bubbleFloat2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(7px,-7px)} }
+@keyframes bubbleFloat3 { 0%,100%{transform:translateY(-50%)} 50%{transform:translateY(calc(-50% - 9px))} }
 
 @media(max-width:1100px){
-  .sc-bubble-inner { width:84px; height:84px; }
-  .sc-bubble--a { left:4%; top:20%; }
-  .sc-bubble--b { left:6%; top:57%; }
-  .sc-bubble--c { right:4%; }
+  .sc-bubble-inner { width:110px; height:110px; }
+  .sc-bubble--a { left:3%; top:18%; }
+  .sc-bubble--b { left:5%; top:58%; }
+  .sc-bubble--c { right:3%; }
 }
 @media(max-width:959px){ .sc-bubbles-wrap { display:none; } }
 .sc-top { position:absolute; top:3rem; left:0; right:0; z-index:3; text-align:center; }
@@ -1174,39 +1184,64 @@ section { position:relative; overflow:hidden; }
   height:1px; background:linear-gradient(90deg,transparent,rgba(201,168,76,.18),transparent);
 }
 
-/* Carousel secondaire — petite taille, défilé automatique horizontal */
+/* Carousel secondaire — défilement automatique horizontal amélioré */
 .sw-secondary {
   position:relative; overflow:hidden;
-  height:120px; margin:0;
-  /* Fade edges */
-  -webkit-mask-image:linear-gradient(90deg, transparent 0%, black 8%, black 92%, transparent 100%);
-  mask-image:linear-gradient(90deg, transparent 0%, black 8%, black 92%, transparent 100%);
+  height:148px; margin:0;
+  -webkit-mask-image:linear-gradient(90deg, transparent 0%, black 10%, black 90%, transparent 100%);
+  mask-image:linear-gradient(90deg, transparent 0%, black 10%, black 90%, transparent 100%);
 }
 .sw-secondary-track {
-  display:flex; gap:1.6rem; align-items:center;
-  width:max-content;
-  height:100%;
+  display:flex; gap:1.4rem; align-items:center;
+  width:max-content; height:100%;
   will-change:transform;
 }
 .sw-sec-item {
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:.5rem; flex-shrink:0;
-  width:92px; height:92px;
-  border:1px solid rgba(201,168,76,.12);
-  background:rgba(255,255,255,.015);
-  transition:border-color .3s, background .3s;
+  gap:.65rem; flex-shrink:0;
+  width:110px; height:118px;
+  border:1px solid rgba(201,168,76,.1);
+  background:rgba(255,255,255,.018);
+  position:relative; overflow:hidden;
+  transition:border-color .4s, background .4s, transform .4s var(--eout), box-shadow .4s;
   cursor:default;
 }
-.sw-sec-item:hover { border-color:rgba(201,168,76,.35); background:rgba(201,168,76,.04); }
-.sw-sec-ico {
-  width:40px; height:40px; border-radius:50%;
-  border:1px solid rgba(201,168,76,.18);
-  display:flex; align-items:center; justify-content:center;
-  background:rgba(0,0,0,.2);
+/* Coin HUD discret */
+.sw-sec-item::before,.sw-sec-item::after {
+  content:''; position:absolute;
+  width:10px; height:10px;
+  opacity:0; transition:opacity .3s;
 }
-.sw-sec-ico img { width:22px; height:22px; object-fit:contain; filter:grayscale(25%) brightness(0.85); }
-.sw-sec-ico span { font-family:'Cormorant Garamond',serif; font-size:.75rem; color:rgba(201,168,76,.7); font-style:italic; }
-.sw-sec-name { font-size:.48rem; letter-spacing:.18em; text-transform:uppercase; color:rgba(255,255,255,.28); text-align:center; }
+.sw-sec-item::before { top:5px; left:5px; border-top:1px solid rgba(201,168,76,.5); border-left:1px solid rgba(201,168,76,.5); }
+.sw-sec-item::after  { bottom:5px; right:5px; border-bottom:1px solid rgba(201,168,76,.5); border-right:1px solid rgba(201,168,76,.5); }
+.sw-sec-item:hover {
+  border-color:rgba(201,168,76,.38);
+  background:rgba(201,168,76,.05);
+  transform:translateY(-4px);
+  box-shadow:0 12px 32px rgba(0,0,0,.3), 0 0 20px rgba(201,168,76,.08);
+}
+.sw-sec-item:hover::before,.sw-sec-item:hover::after { opacity:1; }
+
+.sw-sec-ico {
+  width:46px; height:46px; border-radius:50%;
+  border:1px solid rgba(201,168,76,.2);
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(0,0,0,.22);
+  transition:border-color .3s, box-shadow .3s;
+}
+.sw-sec-item:hover .sw-sec-ico {
+  border-color:rgba(201,168,76,.5);
+  box-shadow:0 0 16px rgba(201,168,76,.18);
+}
+.sw-sec-ico img { width:26px; height:26px; object-fit:contain; filter:grayscale(20%) brightness(0.88); transition:filter .3s; }
+.sw-sec-item:hover .sw-sec-ico img { filter:grayscale(0%) brightness(1); }
+.sw-sec-ico span { font-family:'Cormorant Garamond',serif; font-size:.85rem; color:rgba(201,168,76,.7); font-style:italic; }
+.sw-sec-name {
+  font-size:.46rem; letter-spacing:.2em; text-transform:uppercase;
+  color:rgba(255,255,255,.28); text-align:center; line-height:1.5;
+  transition:color .3s;
+}
+.sw-sec-item:hover .sw-sec-name { color:rgba(201,168,76,.7); }
 /* ════════════════════════════════════════════════════════
    PAST PROJECTS — TETRIS PAGINÉ
 ════════════════════════════════════════════════════════ */
@@ -1868,10 +1903,34 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
             <rect x="46" y="24" width="4" height="4" fill="rgba(201,168,76,.25)" rx="1"/>
           </svg>
         </div>
-        <span class="sc-bubble-label">Moteur EMRAX 228</span>
+        <span class="sc-bubble-label">Moteur CBR 600</span>
       </div>
 
     </div>
+
+    <!-- Traits de connexion dessin technique -->
+    <svg class="sc-bubble-lines" id="scBubbleLines" viewBox="0 0 1000 600" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="mDot" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5">
+          <circle cx="2.5" cy="2.5" r="1.6" fill="rgba(201,168,76,.45)"/>
+        </marker>
+      </defs>
+      <!-- A gauche-haute → centre -->
+      <line x1="160" y1="210" x2="500" y2="300"
+            stroke="rgba(201,168,76,.18)" stroke-width=".9" stroke-dasharray="6 8"
+            marker-start="url(#mDot)" marker-end="url(#mDot)"/>
+      <!-- B gauche-basse → centre -->
+      <line x1="175" y1="435" x2="500" y2="300"
+            stroke="rgba(201,168,76,.18)" stroke-width=".9" stroke-dasharray="6 8"
+            marker-start="url(#mDot)" marker-end="url(#mDot)"/>
+      <!-- C droite → centre -->
+      <line x1="840" y1="300" x2="500" y2="300"
+            stroke="rgba(201,168,76,.18)" stroke-width=".9" stroke-dasharray="6 8"
+            marker-start="url(#mDot)" marker-end="url(#mDot)"/>
+      <!-- Nœud central -->
+      <circle cx="500" cy="300" r="4" fill="rgba(201,168,76,.25)" stroke="rgba(201,168,76,.5)" stroke-width=".8"/>
+      <circle cx="500" cy="300" r="12" fill="none" stroke="rgba(201,168,76,.1)" stroke-width=".8"/>
+    </svg>
     <svg class="sc-corner tl" viewBox="0 0 60 60" width="55" height="55" xmlns="http://www.w3.org/2000/svg">
       <path d="M2,58 L2,10 Q2,2 10,2 L58,2" fill="none" stroke="#C9A84C" stroke-width=".8" opacity=".4"/>
       <path d="M2,58 L2,16 Q2,6 12,6 L58,6" fill="none" stroke="#C49A8A" stroke-width=".5" opacity=".3"/>
@@ -1891,7 +1950,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
     </svg>
     <div class="sc-top rv">
       <p class="sc-eyebrow">Mon projet actuel :</p>
-      <h2 class="sc-title">Participation à la Formula Student</h2>
+      <h2 class="sc-title">Participation à la Formula Student dans notre équipe BFS</h2>
     </div>
     <svg class="sc-fio-l" style="display:none"></svg>
     <svg class="sc-fio-r" style="display:none"></svg>
@@ -1899,8 +1958,8 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
     <!-- ── Barre basse ── -->
     <div class="sc-bottom-bar" id="scBottom">
       <div class="sc-bottom-left">
-        <span class="sc-bfs-name">BFS — Boquette Formula Student</span>
-        <span class="sc-bfs-sub">ENSAM Angers</span>
+        <span class="sc-bfs-name">BFS — Bourges Formula Student</span>
+        <span class="sc-bfs-sub">ENSAM Bourges · Équipe de compétition</span>
       </div>
       <div class="sc-bottom-center">
         <div class="sc-drag-icon">
@@ -1910,8 +1969,8 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         <span class="sc-drag-hint">Glisser pour faire pivoter</span>
       </div>
       <div class="sc-bottom-right">
-        <span class="sc-season">Objectif : 2027</span>
-        <span class="sc-event">Développement d’une monoplace destinée à concourir à la Formula Student France sur le circuit de Transpolis.</span>
+        <span class="sc-season">2024</span>
+        <span class="sc-event">Formula Student Germany</span>
       </div>
     </div>
   </section>
@@ -2586,7 +2645,7 @@ function initShowcase() {
         const box = new THREE.Box3().setFromObject(model);
         const center = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3());
-        const scale = 2.8 / Math.max(size.x, size.y, size.z);
+        const scale = 3.6 / Math.max(size.x, size.y, size.z);
         model.scale.setScalar(scale);
         model.position.sub(center.multiplyScalar(scale));
         model.traverse(child => {
@@ -2665,13 +2724,13 @@ const SOFTS_MAIN = [
 ];
 
 const SOFTS_SEC = [
-  { name:'CATIA V5',      abbr:'CV', logo:null },
-  { name:'3DEXPERIENCE',  abbr:'3DX', logo:null },
-  { name:'Flexsim',       abbr:'FS', logo:null },
-  { name:'LaTeX',         abbr:'LX', logo:null },
-  { name:'Scilab',        abbr:'SC', logo:null },
-  { name:'RDM Le Mans',   abbr:'LM', logo:null },
-  { name:'Ansys Granta',  abbr:'GR', logo:null },
+  { name:'CATIA V5',      abbr:'CV',  logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/CATIA_2018x.svg/240px-CATIA_2018x.svg.png' },
+  { name:'3DEXPERIENCE',  abbr:'3DX', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/3DEXPERIENCE_logo.svg/240px-3DEXPERIENCE_logo.svg.png' },
+  { name:'Flexsim',       abbr:'FS',  logo:null },
+  { name:'LaTeX',         abbr:'LX',  logo:'https://upload.wikimedia.org/wikipedia/commons/9/92/LaTeX_logo.svg' },
+  { name:'Scilab',        abbr:'SC',  logo:'https://upload.wikimedia.org/wikipedia/commons/b/b1/Scilab_Logo.png' },
+  { name:'RDM Le Mans',   abbr:'RDM', logo:null },
+  { name:'Ansys Granta',  abbr:'GR',  logo:null },
 ];
 
 /* ════ 1. GEAR LOADER ════════════════════════════════ */
@@ -3333,13 +3392,15 @@ document.querySelectorAll('.sk-fg').forEach(el=>ioSk.observe(el));
 /* ════ BUBBLES SHOWCASE ══════════════════════════════ */
 (function(){
   const bubbles = document.querySelectorAll('.sc-bubble');
+  const lines   = document.getElementById('scBubbleLines');
   if(!bubbles.length) return;
   const showcase = document.getElementById('showcase');
   if(!showcase) return;
   const io = new IntersectionObserver(entries=>{
     entries.forEach(e=>{
       if(e.isIntersecting){
-        bubbles.forEach((b,i)=>{ setTimeout(()=>b.classList.add('sc-vis'), i*200); });
+        bubbles.forEach((b,i)=>{ setTimeout(()=>b.classList.add('sc-vis'), i*220); });
+        if(lines) setTimeout(()=>lines.classList.add('sc-vis'), 600);
       }
     });
   },{threshold:.25});
