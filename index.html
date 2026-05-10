@@ -526,9 +526,18 @@ section { position:relative; overflow:hidden; }
 .aphtxt { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:1rem; letter-spacing:.3em; color:var(--gold); position:relative; z-index:1; }
 
 /* Badges de certification flottants */
+/* ════════════════════════════════════════════════════════
+   CERT BADGES — rond blanc sur le cadre photo
+   ────────────────────────────────────────────────────────
+   Pour ajouter une nouvelle certif :
+     1. Ajouter une classe de position ci-dessous (ex: .cert-badge.macertif)
+     2. Ajouter le badge dans le HTML : même structure que .cswa / .cswp / .pix
+   Conseil positions : top/bottom entre -22px et 50%,
+                       left/right entre -24px et -10px
+════════════════════════════════════════════════════════ */
 .cert-badge {
   position:absolute; z-index:10;
-  width:108px; height:108px; border-radius:50%;
+  width:103px; height:103px; border-radius:50%;
   background:rgba(255,255,255,.95);
   border:1.5px solid rgba(201,168,76,.5);
   display:flex; align-items:center; justify-content:center;
@@ -538,21 +547,23 @@ section { position:relative; overflow:hidden; }
   text-decoration:none;
 }
 .cert-badge:hover {
-  transform:scale(1.12) !important;
   box-shadow:0 8px 28px rgba(201,168,76,.32);
 }
+.cert-badge.cswa:hover  { transform:rotate(-8deg) scale(1.12); }
+.cert-badge.cswp:hover  { transform:rotate(6deg)  scale(1.12); }
+.cert-badge.pix:hover   { transform:rotate(-5deg) scale(1.12); }
+/* Badge 4 — adapter le rotate si vous ajoutez une certif
+.cert-badge.macertif:hover { transform:translateY(-50%) rotate(4deg) scale(1.12); } */
 .cert-img{
-  width:110px;
-  height:110px;
+  width:92px;
+  height:92px;
   object-fit:contain;
   display:block;
   transition:.3s ease;
 }
-
 .cert-badge:hover .cert-img{
   transform:scale(1.08);
 }
-
 .cert-badge .cert-label {
   position:absolute; bottom:-22px; left:50%; transform:translateX(-50%);
   font-family:'Raleway',sans-serif; font-size:.42rem; letter-spacing:.28em;
@@ -560,15 +571,28 @@ section { position:relative; overflow:hidden; }
   opacity:0; transition:opacity .25s;
 }
 .cert-badge:hover .cert-label { opacity:1; }
-/* Positions aléatoires sur le cadre */
+
+/* ── Positions des badges sur le cadre ── */
+/* Badge 1 — coin haut gauche */
 .cert-badge.cswa {
   top: -18px; left: -18px;
   transform:rotate(-8deg);
 }
+/* Badge 2 — milieu bas droite */
 .cert-badge.cswp {
   bottom: 40px; right: -22px;
   transform:rotate(6deg);
 }
+/* Badge 3 — coin bas gauche */
+.cert-badge.pix {
+  bottom: -14px; left: 18px;
+  transform:rotate(-5deg);
+}
+/* Badge 4 — (réservé, exemple) : dupliquer ce bloc
+.cert-badge.macertif {
+  top: 50%; right: -22px;
+  transform:translateY(-50%) rotate(4deg);
+} */
 
 .al   { font-size:.58rem; letter-spacing:.55em; text-transform:uppercase; color:var(--gold); margin-bottom:1.4rem; display:block; }
 .ah2  { font-family:'Cormorant Garamond',serif; font-weight:300; font-size:clamp(2rem,3.5vw,3rem); line-height:1.18; color:var(--text); margin-bottom:.6rem; }
@@ -1825,6 +1849,20 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
 
             <span class="cert-label">CSWP</span>
           </a>
+
+          <!-- Badge PIX -->
+          <a class="cert-badge pix"
+             href="Assets/cert_PIX.pdf"
+             target="_blank"
+             rel="noopener"
+             title="Voir la certification PIX">
+
+            <img src="Images/badge_PIX.png"
+                 alt="Badge PIX"
+                 class="cert-img">
+
+            <span class="cert-label">PIX</span>
+          </a>
         </div>
       </div>
       <div>
@@ -1842,7 +1880,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         <p class="ap rv">Étudiant ingénieur aux Arts et Métiers, je développe des compétences en conception mécanique, fabrication industrielle et visualisation numérique.</p>
         <p class="ap rv d1">Je m'intéresse autant aux procédés industriels — usinage, soudure, forgeage ou métrologie — qu'aux outils numériques comme SolidWorks, Blender, Unreal Engine 5 et Python.</p>
         <div class="astats rv d2">
-          <div><span class="stn">2</span><span class="stl">Certifications SolidWorks</span></div>
+          <div><span class="stn">3</span><span class="stl">Certifications obtenues</span></div>
           <div><span class="stn">6+</span><span class="stl">Procédés industriels</span></div>
           <div><span class="stn">3</span><span class="stl">Projets 3D actifs</span></div>
         </div>
