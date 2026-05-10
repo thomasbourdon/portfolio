@@ -63,15 +63,105 @@ body { font-family:'Raleway',sans-serif; font-weight:300; background:var(--white
 /* ════════════════════════════════════════════════════════
    NAVIGATION
 ════════════════════════════════════════════════════════ */
+/* Barre de progression dorée */
+#nav-progress {
+  position:fixed; top:0; left:0; height:2px; width:0%;
+  background:linear-gradient(90deg, var(--gold-dk), var(--gold), var(--rose));
+  z-index:9000; pointer-events:none;
+  transition:width .1s linear;
+  box-shadow:0 0 8px rgba(201,168,76,.5);
+}
+
 nav { position:fixed; top:0; left:0; right:0; z-index:8000; padding:1.8rem 4rem; display:flex; align-items:center; justify-content:space-between; transition:background .5s,padding .5s,border-color .5s; border-bottom:1px solid transparent; }
-nav.sc  { background:rgba(255,255,255,.93); backdrop-filter:blur(24px); padding:1rem 4rem; border-bottom-color:var(--gold-p); }
+nav.sc  { background:rgba(255,255,255,.95); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); padding:1rem 4rem; border-bottom-color:var(--gold-p); box-shadow:0 2px 24px rgba(0,0,0,.06); }
+
+/* Nav sur Hero (fond sombre) */
+nav.on-hero .nlogo { color:rgba(255,255,255,.85); }
+nav.on-hero .nlinks a { color:rgba(255,255,255,.45); }
+nav.on-hero .nlinks a:hover { color:var(--gold-l); }
+nav.on-hero .nlinks a.active { color:var(--gold-l); }
+nav.on-hero .nlinks a.active::after { background:var(--gold-l); }
+
 .nlogo  { font-family:'Cormorant Garamond',serif; font-weight:400; font-size:1.5rem; letter-spacing:.18em; color:var(--text); text-decoration:none; transition:color .4s; }
 .nlogo b { color:var(--gold); font-weight:400; }
 .nlinks { display:flex; gap:2.8rem; list-style:none; }
 .nlinks a { font-size:.6rem; letter-spacing:.3em; text-transform:uppercase; color:var(--text-m); text-decoration:none; position:relative; padding-bottom:3px; transition:color .3s; }
 .nlinks a::after { content:''; position:absolute; bottom:0; left:0; width:0; height:1px; background:var(--gold); transition:width .4s var(--eout); }
-.nlinks a:hover { color:var(--gold); }
+.nlinks a:hover  { color:var(--gold); }
 .nlinks a:hover::after { width:100%; }
+/* Lien actif */
+.nlinks a.active { color:var(--gold); }
+.nlinks a.active::after { width:100%; }
+
+/* ── Burger ── */
+.n-burger {
+  display:none; flex-direction:column; justify-content:center; gap:5px;
+  width:36px; height:36px; background:none; border:none; cursor:none;
+  padding:4px; z-index:8200; position:relative;
+}
+.n-burger span {
+  display:block; height:1px; background:var(--gold);
+  transition:transform .4s var(--eout), opacity .3s, width .4s var(--eout);
+  transform-origin:center;
+}
+.n-burger span:nth-child(1) { width:22px; margin-left:auto; }
+.n-burger span:nth-child(2) { width:28px; }
+.n-burger span:nth-child(3) { width:18px; margin-left:auto; }
+.n-burger.open span:nth-child(1) { transform:translateY(6px) rotate(45deg); width:26px; }
+.n-burger.open span:nth-child(2) { opacity:0; }
+.n-burger.open span:nth-child(3) { transform:translateY(-6px) rotate(-45deg); width:26px; }
+/* Burger sur hero */
+nav.on-hero .n-burger span { background:rgba(255,255,255,.7); }
+
+/* ── Menu mobile overlay ── */
+#nav-mobile {
+  position:fixed; inset:0; z-index:8100;
+  background:rgba(9,7,10,.97);
+  backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:0;
+  opacity:0; pointer-events:none;
+  transition:opacity .5s var(--eout);
+}
+#nav-mobile.open { opacity:1; pointer-events:all; }
+.nm-item { overflow:hidden; display:block; }
+.nm-link {
+  display:block;
+  font-family:'Cormorant Garamond',serif; font-weight:300; font-style:italic;
+  font-size:clamp(2rem,7vw,3.2rem); letter-spacing:.08em;
+  color:rgba(255,255,255,.55); text-decoration:none;
+  padding:.55rem 0; text-align:center;
+  transform:translateY(110%);
+  transition:transform .6s var(--eout), color .3s;
+  position:relative;
+}
+.nm-link::after {
+  content:''; position:absolute; bottom:8px; left:50%; transform:translateX(-50%);
+  width:0; height:1px; background:var(--gold);
+  transition:width .4s var(--eout);
+}
+.nm-link:hover  { color:var(--gold-l); }
+.nm-link:hover::after { width:60px; }
+#nav-mobile.open .nm-link { transform:translateY(0); }
+#nav-mobile.open .nm-item:nth-child(1) .nm-link { transition-delay:.04s; }
+#nav-mobile.open .nm-item:nth-child(2) .nm-link { transition-delay:.09s; }
+#nav-mobile.open .nm-item:nth-child(3) .nm-link { transition-delay:.14s; }
+#nav-mobile.open .nm-item:nth-child(4) .nm-link { transition-delay:.19s; }
+#nav-mobile.open .nm-item:nth-child(5) .nm-link { transition-delay:.24s; }
+#nav-mobile.open .nm-item:nth-child(6) .nm-link { transition-delay:.29s; }
+#nav-mobile.open .nm-item:nth-child(7) .nm-link { transition-delay:.34s; }
+.nm-divider {
+  width:1px; height:28px;
+  background:linear-gradient(to bottom,transparent,rgba(201,168,76,.2),transparent);
+  margin:.05rem 0;
+}
+.nm-footer {
+  position:absolute; bottom:2.5rem;
+  font-family:'Raleway',sans-serif; font-size:.5rem; letter-spacing:.4em;
+  text-transform:uppercase; color:rgba(201,168,76,.3);
+  opacity:0; transition:opacity .5s .4s;
+}
+#nav-mobile.open .nm-footer { opacity:1; }
 
 /* ════════════════════════════════════════════════════════
    SECTION NAV BUBBLES — navigation latérale dorée
@@ -915,6 +1005,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
   nav { padding:1.4rem 2rem; }
   nav.sc { padding:.9rem 2rem; }
   .nlinks { display:none; }
+  .n-burger { display:flex; }
   .agrid { grid-template-columns:1fr; gap:3rem; }
   .aphw { max-width:280px; margin:0 auto; }
   .fgrid { grid-template-columns:repeat(2,1fr); }
@@ -1164,6 +1255,8 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
 ════════════════════════════ -->
 <div id="intro"><canvas id="icanv"></canvas></div>
 
+<div id="nav-progress"></div>
+
 <!-- ════════════════════════════
      NAVIGATION
 ════════════════════════════ -->
@@ -1178,7 +1271,28 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
     <li><a href="#past">TP ENSAM</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
+  <button class="n-burger" id="navBurger" aria-label="Menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<!-- Menu mobile overlay -->
+<div id="nav-mobile" role="dialog" aria-label="Menu navigation">
+  <div class="nm-item"><a href="#feat"     class="nm-link" data-nm>Projets</a></div>
+  <div class="nm-divider"></div>
+  <div class="nm-item"><a href="#about"    class="nm-link" data-nm>À Propos</a></div>
+  <div class="nm-divider"></div>
+  <div class="nm-item"><a href="#showcase" class="nm-link" data-nm>Pièce 3D</a></div>
+  <div class="nm-divider"></div>
+  <div class="nm-item"><a href="#skills"   class="nm-link" data-nm>Parcours</a></div>
+  <div class="nm-divider"></div>
+  <div class="nm-item"><a href="#software" class="nm-link" data-nm>Logiciels</a></div>
+  <div class="nm-divider"></div>
+  <div class="nm-item"><a href="#past"     class="nm-link" data-nm>TP ENSAM</a></div>
+  <div class="nm-divider"></div>
+  <div class="nm-item"><a href="#contact"  class="nm-link" data-nm>Contact</a></div>
+  <div class="nm-footer">T · Bourdon — Portfolio</div>
+</div>
 
 <main id="main" style="opacity:1;">
 
@@ -2442,13 +2556,92 @@ document.addEventListener('mousemove',e=>{ curX=e.clientX; curY=e.clientY; });
   ring.style.left=rX+'px'; ring.style.top=rY+'px';
   requestAnimationFrame(moveCur);
 })();
-document.querySelectorAll('a,button,.pc,.ppc,.swi,.cert-badge').forEach(el=>{
+document.querySelectorAll('a,button,.pc,.ppc,.swi,.cert-badge,.n-burger').forEach(el=>{
   el.addEventListener('mouseenter',()=>ring.classList.add('h'));
   el.addEventListener('mouseleave',()=>ring.classList.remove('h'));
 });
 
-/* ════ 6. NAV SCROLL ════════════════════════════════ */
-window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('sc',scrollY>80),{passive:true});
+/* ════ 6. NAV — scroll, active, burger, progress ════ */
+(function(){
+  const nav      = document.getElementById('nav');
+  const progress = document.getElementById('nav-progress');
+  const burger   = document.getElementById('navBurger');
+  const mobileMenu = document.getElementById('nav-mobile');
+  const navLinks = document.querySelectorAll('.nlinks a');
+  const nmLinks  = document.querySelectorAll('[data-nm]');
+  const heroEl   = document.getElementById('hero');
+
+  const SECTIONS = ['feat','about','showcase','skills','software','past','contact'];
+
+  /* ── Barre de progression ── */
+  function updateProgress() {
+    const doc = document.documentElement;
+    const pct = (scrollY / (doc.scrollHeight - doc.clientHeight)) * 100;
+    progress.style.width = Math.min(pct, 100) + '%';
+  }
+
+  /* ── Active links ── */
+  function updateActive() {
+    const wH = window.innerHeight;
+    let current = 'hero';
+
+    SECTIONS.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (el.getBoundingClientRect().top <= wH * 0.45) current = id;
+    });
+
+    navLinks.forEach(a => {
+      const href = a.getAttribute('href').replace('#','');
+      a.classList.toggle('active', href === current);
+    });
+  }
+
+  /* ── Hero state (nav transparent sur fond sombre) ── */
+  function updateHeroState() {
+    if (!heroEl) return;
+    const heroBottom = heroEl.getBoundingClientRect().bottom;
+    nav.classList.toggle('on-hero', heroBottom > 80);
+    nav.classList.toggle('sc', scrollY > 80);
+  }
+
+  /* ── Burger / menu mobile ── */
+  function openMenu() {
+    burger.classList.add('open');
+    mobileMenu.classList.add('open');
+    burger.setAttribute('aria-expanded','true');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeMenu() {
+    burger.classList.remove('open');
+    mobileMenu.classList.remove('open');
+    burger.setAttribute('aria-expanded','false');
+    document.body.style.overflow = '';
+  }
+
+  burger.addEventListener('click', () => {
+    burger.classList.contains('open') ? closeMenu() : openMenu();
+  });
+
+  nmLinks.forEach(a => {
+    a.addEventListener('click', () => closeMenu());
+  });
+
+  /* Fermer sur Escape */
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+
+  /* ── Scroll listener ── */
+  window.addEventListener('scroll', () => {
+    updateProgress();
+    updateActive();
+    updateHeroState();
+  }, { passive: true });
+
+  /* Init */
+  updateProgress();
+  updateActive();
+  updateHeroState();
+})();
 
 /* ════ 6b. EMAIL COPY ═══════════════════════════════ */
 (function(){
