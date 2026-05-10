@@ -122,7 +122,135 @@ nav.sc  { background:rgba(255,255,255,.93); backdrop-filter:blur(24px); padding:
 @keyframes fadeUp  { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:none} }
 @keyframes fadeIn  { to{opacity:1} }
 @keyframes glow    { 0%,100%{opacity:.35;transform:scale(1)} 50%{opacity:.72;transform:scale(1.18)} }
-@keyframes scrollD { 0%{transform:scaleY(0);transform-origin:top;opacity:1} 45%{transform:scaleY(1);transform-origin:top;opacity:1} 55%{transform:scaleY(1);transform-origin:bottom;opacity:1} 100%{transform:scaleY(0);transform-origin:bottom;opacity:0} }
+/* ════════════════════════════════════════════════════════
+   RESPONSIVE — Mobile · Tablette · Desktop
+   Breakpoints : 480px / 700px / 900px / 1100px
+════════════════════════════════════════════════════════ */
+
+/* ── Tablette (≤900px) ── */
+@media (max-width: 900px) {
+  /* Nav */
+  .nlinks { gap:1.2rem; }
+  .nlinks a { font-size:.48rem; letter-spacing:.28em; }
+
+  /* Hero */
+  .h-port-text { font-size:clamp(3rem,8vw,6rem); }
+  .h-gear-wrap { width:clamp(2.8rem,7vw,5.5rem); height:clamp(2.8rem,7vw,5.5rem); }
+
+  /* About */
+  .about-grid { grid-template-columns:1fr; gap:3rem; }
+  .astats { grid-template-columns:repeat(3,1fr); }
+
+  /* Tetris TP — 2 colonnes sur tablette */
+  .tp-grid { grid-template-columns:repeat(6,1fr); grid-template-rows:repeat(6,90px); height:calc(6*90px + 5*8px); }
+  #tpPage0 .tp-c1 { grid-column:1/4; grid-row:1/4; }
+  #tpPage0 .tp-c2 { grid-column:4/7; grid-row:1/3; }
+  #tpPage0 .tp-c3 { grid-column:4/7; grid-row:3/5; }
+  #tpPage0 .tp-c4 { grid-column:1/4; grid-row:4/6; }
+  #tpPage0 .tp-c5 { grid-column:4/7; grid-row:5/7; }
+  #tpPage0 .tp-c6 { grid-column:1/4; grid-row:6/7; }
+  #tpPage0 .tp-c7 { display:none; }
+  #tpPage1 .tp-c1 { grid-column:1/4; grid-row:1/4; }
+  #tpPage1 .tp-c2 { grid-column:4/7; grid-row:1/3; }
+  #tpPage1 .tp-c3 { grid-column:4/7; grid-row:3/5; }
+  #tpPage1 .tp-c4 { grid-column:1/4; grid-row:4/6; }
+  #tpPage1 .tp-c5 { grid-column:4/7; grid-row:5/7; }
+  #tpPage1 .tp-c6 { grid-column:1/4; grid-row:6/7; }
+  #tpPage1 .tp-c7 { display:none; }
+
+  /* Software */
+  .sw-cats { grid-template-columns:repeat(2,1fr); }
+
+  /* Contact */
+  .cbtns { flex-direction:column; align-items:center; gap:.8rem; }
+
+  /* Footer */
+  footer { padding:2rem 2rem; flex-direction:column; text-align:center; }
+}
+
+/* ── Mobile large (≤700px) ── */
+@media (max-width: 700px) {
+  /* Nav — burger simple */
+  #nav { padding:.8rem 1.4rem; }
+  .nlinks { display:none; }
+  .nlogo { font-size:.65rem; }
+
+  /* Section nav bubbles */
+  #sec-nav { display:none; }
+
+  /* Hero */
+  .h-portfolio-wrap { flex-wrap:wrap; justify-content:center; }
+  .h-port-text { font-size:clamp(2.2rem,12vw,4rem); }
+  .h-gear-wrap { width:clamp(2rem,10vw,3.5rem); height:clamp(2rem,10vw,3.5rem); }
+  .h-name { font-size:clamp(1.5rem,6vw,2.5rem); }
+  .h-tagline { font-size:.75rem; }
+
+  /* Sections padding */
+  #about, #skills, #past, #software { padding:5rem 1.5rem 4rem; }
+
+  /* About stats */
+  .astats { grid-template-columns:1fr; gap:1.5rem; text-align:center; }
+
+  /* Timeline */
+  .tl-spine { left:1.2rem; }
+  .tl-item { grid-template-columns:0 24px 1fr; }
+  .tl-left { display:none; }
+  .tl-right { padding-left:1.2rem; text-align:left; }
+  .tl-tags { justify-content:flex-start !important; }
+  .tl-year { font-size:1.6rem; }
+
+  /* Tetris TP — 1 colonne sur mobile */
+  .tp-grid {
+    grid-template-columns:1fr;
+    grid-template-rows:repeat(7,160px);
+    height:auto;
+    gap:6px;
+  }
+  #tpPage0 .tp-c1,#tpPage0 .tp-c2,#tpPage0 .tp-c3,
+  #tpPage0 .tp-c4,#tpPage0 .tp-c5,#tpPage0 .tp-c6,#tpPage0 .tp-c7,
+  #tpPage1 .tp-c1,#tpPage1 .tp-c2,#tpPage1 .tp-c3,
+  #tpPage1 .tp-c4,#tpPage1 .tp-c5,#tpPage1 .tp-c6,#tpPage1 .tp-c7 {
+    grid-column:1; grid-row:auto; display:block;
+  }
+
+  /* Software */
+  .sw-cats { grid-template-columns:1fr; }
+
+  /* Showcase */
+  #showcase { min-height:60vh; }
+
+  /* Contact */
+  .cinner { padding:0 1rem; }
+  .csub { font-size:.72rem; }
+
+  /* Section header */
+  .st { font-size:clamp(1.6rem,7vw,2.5rem); }
+  .sl { font-size:.46rem; letter-spacing:.35em; }
+
+  /* Footer */
+  footer { padding:1.8rem 1.2rem; gap:.6rem; }
+}
+
+/* ── Mobile petit (≤480px) ── */
+@media (max-width: 480px) {
+  .h-port-text { font-size:clamp(1.8rem,10vw,3rem); }
+  .h-gear-wrap { width:clamp(1.6rem,9vw,2.8rem); height:clamp(1.6rem,9vw,2.8rem); }
+  .h-name { font-size:clamp(1.2rem,7vw,1.8rem); }
+  .h-btn { font-size:.44rem; padding:.65rem 1.6rem; letter-spacing:.3em; }
+  #about, #skills, #past, #software { padding:4rem 1rem 3rem; }
+  .tl-right { padding-left:.8rem; }
+  .tp-grid { grid-template-rows:repeat(7,130px); }
+  .cemail { font-size:.8rem; letter-spacing:.1em; }
+  .cbtns { gap:.6rem; }
+  .btn-cg, .btn-cr, .btn-cghost { font-size:.46rem; padding:.6rem 1.4rem; }
+}
+
+/* ── Grand écran (≥1400px) ── */
+@media (min-width: 1400px) {
+  .tp-grid { max-width:1400px; }
+  .sw-inner { max-width:1400px; }
+  .cinner { max-width:960px; }
+}
 @keyframes rotHalo { to{transform:rotate(360deg)} }
 
 section { position:relative; overflow:hidden; }
@@ -437,57 +565,82 @@ section { position:relative; overflow:hidden; }
    TIMELINE — Mon Parcours
 ════════════════════════════════════════════════════════ */
 #skills { padding:8rem 3rem 7rem; background:var(--cream); overflow:visible; position:relative; }
-.tl-wrap { max-width:900px; margin:0 auto; position:relative; }
+.tl-wrap { max-width:960px; margin:0 auto; position:relative; }
 .tl-spine {
   position:absolute; left:50%; top:0; bottom:0; width:1px;
-  background:linear-gradient(to bottom, transparent, var(--gold) 8%, var(--gold) 92%, transparent);
+  background:linear-gradient(to bottom, transparent, var(--gold) 6%, var(--gold) 94%, transparent);
   transform:translateX(-50%);
 }
-@media(max-width:700px){ .tl-spine { left:2.2rem; } }
+
+/* Chaque item : grille 3 colonnes [texte · point · texte] */
 .tl-item {
-  display:flex; align-items:flex-start; gap:3rem;
-  margin-bottom:4.5rem; position:relative;
+  display:grid;
+  grid-template-columns:1fr 32px 1fr;
+  align-items:flex-start;
+  margin-bottom:4rem;
+  position:relative;
+  gap:0;
 }
-.tl-item:nth-child(even) { flex-direction:row-reverse; }
-.tl-side { width:calc(50% - 2.5rem); flex-shrink:0; }
-.tl-item:nth-child(even) .tl-side { text-align:right; }
+
+/* Colonne gauche */
+.tl-left {
+  padding-right:2.4rem;
+  text-align:right;
+}
+
+/* Colonne droite */
+.tl-right {
+  padding-left:2.4rem;
+  text-align:left;
+}
+
+/* Vide = rien à afficher */
+.tl-empty { display:block; }
+
+/* Point central */
 .tl-dot {
-  position:absolute; left:50%; top:.55rem;
-  transform:translateX(-50%);
+  display:flex; align-items:flex-start; justify-content:center;
+  padding-top:.65rem;
+}
+.tl-dot-inner {
   width:11px; height:11px; border-radius:50%;
   background:var(--gold); border:2px solid var(--cream);
-  box-shadow:0 0 0 2px var(--gold);
-  z-index:2;
+  box-shadow:0 0 0 2px var(--gold), 0 0 12px rgba(201,168,76,.3);
+  flex-shrink:0;
 }
-@media(max-width:700px){
-  .tl-item, .tl-item:nth-child(even) { flex-direction:column; padding-left:4.5rem; }
-  .tl-side { width:100%; }
-  .tl-item:nth-child(even) .tl-side { text-align:left; }
-  .tl-dot { left:2.2rem; }
-}
+
 .tl-year {
   font-family:'Cormorant Garamond',serif; font-style:italic;
-  font-size:2.2rem; color:var(--gold); line-height:1; margin-bottom:.4rem;
+  font-size:2.2rem; color:var(--gold); line-height:1; margin-bottom:.35rem;
 }
 .tl-title {
-  font-family:'Cormorant Garamond',serif; font-size:1.15rem;
-  font-weight:400; color:var(--text); margin-bottom:.5rem; line-height:1.3;
+  font-family:'Cormorant Garamond',serif; font-size:1.12rem;
+  font-weight:400; color:var(--text); margin-bottom:.4rem; line-height:1.3;
 }
 .tl-sub {
-  font-size:.58rem; letter-spacing:.32em; text-transform:uppercase;
-  color:var(--rose); margin-bottom:.7rem;
+  font-size:.56rem; letter-spacing:.32em; text-transform:uppercase;
+  color:var(--rose); margin-bottom:.6rem; display:block;
 }
 .tl-desc {
-  font-size:.72rem; line-height:1.75; color:var(--text-m);
+  font-size:.71rem; line-height:1.8; color:var(--text-m);
 }
 .tl-tags {
-  display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.8rem;
+  display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.75rem;
 }
-.tl-item:nth-child(even) .tl-tags { justify-content:flex-end; }
+.tl-left .tl-tags { justify-content:flex-end; }
+.tl-right .tl-tags { justify-content:flex-start; }
 .tl-tag {
-  font-size:.48rem; letter-spacing:.22em; text-transform:uppercase;
-  padding:.3rem .8rem; border:1px solid rgba(201,168,76,.3);
+  font-size:.46rem; letter-spacing:.2em; text-transform:uppercase;
+  padding:.28rem .75rem; border:1px solid rgba(201,168,76,.28);
   color:var(--gold-dk); background:rgba(201,168,76,.05);
+}
+
+@media(max-width:700px){
+  .tl-spine { left:1.6rem; }
+  .tl-item { grid-template-columns:0 28px 1fr; }
+  .tl-left { display:none; }
+  .tl-right { padding-left:1.6rem; text-align:left; }
+  .tl-left .tl-tags { justify-content:flex-start; }
 }
 
 /* ════════════════════════════════════════════════════════
@@ -496,14 +649,13 @@ section { position:relative; overflow:hidden; }
 .tp-page { display:none; }
 .tp-page.active { display:grid; }
 
-/* Les deux pages partagent la même hauteur totale = 6 row-units × 90px = 540px */
+/* Les deux pages partagent la même hauteur totale = 6 row-units × 100px = 600px */
 .tp-grid {
   grid-template-columns: repeat(12, 1fr);
-  grid-template-rows: repeat(6, 90px);
+  grid-template-rows: repeat(6, 100px);
   gap: 8px;
   max-width:1320px; margin:0 auto;
-  /* Hauteur fixe = 6×90 + 5×8 = 540+40 = 580px */
-  height: calc(6 * 90px + 5 * 8px);
+  height: calc(6 * 100px + 5 * 8px);
 }
 
 /* ── PAGE 1 : disposition Tetris précise ── */
@@ -511,9 +663,9 @@ section { position:relative; overflow:hidden; }
 #tpPage0 .tp-c1  { grid-column:1/5;  grid-row:1/5;  }
 /* Soudage       : col 5-9 , row 1-3  */
 #tpPage0 .tp-c2  { grid-column:5/9;  grid-row:1/3;  }
-/* Fonderie      : col 9-13, row 1-3  */
+/* Fonderie      : col 9-13, row 1-4  */
 #tpPage0 .tp-c3  { grid-column:9/13; grid-row:1/4;  }
-/* Fraisage CNC  : col 5-9 , row 3-5  */
+/* Fraisage CNC  : col 5-9 , row 3-6  */
 #tpPage0 .tp-c4  { grid-column:5/9;  grid-row:3/6;  }
 /* Tournage      : col 9-13, row 4-7  */
 #tpPage0 .tp-c5  { grid-column:9/13; grid-row:4/7;  }
@@ -529,30 +681,34 @@ section { position:relative; overflow:hidden; }
 #tpPage1 .tp-c2  { grid-column:7/13; grid-row:1/3;  }
 /* Polymères     : col 7-10, row 3-5  */
 #tpPage1 .tp-c3  { grid-column:7/10; grid-row:3/5;  }
-/* Sélection mat : col 10-13,row 3-5  */
+/* Sélection mat : col 10-13,row 3-6  */
 #tpPage1 .tp-c4  { grid-column:10/13;grid-row:3/6;  }
 /* Emboutissage  : col 1-5 , row 4-7  */
 #tpPage1 .tp-c5  { grid-column:1/5;  grid-row:4/7;  }
 /* Dessin indus  : col 5-10, row 5-7  */
 #tpPage1 .tp-c6  { grid-column:5/10; grid-row:5/7;  }
-/* Thermique     : col 7-13, row 5-7  */
+/* Thermique     : col 10-13,row 6-7  */
 #tpPage1 .tp-c7  { grid-column:10/13;grid-row:6/7;  }
 
 /* ── Card base ── */
 .tp-card {
   position:relative; overflow:hidden; cursor:pointer;
   transition:transform .35s var(--eout), box-shadow .35s;
-  min-height:0; min-width:0;
+  min-height:100px; min-width:0; /* hauteur mini garantie */
 }
-.tp-card:hover { transform:translateY(-2px); box-shadow:0 12px 40px rgba(0,0,0,.15); }
+.tp-card:hover { transform:translateY(-2px); box-shadow:0 12px 40px rgba(0,0,0,.18); }
 
-/* Gallery */
+/* Gallery — images ET vidéos */
 .tp-gallery { position:absolute; inset:0; }
-.tp-gallery img {
+.tp-gallery img,
+.tp-gallery video {
   position:absolute; inset:0; width:100%; height:100%;
   object-fit:cover; opacity:0; transition:opacity .5s ease;
 }
-.tp-gallery img.active { opacity:1; }
+.tp-gallery img.active,
+.tp-gallery video.active { opacity:1; }
+/* Autoplay silencieux pour les vidéos */
+.tp-gallery video { pointer-events:none; }
 
 .tp-gallery-placeholder {
   position:absolute; inset:0;
@@ -985,9 +1141,9 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
   <div class="sn-bubble"        data-target="feat"     data-label="Projets"></div>
   <div class="sn-bubble"        data-target="about"    data-label="À Propos"></div>
   <div class="sn-bubble"        data-target="showcase" data-label="Pièce 3D"></div>
-  <div class="sn-bubble"        data-target="skills"   data-label="Compétences"></div>
+  <div class="sn-bubble"        data-target="skills"   data-label="Parcours"></div>
   <div class="sn-bubble"        data-target="software" data-label="Logiciels"></div>
-  <div class="sn-bubble"        data-target="past"     data-label="Réalisations"></div>
+  <div class="sn-bubble"        data-target="past"     data-label="TP ENSAM"></div>
   <div class="sn-bubble"        data-target="contact"  data-label="Contact"></div>
 </nav>
 
@@ -1012,14 +1168,14 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
      NAVIGATION
 ════════════════════════════ -->
 <nav id="nav">
-  <a href="#hero" class="nlogo">Mon Portfolio</a>
+  <a href="#hero" class="nlogo">T · <b>Bourdon</b></a>
   <ul class="nlinks">
     <li><a href="#feat">Projets</a></li>
     <li><a href="#about">À Propos</a></li>
     <li><a href="#showcase">Pièce 3D</a></li>
-    <li><a href="#skills">Compétences</a></li>
+    <li><a href="#skills">Parcours</a></li>
     <li><a href="#software">Logiciels</a></li>
-    <li><a href="#past">Réalisations</a></li>
+    <li><a href="#past">TP ENSAM</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
 </nav>
@@ -1346,24 +1502,24 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
 <div class="tl-wrap rv">
   <div class="tl-spine"></div>
 
-  <!-- 1 -->
+  <!-- 1 — contenu GAUCHE -->
   <div class="tl-item rv">
-    <div class="tl-side">
+    <div class="tl-left">
       <div class="tl-year">2022</div>
       <div class="tl-sub">Baccalauréat</div>
       <div class="tl-title">Bac Scientifique — Mention Très Bien</div>
       <div class="tl-desc">Spécialités Mathématiques &amp; Sciences de l'Ingénieur. Première approche de la conception mécanique et de la modélisation.</div>
       <div class="tl-tags"><span class="tl-tag">Maths</span><span class="tl-tag">Sciences de l'ingénieur</span></div>
     </div>
-    <div class="tl-dot"></div>
-    <div class="tl-side"></div>
+    <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+    <div class="tl-right tl-empty"></div>
   </div>
 
-  <!-- 2 -->
+  <!-- 2 — contenu DROITE -->
   <div class="tl-item rv d1">
-    <div class="tl-side"></div>
-    <div class="tl-dot"></div>
-    <div class="tl-side">
+    <div class="tl-left tl-empty"></div>
+    <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+    <div class="tl-right">
       <div class="tl-year">2022–24</div>
       <div class="tl-sub">Classes Préparatoires</div>
       <div class="tl-title">MPSI / MP — Lycée de Cornouaille</div>
@@ -1372,24 +1528,24 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
     </div>
   </div>
 
-  <!-- 3 -->
+  <!-- 3 — contenu GAUCHE -->
   <div class="tl-item rv d2">
-    <div class="tl-side">
+    <div class="tl-left">
       <div class="tl-year">2024</div>
       <div class="tl-sub">Entrée Grande École</div>
       <div class="tl-title">Arts et Métiers — ENSAM</div>
       <div class="tl-desc">Intégration du cursus ingénieur généraliste. Spécialisation progressive en conception mécanique, procédés industriels et systèmes numériques.</div>
       <div class="tl-tags"><span class="tl-tag">Génie mécanique</span><span class="tl-tag">Conception</span><span class="tl-tag">Fabrication</span></div>
     </div>
-    <div class="tl-dot"></div>
-    <div class="tl-side"></div>
+    <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+    <div class="tl-right tl-empty"></div>
   </div>
 
-  <!-- 4 -->
+  <!-- 4 — contenu DROITE -->
   <div class="tl-item rv d3">
-    <div class="tl-side"></div>
-    <div class="tl-dot"></div>
-    <div class="tl-side">
+    <div class="tl-left tl-empty"></div>
+    <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+    <div class="tl-right">
       <div class="tl-year">2024</div>
       <div class="tl-sub">Certification officielle</div>
       <div class="tl-title">CSWA &amp; CSWP — SolidWorks</div>
@@ -1398,24 +1554,24 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
     </div>
   </div>
 
-  <!-- 5 -->
+  <!-- 5 — contenu GAUCHE -->
   <div class="tl-item rv d4">
-    <div class="tl-side">
+    <div class="tl-left">
       <div class="tl-year">2024–25</div>
       <div class="tl-sub">Projet étudiant</div>
       <div class="tl-title">Équipe BFS — Formula Student</div>
       <div class="tl-desc">Conception et modélisation 3D d'un monoplace de compétition au sein de l'équipe formula student ENSAM. Travail pluridisciplinaire entre mécanique, aérodynamique et fabrication.</div>
       <div class="tl-tags"><span class="tl-tag">Formula Student</span><span class="tl-tag">Assemblage 3D</span><span class="tl-tag">Travail d'équipe</span></div>
     </div>
-    <div class="tl-dot"></div>
-    <div class="tl-side"></div>
+    <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+    <div class="tl-right tl-empty"></div>
   </div>
 
-  <!-- 6 -->
+  <!-- 6 — contenu DROITE -->
   <div class="tl-item rv d5">
-    <div class="tl-side"></div>
-    <div class="tl-dot"></div>
-    <div class="tl-side">
+    <div class="tl-left tl-empty"></div>
+    <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+    <div class="tl-right">
       <div class="tl-year">2025–26</div>
       <div class="tl-sub">En cours</div>
       <div class="tl-title">Spécialisation &amp; Projets Numériques</div>
@@ -1725,40 +1881,25 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
 
   </section>
 
-  <!-- wave past → contact (propre, sobre) -->
-  <div class="tw" style="background:linear-gradient(to right,#050505,#050505); margin-bottom:-2px;">
-    <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" width="100%" height="80">
-      <path d="M0,0 L1440,0 L1440,35 C1200,72 960,72 720,50 C480,28 240,68 0,55 Z" fill="#FFFFFF"/>
-    </svg>
-  </div>
-
 <!-- ─────────── CONTACT ─────────── -->
 <section id="contact"
-         style="
-           position: relative;
-           overflow: visible;
-           background: #050505;
-           min-height: 100vh;
-           display: flex;
-           flex-direction: column;
-           justify-content: center;
-           z-index:1;
-         ">
+         style="position:relative; overflow:hidden; background:#060608; min-height:100vh; display:flex; flex-direction:column; justify-content:center; z-index:1; margin-top:0;">
 
-  <svg
-    viewBox="0 0 1600 900"
-    xmlns="http://www.w3.org/2000/svg"
-    preserveAspectRatio="xMidYMid slice"
-    style="
-      position: absolute;
-      top: -50px; left: 0;
-      width: 100%; height: calc(100% + 50px);
-      z-index: 2;
-      pointer-events: none;
-      overflow: visible;
-    ">
-
+  <!-- ══ TEXTURE GÉOMÉTRIQUE + TRANSITION BLANCHE EN HAUT
+       Pas unique de 200px. Le rect fadeWhite remplace l'ancien "wave" div.
+  ══════════════════════════════════════════════════════════ -->
+  <svg viewBox="0 0 1600 1080" xmlns="http://www.w3.org/2000/svg"
+       preserveAspectRatio="xMidYMid slice"
+       style="position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;">
     <defs>
+      <radialGradient id="cRadGold" cx="50%" cy="50%" r="60%">
+        <stop offset="0%" stop-color="#C9A84C" stop-opacity="0.06"/>
+        <stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="cRadRose" cx="20%" cy="80%" r="45%">
+        <stop offset="0%" stop-color="#C49A8A" stop-opacity="0.05"/>
+        <stop offset="100%" stop-color="#C49A8A" stop-opacity="0"/>
+      </radialGradient>
       <linearGradient id="cg-gold" x1="0" y1="0" x2="1" y2="0">
         <stop offset="0%"   stop-color="#8A5A1E" stop-opacity="0"/>
         <stop offset="20%"  stop-color="#C8820A"/>
@@ -1767,35 +1908,49 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         <stop offset="78%"  stop-color="#D6982B"/>
         <stop offset="100%" stop-color="#6F4517" stop-opacity="0"/>
       </linearGradient>
+      <linearGradient id="fadeWhite" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#FFFFFF" stop-opacity="1"/>
+        <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+      </linearGradient>
     </defs>
-
-    <!-- VAGUE HAUTE — ligne principale -->
-    <path d="M -20 205
-             C 268 125, 540 245, 800 167
-             C 1080 87, 1350 187, 1620 130"
-          stroke="url(#cg-gold)" stroke-width="10" fill="none" stroke-linecap="round"/>
-
-    <!-- VAGUE HAUTE — ligne fine -->
-    <path d="M -20 148
-             C 280 55, 560 170, 800 112
-             C 1040 58, 1340 148, 1620 72"
-          stroke="url(#cg-gold)" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".6"/>
-
-    <!-- VAGUE BASSE — ligne principale -->
-    <path d="M -20 732
-             C 220 798, 500 681, 780 753
-             C 1020 815, 1250 675, 1620 588"
-          stroke="url(#cg-gold)" stroke-width="10" fill="none" stroke-linecap="round"/>
-
-    <!-- VAGUE BASSE — ligne fine -->
-    <path d="M -20 790
-             C 220 855, 500 738, 780 810
-             C 1020 870, 1250 730, 1620 645"
-          stroke="url(#cg-gold)" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".6"/>
-
+    <rect width="1600" height="1080" fill="#060608"/>
+    <!-- Triangles pas=200px, 9 lignes de 120px -->
+    <polygon points="0,0 200,0 100,120" fill="#0C0C10"/><polygon points="200,0 400,0 300,120 100,120" fill="#090910"/><polygon points="400,0 600,0 500,120 300,120" fill="#0E0E12"/><polygon points="600,0 800,0 700,120 500,120" fill="#0B0B0F"/><polygon points="800,0 1000,0 900,120 700,120" fill="#0C0C10"/><polygon points="1000,0 1200,0 1100,120 900,120" fill="#0A0A0E"/><polygon points="1200,0 1400,0 1300,120 1100,120" fill="#0E0E12"/><polygon points="1400,0 1600,0 1500,120 1300,120" fill="#090910"/>
+    <polygon points="0,120 200,120 100,240" fill="#0F0F13"/><polygon points="200,120 400,120 300,240 100,240" fill="#0B0B0F"/><polygon points="400,120 600,120 500,240 300,240" fill="#0E0E12"/><polygon points="600,120 800,120 700,240 500,240" fill="#090910"/><polygon points="800,120 1000,120 900,240 700,240" fill="#0D0D11"/><polygon points="1000,120 1200,120 1100,240 900,240" fill="#0A0A0E"/><polygon points="1200,120 1400,120 1300,240 1100,240" fill="#0E0E12"/><polygon points="1400,120 1600,120 1500,240 1300,240" fill="#0C0C10"/>
+    <polygon points="0,240 200,240 100,360" fill="#0B0B0F"/><polygon points="200,240 400,240 300,360 100,360" fill="#0F0F13"/><polygon points="400,240 600,240 500,360 300,360" fill="#0A0A0E"/><polygon points="600,240 800,240 700,360 500,360" fill="#0D0D11"/><polygon points="800,240 1000,240 900,360 700,360" fill="#0B0B0F"/><polygon points="1000,240 1200,240 1100,360 900,360" fill="#0E0E12"/><polygon points="1200,240 1400,240 1300,360 1100,360" fill="#090910"/><polygon points="1400,240 1600,240 1500,360 1300,360" fill="#0C0C10"/>
+    <polygon points="0,360 200,360 100,480" fill="#0E0E14"/><polygon points="200,360 400,360 300,480 100,480" fill="#0B0B0F"/><polygon points="400,360 600,360 500,480 300,480" fill="#0F0F13"/><polygon points="600,360 800,360 700,480 500,480" fill="#090910"/><polygon points="800,360 1000,360 900,480 700,480" fill="#0D0D11"/><polygon points="1000,360 1200,360 1100,480 900,480" fill="#0A0A0E"/><polygon points="1200,360 1400,360 1300,480 1100,480" fill="#0E0E12"/><polygon points="1400,360 1600,360 1500,480 1300,480" fill="#0B0B0F"/>
+    <polygon points="0,480 200,480 100,600" fill="#0C0C10"/><polygon points="200,480 400,480 300,600 100,600" fill="#0F0F13"/><polygon points="400,480 600,480 500,600 300,600" fill="#0A0A0E"/><polygon points="600,480 800,480 700,600 500,600" fill="#0E0E12"/><polygon points="800,480 1000,480 900,600 700,600" fill="#0B0B0F"/><polygon points="1000,480 1200,480 1100,600 900,600" fill="#0D0D11"/><polygon points="1200,480 1400,480 1300,600 1100,600" fill="#090910"/><polygon points="1400,480 1600,480 1500,600 1300,600" fill="#0C0C10"/>
+    <polygon points="0,600 200,600 100,720" fill="#0B0B0F"/><polygon points="200,600 400,600 300,720 100,720" fill="#0E0E12"/><polygon points="400,600 600,600 500,720 300,720" fill="#0C0C10"/><polygon points="600,600 800,600 700,720 500,720" fill="#0F0F13"/><polygon points="800,600 1000,600 900,720 700,720" fill="#090910"/><polygon points="1000,600 1200,600 1100,720 900,720" fill="#0D0D11"/><polygon points="1200,600 1400,600 1300,720 1100,720" fill="#0A0A0E"/><polygon points="1400,600 1600,600 1500,720 1300,720" fill="#0E0E12"/>
+    <polygon points="0,720 200,720 100,840" fill="#0C0C10"/><polygon points="200,720 400,720 300,840 100,840" fill="#090910"/><polygon points="400,720 600,720 500,840 300,840" fill="#0E0E12"/><polygon points="600,720 800,720 700,840 500,840" fill="#0B0B0F"/><polygon points="800,720 1000,720 900,840 700,840" fill="#0F0F13"/><polygon points="1000,720 1200,720 1100,840 900,840" fill="#0A0A0E"/><polygon points="1200,720 1400,720 1300,840 1100,840" fill="#0D0D11"/><polygon points="1400,720 1600,720 1500,840 1300,840" fill="#090910"/>
+    <polygon points="0,840 200,840 100,960" fill="#0B0B0F"/><polygon points="200,840 400,840 300,960 100,960" fill="#0F0F13"/><polygon points="400,840 600,840 500,960 300,960" fill="#0A0A0E"/><polygon points="600,840 800,840 700,960 500,960" fill="#0E0E12"/><polygon points="800,840 1000,840 900,960 700,960" fill="#0C0C10"/><polygon points="1000,840 1200,840 1100,960 900,960" fill="#0D0D11"/><polygon points="1200,840 1400,840 1300,960 1100,960" fill="#090910"/><polygon points="1400,840 1600,840 1500,960 1300,960" fill="#0E0E12"/>
+    <polygon points="0,960 200,960 100,1080" fill="#0C0C10"/><polygon points="200,960 400,960 300,1080 100,1080" fill="#090910"/><polygon points="400,960 600,960 500,1080 300,1080" fill="#0E0E12"/><polygon points="600,960 800,960 700,1080 500,1080" fill="#0B0B0F"/><polygon points="800,960 1000,960 900,1080 700,1080" fill="#0F0F13"/><polygon points="1000,960 1200,960 1100,1080 900,1080" fill="#0A0A0E"/><polygon points="1200,960 1400,960 1300,1080 1100,1080" fill="#0D0D11"/><polygon points="1400,960 1600,960 1500,1080 1300,1080" fill="#090910"/>
+    <!-- Grille lignes pas=200px -->
+    <g stroke="#1A1A22" stroke-width=".55" opacity=".75">
+      <line x1="0" y1="0" x2="100" y2="120"/><line x1="200" y1="0" x2="100" y2="120"/><line x1="200" y1="0" x2="300" y2="120"/><line x1="400" y1="0" x2="300" y2="120"/><line x1="400" y1="0" x2="500" y2="120"/><line x1="600" y1="0" x2="500" y2="120"/><line x1="600" y1="0" x2="700" y2="120"/><line x1="800" y1="0" x2="700" y2="120"/><line x1="800" y1="0" x2="900" y2="120"/><line x1="1000" y1="0" x2="900" y2="120"/><line x1="1000" y1="0" x2="1100" y2="120"/><line x1="1200" y1="0" x2="1100" y2="120"/><line x1="1200" y1="0" x2="1300" y2="120"/><line x1="1400" y1="0" x2="1300" y2="120"/><line x1="1400" y1="0" x2="1500" y2="120"/><line x1="1600" y1="0" x2="1500" y2="120"/>
+      <line x1="0" y1="120" x2="100" y2="240"/><line x1="200" y1="120" x2="100" y2="240"/><line x1="200" y1="120" x2="300" y2="240"/><line x1="400" y1="120" x2="300" y2="240"/><line x1="400" y1="120" x2="500" y2="240"/><line x1="600" y1="120" x2="500" y2="240"/><line x1="600" y1="120" x2="700" y2="240"/><line x1="800" y1="120" x2="700" y2="240"/><line x1="800" y1="120" x2="900" y2="240"/><line x1="1000" y1="120" x2="900" y2="240"/><line x1="1000" y1="120" x2="1100" y2="240"/><line x1="1200" y1="120" x2="1100" y2="240"/><line x1="1200" y1="120" x2="1300" y2="240"/><line x1="1400" y1="120" x2="1300" y2="240"/><line x1="1400" y1="120" x2="1500" y2="240"/><line x1="1600" y1="120" x2="1500" y2="240"/>
+      <line x1="0" y1="240" x2="100" y2="360"/><line x1="200" y1="240" x2="100" y2="360"/><line x1="200" y1="240" x2="300" y2="360"/><line x1="400" y1="240" x2="300" y2="360"/><line x1="400" y1="240" x2="500" y2="360"/><line x1="600" y1="240" x2="500" y2="360"/><line x1="600" y1="240" x2="700" y2="360"/><line x1="800" y1="240" x2="700" y2="360"/><line x1="800" y1="240" x2="900" y2="360"/><line x1="1000" y1="240" x2="900" y2="360"/><line x1="1000" y1="240" x2="1100" y2="360"/><line x1="1200" y1="240" x2="1100" y2="360"/><line x1="1200" y1="240" x2="1300" y2="360"/><line x1="1400" y1="240" x2="1300" y2="360"/><line x1="1400" y1="240" x2="1500" y2="360"/><line x1="1600" y1="240" x2="1500" y2="360"/>
+      <line x1="0" y1="360" x2="100" y2="480"/><line x1="200" y1="360" x2="100" y2="480"/><line x1="200" y1="360" x2="300" y2="480"/><line x1="400" y1="360" x2="300" y2="480"/><line x1="400" y1="360" x2="500" y2="480"/><line x1="600" y1="360" x2="500" y2="480"/><line x1="600" y1="360" x2="700" y2="480"/><line x1="800" y1="360" x2="700" y2="480"/><line x1="800" y1="360" x2="900" y2="480"/><line x1="1000" y1="360" x2="900" y2="480"/><line x1="1000" y1="360" x2="1100" y2="480"/><line x1="1200" y1="360" x2="1100" y2="480"/><line x1="1200" y1="360" x2="1300" y2="480"/><line x1="1400" y1="360" x2="1300" y2="480"/><line x1="1400" y1="360" x2="1500" y2="480"/><line x1="1600" y1="360" x2="1500" y2="480"/>
+      <line x1="0" y1="480" x2="100" y2="600"/><line x1="200" y1="480" x2="100" y2="600"/><line x1="200" y1="480" x2="300" y2="600"/><line x1="400" y1="480" x2="300" y2="600"/><line x1="400" y1="480" x2="500" y2="600"/><line x1="600" y1="480" x2="500" y2="600"/><line x1="600" y1="480" x2="700" y2="600"/><line x1="800" y1="480" x2="700" y2="600"/><line x1="800" y1="480" x2="900" y2="600"/><line x1="1000" y1="480" x2="900" y2="600"/><line x1="1000" y1="480" x2="1100" y2="600"/><line x1="1200" y1="480" x2="1100" y2="600"/><line x1="1200" y1="480" x2="1300" y2="600"/><line x1="1400" y1="480" x2="1300" y2="600"/><line x1="1400" y1="480" x2="1500" y2="600"/><line x1="1600" y1="480" x2="1500" y2="600"/>
+      <line x1="0" y1="600" x2="100" y2="720"/><line x1="200" y1="600" x2="100" y2="720"/><line x1="200" y1="600" x2="300" y2="720"/><line x1="400" y1="600" x2="300" y2="720"/><line x1="400" y1="600" x2="500" y2="720"/><line x1="600" y1="600" x2="500" y2="720"/><line x1="600" y1="600" x2="700" y2="720"/><line x1="800" y1="600" x2="700" y2="720"/><line x1="800" y1="600" x2="900" y2="720"/><line x1="1000" y1="600" x2="900" y2="720"/><line x1="1000" y1="600" x2="1100" y2="720"/><line x1="1200" y1="600" x2="1100" y2="720"/><line x1="1200" y1="600" x2="1300" y2="720"/><line x1="1400" y1="600" x2="1300" y2="720"/><line x1="1400" y1="600" x2="1500" y2="720"/><line x1="1600" y1="600" x2="1500" y2="720"/>
+      <line x1="0" y1="720" x2="100" y2="840"/><line x1="200" y1="720" x2="100" y2="840"/><line x1="200" y1="720" x2="300" y2="840"/><line x1="400" y1="720" x2="300" y2="840"/><line x1="400" y1="720" x2="500" y2="840"/><line x1="600" y1="720" x2="500" y2="840"/><line x1="600" y1="720" x2="700" y2="840"/><line x1="800" y1="720" x2="700" y2="840"/><line x1="800" y1="720" x2="900" y2="840"/><line x1="1000" y1="720" x2="900" y2="840"/><line x1="1000" y1="720" x2="1100" y2="840"/><line x1="1200" y1="720" x2="1100" y2="840"/><line x1="1200" y1="720" x2="1300" y2="840"/><line x1="1400" y1="720" x2="1300" y2="840"/><line x1="1400" y1="720" x2="1500" y2="840"/><line x1="1600" y1="720" x2="1500" y2="840"/>
+      <line x1="0" y1="840" x2="100" y2="960"/><line x1="200" y1="840" x2="100" y2="960"/><line x1="200" y1="840" x2="300" y2="960"/><line x1="400" y1="840" x2="300" y2="960"/><line x1="400" y1="840" x2="500" y2="960"/><line x1="600" y1="840" x2="500" y2="960"/><line x1="600" y1="840" x2="700" y2="960"/><line x1="800" y1="840" x2="700" y2="960"/><line x1="800" y1="840" x2="900" y2="960"/><line x1="1000" y1="840" x2="900" y2="960"/><line x1="1000" y1="840" x2="1100" y2="960"/><line x1="1200" y1="840" x2="1100" y2="960"/><line x1="1200" y1="840" x2="1300" y2="960"/><line x1="1400" y1="840" x2="1300" y2="960"/><line x1="1400" y1="840" x2="1500" y2="960"/><line x1="1600" y1="840" x2="1500" y2="960"/>
+      <line x1="0" y1="960" x2="100" y2="1080"/><line x1="200" y1="960" x2="100" y2="1080"/><line x1="200" y1="960" x2="300" y2="1080"/><line x1="400" y1="960" x2="300" y2="1080"/><line x1="400" y1="960" x2="500" y2="1080"/><line x1="600" y1="960" x2="500" y2="1080"/><line x1="600" y1="960" x2="700" y2="1080"/><line x1="800" y1="960" x2="700" y2="1080"/><line x1="800" y1="960" x2="900" y2="1080"/><line x1="1000" y1="960" x2="900" y2="1080"/><line x1="1000" y1="960" x2="1100" y2="1080"/><line x1="1200" y1="960" x2="1100" y2="1080"/><line x1="1200" y1="960" x2="1300" y2="1080"/><line x1="1400" y1="960" x2="1300" y2="1080"/><line x1="1400" y1="960" x2="1500" y2="1080"/><line x1="1600" y1="960" x2="1500" y2="1080"/>
+      <line x1="0" y1="120" x2="1600" y2="120"/><line x1="0" y1="240" x2="1600" y2="240"/><line x1="0" y1="360" x2="1600" y2="360"/><line x1="0" y1="480" x2="1600" y2="480"/><line x1="0" y1="600" x2="1600" y2="600"/><line x1="0" y1="720" x2="1600" y2="720"/><line x1="0" y1="840" x2="1600" y2="840"/><line x1="0" y1="960" x2="1600" y2="960"/>
+      <line x1="200" y1="0" x2="200" y2="1080"/><line x1="400" y1="0" x2="400" y2="1080"/><line x1="600" y1="0" x2="600" y2="1080"/><line x1="800" y1="0" x2="800" y2="1080"/><line x1="1000" y1="0" x2="1000" y2="1080"/><line x1="1200" y1="0" x2="1200" y2="1080"/><line x1="1400" y1="0" x2="1400" y2="1080"/>
+    </g>
+    <rect width="1600" height="1080" fill="url(#cRadGold)"/>
+    <rect width="1600" height="1080" fill="url(#cRadRose)"/>
+    <path d="M -20 280 C 268 200,540 320,800 242 C 1080 162,1350 262,1620 205" stroke="url(#cg-gold)" stroke-width="10" fill="none" stroke-linecap="round"/>
+    <path d="M -20 223 C 280 130,560 245,800 187 C 1040 133,1340 223,1620 147" stroke="url(#cg-gold)" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".6"/>
+    <path d="M -20 807 C 220 873,500 756,780 828 C 1020 890,1250 750,1620 663" stroke="url(#cg-gold)" stroke-width="10" fill="none" stroke-linecap="round"/>
+    <path d="M -20 865 C 220 930,500 813,780 885 C 1020 945,1250 805,1620 720" stroke="url(#cg-gold)" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".6"/>
+    <!-- Masque blanc → transparent sur les 220 premiers px = remplace l'ancien "wave" div -->
+    <rect width="1600" height="220" fill="url(#fadeWhite)"/>
+    <path d="M0,165 C200,185 400,150 600,170 C800,190 1000,155 1200,172 C1400,190 1500,162 1600,170"
+          fill="none" stroke="rgba(201,168,76,.2)" stroke-width="1.5"/>
   </svg>
-
-  <div class="cinner" style="position: relative; z-index: 1;">
+  <!-- ══ FIN TEXTURE + TRANSITION ══ -->
+    <div class="cinner" style="position:relative;z-index:2;">
     <div class="sh rv">
       <span class="sl">Contact</span>
       <h2 class="st">
@@ -1839,10 +1994,55 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
 </section>
 
 <!-- ─────────── FOOTER ─────────── -->
-<footer style="background:#050505; border-top:none; margin-top:0;">
-  <span class="flogo">Mon Portfolio</span>
-  <p>2026 · Thomas Bourdon · Etudiant-Ingénieur</p>
-  <p style="color:rgba(255,255,255,.18);font-size:.55rem;letter-spacing:.2em">Version 1.0</p>
+<footer style="position:relative; background:#060608; overflow:hidden; padding:2.8rem 4rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; border-top:none;">
+
+  <!-- Texture géométrique footer — même pas 200px, continuité parfaite avec le contact.
+       Les triangles pointent vers le haut (sommets à y=0) et vers le bas (sommets à y=90)
+       pour former une rangée qui se raccorde visuellement à la dernière rangée du contact. -->
+  <svg viewBox="0 0 1600 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"
+       style="position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;" aria-hidden="true">
+    <!-- Triangles pointe-haute (miroir bas du contact) -->
+    <polygon points="0,90 200,90 100,0"            fill="#0C0C10"/>
+    <polygon points="200,90 400,90 300,0 100,0"    fill="#090910"/>
+    <polygon points="400,90 600,90 500,0 300,0"    fill="#0E0E12"/>
+    <polygon points="600,90 800,90 700,0 500,0"    fill="#0B0B0F"/>
+    <polygon points="800,90 1000,90 900,0 700,0"   fill="#0C0C10"/>
+    <polygon points="1000,90 1200,90 1100,0 900,0" fill="#0A0A0E"/>
+    <polygon points="1200,90 1400,90 1300,0 1100,0" fill="#0E0E12"/>
+    <polygon points="1400,90 1600,90 1500,0 1300,0" fill="#090910"/>
+    <!-- Grille même pas -->
+    <g stroke="#1A1A22" stroke-width=".5" opacity=".65">
+      <line x1="0" y1="90" x2="100" y2="0"/><line x1="200" y1="90" x2="100" y2="0"/>
+      <line x1="200" y1="90" x2="300" y2="0"/><line x1="400" y1="90" x2="300" y2="0"/>
+      <line x1="400" y1="90" x2="500" y2="0"/><line x1="600" y1="90" x2="500" y2="0"/>
+      <line x1="600" y1="90" x2="700" y2="0"/><line x1="800" y1="90" x2="700" y2="0"/>
+      <line x1="800" y1="90" x2="900" y2="0"/><line x1="1000" y1="90" x2="900" y2="0"/>
+      <line x1="1000" y1="90" x2="1100" y2="0"/><line x1="1200" y1="90" x2="1100" y2="0"/>
+      <line x1="1200" y1="90" x2="1300" y2="0"/><line x1="1400" y1="90" x2="1300" y2="0"/>
+      <line x1="1400" y1="90" x2="1500" y2="0"/><line x1="1600" y1="90" x2="1500" y2="0"/>
+      <line x1="100" y1="0" x2="300" y2="0"/><line x1="300" y1="0" x2="500" y2="0"/>
+      <line x1="500" y1="0" x2="700" y2="0"/><line x1="700" y1="0" x2="900" y2="0"/>
+      <line x1="900" y1="0" x2="1100" y2="0"/><line x1="1100" y1="0" x2="1300" y2="0"/>
+      <line x1="1300" y1="0" x2="1500" y2="0"/>
+      <line x1="200" y1="0" x2="200" y2="90"/><line x1="400" y1="0" x2="400" y2="90"/>
+      <line x1="600" y1="0" x2="600" y2="90"/><line x1="800" y1="0" x2="800" y2="90"/>
+      <line x1="1000" y1="0" x2="1000" y2="90"/><line x1="1200" y1="0" x2="1200" y2="90"/>
+      <line x1="1400" y1="0" x2="1400" y2="90"/>
+    </g>
+  </svg>
+
+  <span class="flogo" style="position:relative;z-index:1;">T · Bourdon</span>
+  <p style="position:relative;z-index:1;font-size:.6rem;letter-spacing:.18em;color:rgba(255,255,255,.2);">2026 · Thomas Bourdon · Étudiant-Ingénieur ENSAM</p>
+
+  <!-- ════════════════════════════════════════════════════
+       MENTION IA — Supprime ce bloc si tu ne veux pas l'afficher.
+       Pour retirer : efface tout entre les deux lignes de commentaires.
+  ════════════════════════════════════════════════════════ -->
+  <p style="position:relative;z-index:1;font-size:.52rem;letter-spacing:.18em;color:rgba(255,255,255,.15);text-align:right;line-height:1.6;">
+    Design &amp; développement assistés par IA · Contenu, conception mécanique et choix éditoriaux par Thomas Bourdon
+  </p>
+  <!-- ════ FIN MENTION IA ════ -->
+
 </footer>
 
 </main>
@@ -1933,35 +2133,49 @@ function initShowcase() {
   loaderScript.onload = () => {
     if (!THREE.GLTFLoader) { showUnavailable(); return; }
     const gltfLoader = new THREE.GLTFLoader();
-    gltfLoader.load(
-      'Assets/Monoplace.glb',
-      (gltf) => {
-        const model = gltf.scene;
-        const box = new THREE.Box3().setFromObject(model);
-        const center = box.getCenter(new THREE.Vector3());
-        const size = box.getSize(new THREE.Vector3());
-        const scale = 2.8 / Math.max(size.x, size.y, size.z);
-        model.scale.setScalar(scale);
-        model.position.sub(center.multiplyScalar(scale));
-        model.traverse(child => {
-          if (child.isMesh) {
-            child.castShadow = true; child.receiveShadow = true;
-            if (!child.material.map) {
-              child.material.metalness = Math.max(child.material.metalness||0, 0.6);
-              child.material.roughness = Math.min(child.material.roughness??1, 0.35);
+
+    /* Essaie .glb d'abord, puis .glf (même format GLTF binaire) */
+    const paths = ['Assets/Monoplace.glb', 'Assets/Monoplace.glf', 'Assets/Monoplace.gltf'];
+    let tried = 0;
+
+    function tryNext() {
+      if (tried >= paths.length) { showUnavailable(); return; }
+      const path = paths[tried++];
+      gltfLoader.load(
+        path,
+        (gltf) => {
+          console.log('✅ Modèle chargé depuis :', path);
+          const model = gltf.scene;
+          const box = new THREE.Box3().setFromObject(model);
+          const center = box.getCenter(new THREE.Vector3());
+          const size = box.getSize(new THREE.Vector3());
+          const scale = 2.8 / Math.max(size.x, size.y, size.z);
+          model.scale.setScalar(scale);
+          model.position.sub(center.multiplyScalar(scale));
+          model.traverse(child => {
+            if (child.isMesh) {
+              child.castShadow = true; child.receiveShadow = true;
+              if (!child.material.map) {
+                child.material.metalness = Math.max(child.material.metalness||0, 0.6);
+                child.material.roughness = Math.min(child.material.roughness??1, 0.35);
+              }
             }
-          }
-        });
-        master.add(model);
-        loaderEl.style.opacity='0'; loaderEl.style.pointerEvents='none';
-        hintEl.style.opacity='1';
-        setTimeout(()=>{ hintEl.style.transition='opacity 1.5s'; hintEl.style.opacity='0'; }, 3500);
-      },
-      (xhr) => {
-        if(xhr.total){ const pct=Math.round(xhr.loaded/xhr.total*100); const lbl=loaderEl.querySelector('.sc-loader-label'); if(lbl) lbl.textContent='Chargement… '+pct+'%'; }
-      },
-      () => { showUnavailable(); }
-    );
+          });
+          master.add(model);
+          loaderEl.style.opacity='0'; loaderEl.style.pointerEvents='none';
+          hintEl.style.opacity='1';
+          setTimeout(()=>{ hintEl.style.transition='opacity 1.5s'; hintEl.style.opacity='0'; }, 3500);
+        },
+        (xhr) => {
+          if(xhr.total){ const pct=Math.round(xhr.loaded/xhr.total*100); const lbl=loaderEl.querySelector('.sc-loader-label'); if(lbl) lbl.textContent='Chargement… '+pct+'%'; }
+        },
+        (err) => {
+          console.warn('❌ Échec chargement :', path, err.message||err);
+          tryNext();
+        }
+      );
+    }
+    tryNext();
   };
   loaderScript.onerror = () => showUnavailable();
   document.head.appendChild(loaderScript);
@@ -2610,58 +2824,43 @@ window.addEventListener('load',initSpotlight);
   goTo(0);
 })();
 
-/* ════ 14. GALLERY HOVER ════════════════════════════ */
+/* ════ 14. GALLERY HOVER — images + vidéos ══════════ */
 (function(){
   document.querySelectorAll('.tp-card').forEach(card => {
     const gallery = card.querySelector('.tp-gallery');
     if (!gallery) return;
-    const imgs = gallery.querySelectorAll('img');
-    if (!imgs.length) return;
+    const media = Array.from(gallery.querySelectorAll('img, video'));
+    if (!media.length) return;
 
-    // Init first image active
-    imgs[0].classList.add('active');
+    // Active le premier média
+    media[0].classList.add('active');
+    if(media[0].tagName==='VIDEO'){ media[0].muted=true; media[0].loop=true; media[0].play().catch(()=>{}); }
+
     let current = 0;
     let interval = null;
 
+    function showMedia(idx){
+      media[current].classList.remove('active');
+      if(media[current].tagName==='VIDEO') media[current].pause();
+      current = idx;
+      media[current].classList.add('active');
+      if(media[current].tagName==='VIDEO'){ media[current].muted=true; media[current].currentTime=0; media[current].play().catch(()=>{}); }
+    }
+
     card.addEventListener('mouseenter', () => {
-      if (imgs.length < 2) return;
-      interval = setInterval(() => {
-        imgs[current].classList.remove('active');
-        current = (current + 1) % imgs.length;
-        imgs[current].classList.add('active');
-      }, 900);
+      if (media.length < 2) return;
+      interval = setInterval(() => { showMedia((current + 1) % media.length); }, 1000);
     });
 
     card.addEventListener('mouseleave', () => {
-      clearInterval(interval);
-      interval = null;
+      clearInterval(interval); interval = null;
+      // Revenir au premier
+      showMedia(0);
     });
   });
 })();
 
 })();
-</script>
-
-<script>
-const galleries = document.querySelectorAll('.tp-gallery');
-
-galleries.forEach(gallery => {
-  const imgs = gallery.querySelectorAll('img');
-  let current = 0;
-  let interval;
-
-  gallery.addEventListener('mouseenter', () => {
-    interval = setInterval(() => {
-      imgs[current].classList.remove('active');
-      current = (current + 1) % imgs.length;
-      imgs[current].classList.add('active');
-    }, 800);
-  });
-
-  gallery.addEventListener('mouseleave', () => {
-    clearInterval(interval);
-  });
-});
 </script>
 
 </body>
