@@ -603,13 +603,87 @@ section { position:relative; overflow:hidden; }
 }
 #sc3d   { position:absolute; inset:0; width:100%; height:100%; }
 #sclight { position:absolute; inset:0; pointer-events:none; z-index:1; mix-blend-mode:screen; }
-.sc-halo-wrap { position:absolute; inset:0; z-index:2; pointer-events:none; display:flex; align-items:center; justify-content:center; }
-.sc-hr { position:absolute; border-radius:50%; border:1px solid; animation:rotHalo linear infinite; }
-.sc-hr-1 { width:340px; height:340px; border-color:rgba(201,168,76,.12); animation-duration:22s; }
-.sc-hr-2 { width:440px; height:440px; border-color:rgba(196,154,138,.08); animation-duration:34s; animation-direction:reverse; }
-.sc-hr-3 { width:550px; height:550px; border-color:rgba(201,168,76,.05); animation-duration:50s; }
-.sc-hr-4 { width:200px; height:200px; border-color:rgba(201,168,76,.18); animation-duration:14s; animation-direction:reverse; }
-.sc-pool  { position:absolute; width:300px; height:300px; border-radius:50%; background:radial-gradient(circle,rgba(201,168,76,.09) 0%,rgba(196,154,138,.05) 40%,transparent 70%); animation:glow 4s ease-in-out infinite; pointer-events:none; }
+/* ── Bubbles composants ── */
+.sc-bubbles-wrap {
+  position:absolute; inset:0; z-index:2; pointer-events:none;
+}
+.sc-bubble-lines {
+  position:absolute; inset:0; width:100%; height:100%;
+  pointer-events:none;
+}
+.sc-bubble {
+  position:absolute;
+  display:flex; flex-direction:column; align-items:center; gap:.6rem;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity 1.2s var(--eout);
+}
+.sc-bubble.sc-vis { opacity:1; }
+
+/* Conteneur circulaire — image ou SVG icon */
+.sc-bubble-inner {
+  width:100px; height:100px;
+  border-radius:50%;
+  border:1px solid rgba(201,168,76,.28);
+  background:rgba(0,0,0,.45);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 0 28px rgba(201,168,76,.12), 0 0 0 1px rgba(201,168,76,.08), inset 0 0 20px rgba(0,0,0,.3);
+  flex-shrink:0;
+}
+/* Image — scale automatique cover */
+.sc-bubble-img {
+  width:100%; height:100%;
+  object-fit:cover; object-position:center;
+  display:block;
+  border-radius:50%;
+}
+/* Icône SVG fallback — remplie dans le cercle */
+.sc-bubble-icon {
+  width:62px; height:62px;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.sc-bubble-label {
+  font-family:'Raleway',sans-serif; font-size:.4rem;
+  letter-spacing:.36em; text-transform:uppercase;
+  color:rgba(201,168,76,.45); white-space:nowrap;
+}
+
+/* ─ Quinconce : 2 bulles à gauche (décalées), 1 à droite centrée ─ */
+/* Gauche haute */
+.sc-bubble--a {
+  left: 6%;
+  top: 22%;
+  animation: bubbleFloat1 7s ease-in-out infinite;
+}
+/* Gauche basse */
+.sc-bubble--b {
+  left: 9%;
+  top: 55%;
+  animation: bubbleFloat2 8.5s ease-in-out infinite;
+}
+/* Droite centrée verticalement */
+.sc-bubble--c {
+  right: 6%;
+  top: 50%;
+  transform: translateY(-50%);
+  animation: bubbleFloat3 7.5s ease-in-out infinite;
+}
+
+@keyframes bubbleFloat1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(5px,-9px)} }
+@keyframes bubbleFloat2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(7px,-6px)} }
+@keyframes bubbleFloat3 { 0%,100%{transform:translateY(-50%)} 50%{transform:translateY(calc(-50% - 8px))} }
+
+@media(max-width:1100px){
+  .sc-bubble-inner { width:84px; height:84px; }
+  .sc-bubble--a { left:4%; top:20%; }
+  .sc-bubble--b { left:6%; top:57%; }
+  .sc-bubble--c { right:4%; }
+}
+@media(max-width:959px){ .sc-bubbles-wrap { display:none; } }
 .sc-top { position:absolute; top:3rem; left:0; right:0; z-index:3; text-align:center; }
 .sc-eyebrow { font-size:.55rem; letter-spacing:.7em; text-transform:uppercase; color:var(--gold); opacity:.8; margin-bottom:1.2rem; }
 .sc-title   { font-family:'Cormorant Garamond',serif; font-weight:300; font-size:clamp(1.4rem,3.5vw,2.5rem); color:rgba(255,255,255,.85); letter-spacing:.08em; }
@@ -1728,12 +1802,75 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
   <section id="showcase">
     <canvas id="sc3d"></canvas>
     <canvas id="sclight"></canvas>
-    <div class="sc-halo-wrap">
-      <div class="sc-pool"></div>
-      <div class="sc-hr sc-hr-4"></div>
-      <div class="sc-hr sc-hr-1"></div>
-      <div class="sc-hr sc-hr-2"></div>
-      <div class="sc-hr sc-hr-3"></div>
+
+    <!-- ── Décoration : bulles composants ──
+         Pour personnaliser les images : placez vos photos dans Images/
+         et nommez-les : fs_volant.jpg · fs_roue.jpg · fs_moteur.jpg
+         Si l'image est absente, l'icône SVG s'affiche automatiquement.
+    ── -->
+    <div class="sc-bubbles-wrap" aria-hidden="true">
+
+      <!-- Gauche haute — Volant -->
+      <div class="sc-bubble sc-bubble--a">
+        <div class="sc-bubble-inner">
+          <img class="sc-bubble-img" src="Images/fs_volant.jpg" alt="Volant"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <svg class="sc-bubble-icon" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="display:none">
+            <circle cx="40" cy="40" r="28" fill="none" stroke="rgba(201,168,76,.75)" stroke-width="5"/>
+            <circle cx="40" cy="40" r="10" fill="none" stroke="rgba(201,168,76,.75)" stroke-width="3"/>
+            <line x1="40" y1="30" x2="40" y2="12" stroke="rgba(201,168,76,.75)" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="30" y1="46" x2="15" y2="58" stroke="rgba(201,168,76,.75)" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="50" y1="46" x2="65" y2="58" stroke="rgba(201,168,76,.75)" stroke-width="3.5" stroke-linecap="round"/>
+            <path d="M12,40 Q11,32 14,27" fill="none" stroke="rgba(201,168,76,.4)" stroke-width="2" stroke-linecap="round"/>
+            <path d="M68,40 Q69,32 66,27" fill="none" stroke="rgba(201,168,76,.4)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="sc-bubble-label">Volant</span>
+      </div>
+
+      <!-- Gauche basse — Roue -->
+      <div class="sc-bubble sc-bubble--b">
+        <div class="sc-bubble-inner">
+          <img class="sc-bubble-img" src="Images/fs_roue.jpg" alt="Roue"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <svg class="sc-bubble-icon" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="display:none">
+            <circle cx="40" cy="40" r="30" fill="none" stroke="rgba(201,168,76,.75)" stroke-width="5"/>
+            <circle cx="40" cy="40" r="18" fill="none" stroke="rgba(201,168,76,.6)" stroke-width="2.5"/>
+            <circle cx="40" cy="40" r="5" fill="rgba(201,168,76,.3)" stroke="rgba(201,168,76,.75)" stroke-width="2"/>
+            <line x1="40" y1="35" x2="40" y2="10" stroke="rgba(201,168,76,.55)" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="40" y1="45" x2="40" y2="70" stroke="rgba(201,168,76,.55)" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="35" y1="40" x2="10" y2="40" stroke="rgba(201,168,76,.55)" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="45" y1="40" x2="70" y2="40" stroke="rgba(201,168,76,.55)" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="36.5" y1="36.5" x2="22" y2="22" stroke="rgba(201,168,76,.4)" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="43.5" y1="43.5" x2="58" y2="58" stroke="rgba(201,168,76,.4)" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="43.5" y1="36.5" x2="58" y2="22" stroke="rgba(201,168,76,.4)" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="36.5" y1="43.5" x2="22" y2="58" stroke="rgba(201,168,76,.4)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="sc-bubble-label">Roue</span>
+      </div>
+
+      <!-- Droite centrée — Moteur -->
+      <div class="sc-bubble sc-bubble--c">
+        <div class="sc-bubble-inner">
+          <img class="sc-bubble-img" src="Images/fs_moteur.jpg" alt="Moteur"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <svg class="sc-bubble-icon" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="display:none">
+            <rect x="22" y="28" width="36" height="28" rx="3" fill="none" stroke="rgba(201,168,76,.75)" stroke-width="2.5"/>
+            <rect x="28" y="18" width="8" height="12" rx="2" fill="none" stroke="rgba(201,168,76,.65)" stroke-width="2"/>
+            <rect x="44" y="18" width="8" height="12" rx="2" fill="none" stroke="rgba(201,168,76,.65)" stroke-width="2"/>
+            <line x1="32" y1="14" x2="32" y2="18" stroke="rgba(201,168,76,.5)" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="48" y1="14" x2="48" y2="18" stroke="rgba(201,168,76,.5)" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="22" y1="42" x2="14" y2="42" stroke="rgba(201,168,76,.75)" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="58" y1="42" x2="66" y2="42" stroke="rgba(201,168,76,.75)" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M34,56 L34,64 Q34,68 40,68 Q46,68 46,64 L46,56" fill="none" stroke="rgba(201,168,76,.5)" stroke-width="2" stroke-linecap="round"/>
+            <rect x="30" y="24" width="4" height="4" fill="rgba(201,168,76,.25)" rx="1"/>
+            <rect x="46" y="24" width="4" height="4" fill="rgba(201,168,76,.25)" rx="1"/>
+          </svg>
+        </div>
+        <span class="sc-bubble-label">Moteur CBR 600</span>
+      </div>
+
     </div>
     <svg class="sc-corner tl" viewBox="0 0 60 60" width="55" height="55" xmlns="http://www.w3.org/2000/svg">
       <path d="M2,58 L2,10 Q2,2 10,2 L58,2" fill="none" stroke="#C9A84C" stroke-width=".8" opacity=".4"/>
@@ -1758,70 +1895,6 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
     </div>
     <svg class="sc-fio-l" style="display:none"></svg>
     <svg class="sc-fio-r" style="display:none"></svg>
-
-    <!-- ── Fiche technique gauche ── -->
-    <div class="sc-specs" id="scSpecs">
-      <div class="sc-specs-header">Fiche technique</div>
-      <div class="sc-spec-wrap">
-        <div class="sc-spine"></div>
-        <div class="sc-specs-list">
-          <div class="sc-spec-item">
-            <span class="sc-spec-label">Châssis</span>
-            <span class="sc-spec-val">Treillis tubulaire</span>
-            <span class="sc-spec-sub">Acier 25CrMo4 · TIG soudé</span>
-          </div>
-          <div class="sc-spec-item">
-            <span class="sc-spec-label">Moteur</span>
-            <span class="sc-spec-val">Honda CBR 600RR</span>
-            <span class="sc-spec-sub">599 cm³ · ~80 ch</span>
-          </div>
-          <div class="sc-spec-item">
-            <span class="sc-spec-label">Suspension</span>
-            <span class="sc-spec-val">Double triangulation</span>
-            <span class="sc-spec-sub">Push-rod · 4 roues indép.</span>
-          </div>
-          <div class="sc-spec-item">
-            <span class="sc-spec-label">Aérodynamique</span>
-            <span class="sc-spec-val">Aileron AV + AR</span>
-            <span class="sc-spec-sub">Diffuseur intégré · NACA 2412</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Annotations composants droite ── -->
-    <div class="sc-annots" id="scAnnots">
-      <div class="sc-annot">
-        <div class="sc-annot-text">
-          <span class="sc-annot-name">Aileron avant</span>
-          <span class="sc-annot-desc">Downforce · appui aérodynamique</span>
-        </div>
-        <div class="sc-annot-connector">
-          <div class="sc-annot-line"></div>
-          <div class="sc-annot-dot"></div>
-        </div>
-      </div>
-      <div class="sc-annot">
-        <div class="sc-annot-text">
-          <span class="sc-annot-name">Monocoque</span>
-          <span class="sc-annot-desc">Structure portante intégrée</span>
-        </div>
-        <div class="sc-annot-connector">
-          <div class="sc-annot-line"></div>
-          <div class="sc-annot-dot"></div>
-        </div>
-      </div>
-      <div class="sc-annot">
-        <div class="sc-annot-text">
-          <span class="sc-annot-name">Diffuseur</span>
-          <span class="sc-annot-desc">Extraction du flux sous caisse</span>
-        </div>
-        <div class="sc-annot-connector">
-          <div class="sc-annot-line"></div>
-          <div class="sc-annot-dot"></div>
-        </div>
-      </div>
-    </div>
 
     <!-- ── Barre basse ── -->
     <div class="sc-bottom-bar" id="scBottom">
@@ -3255,6 +3328,22 @@ document.querySelectorAll('.sk-fg').forEach(el=>ioSk.observe(el));
 
   update();
 
+})();
+
+/* ════ BUBBLES SHOWCASE ══════════════════════════════ */
+(function(){
+  const bubbles = document.querySelectorAll('.sc-bubble');
+  if(!bubbles.length) return;
+  const showcase = document.getElementById('showcase');
+  if(!showcase) return;
+  const io = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        bubbles.forEach((b,i)=>{ setTimeout(()=>b.classList.add('sc-vis'), i*200); });
+      }
+    });
+  },{threshold:.25});
+  io.observe(showcase);
 })();
 
 /* ════ 12. INIT SPOTLIGHT ═══════════════════════════ */
