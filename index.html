@@ -2123,8 +2123,6 @@ function initShowcase() {
     msg.innerHTML=`
       <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.6rem;color:rgba(201,168,76,.65);margin-bottom:.6rem">Pièce non disponible</div>
       <div style="font-family:'Raleway',sans-serif;font-size:.5rem;letter-spacing:.4em;text-transform:uppercase;color:rgba(201,168,76,.3)">Assets/Monoplace.glb introuvable</div>
-      <div style="font-family:'Raleway',sans-serif;font-size:.44rem;letter-spacing:.2em;color:rgba(255,255,255,.15);margin-top:.5rem;padding:0 2rem;text-align:center">Exporter depuis SolidWorks → GLB et déposer dans Assets/</div>
-    `;
     sec.appendChild(msg);
   }
 
@@ -2135,7 +2133,7 @@ function initShowcase() {
     const gltfLoader = new THREE.GLTFLoader();
 
     /* Essaie .glb d'abord, puis .glf (même format GLTF binaire) */
-    const paths = ['Assets/Monoplace.glb', 'Assets/Monoplace.glf', 'Assets/Monoplace.gltf'];
+    const paths = ['Monoplace/Monoplace.gltf', 'Assets/Monoplace.glb', 'Assets/Monoplace.glf'];
     let tried = 0;
 
     function tryNext() {
