@@ -2222,8 +2222,8 @@ function initShowcase() {
   const onMove = e => {
     if(!isDrag) return;
     const s=e.touches?e.touches[0]:e;
-    tRY -= (s.clientX - prev.x) * .012; /* droite → rotation Y négative = tourne vers la droite */
-    tRX -= (s.clientY - prev.y) * .008; /* bas    → rotation X négative = tourne vers le bas   */
+    tRY += (s.clientX - prev.x) * .012; /* droite → tourne vers la droite */
+    tRX += (s.clientY - prev.y) * .008; /* bas    → tourne vers le bas    */
     tRX  = Math.max(-0.9, Math.min(0.9, tRX));
     prev.x=s.clientX; prev.y=s.clientY;
   };
