@@ -1106,6 +1106,7 @@ section { position:relative; overflow:hidden; }
   opacity:0; transition:opacity .35s var(--eout);
   display:flex; flex-direction:column; justify-content:flex-end;
   padding:.9rem 1rem;
+  z-index: 3;
 }
 .tp-card:hover .tp-overlay { opacity:1; }
 .tp-title { font-family:'Cormorant Garamond',serif; font-size:1rem; font-weight:400; color:#fff; line-height:1.2; }
@@ -1116,6 +1117,7 @@ section { position:relative; overflow:hidden; }
   position:absolute; inset:8px; border:1px solid var(--gold);
   opacity:0; transition:opacity .35s, inset .35s var(--eout);
   pointer-events:none;
+  z-index: 4;
 }
 .tp-card:hover .tp-border-hover { opacity:.4; inset:11px; }
 
