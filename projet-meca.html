@@ -1,115 +1,694 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Projet Premium</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Ingénierie — Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,200;0,300;1,200;1,300&family=Raleway:wght@200;300;400&display=swap" rel="stylesheet">
 <style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#0d0d0d}
+body{font-family:'Raleway',sans-serif;font-weight:300;cursor:none;user-select:none}
 
-body{
-  margin:0;
-  background:#0f0d11;
-  color:white;
-  font-family:'Raleway',sans-serif;
+#cur-dot{position:fixed;width:6px;height:6px;background:#fff;border-radius:50%;
+  pointer-events:none;z-index:9999;transform:translate(-50%,-50%);
+  transition:transform .15s,background .25s;mix-blend-mode:difference}
+#cur-ring{position:fixed;width:28px;height:28px;border:1px solid rgba(255,255,255,.35);
+  border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);
+  transition:width .4s,height .4s,border-color .3s;mix-blend-mode:difference}
+body.on-hs #cur-dot{transform:translate(-50%,-50%) scale(2);background:#C9A84C}
+body.on-hs #cur-ring{width:48px;height:48px;border-color:rgba(201,168,76,.6)}
+
+#scene{position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden}
+#bg{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center;
+  transform:scale(1.06);
+  transition:transform 1.4s cubic-bezier(.25,.46,.45,.94),filter 1.2s ease;
+  will-change:transform,filter;
+  pointer-events:none;-webkit-user-drag:none;user-select:none;
 }
-
-.hero{
-  min-height:85vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  padding:4rem;
+body.panel-open #bg{filter:brightness(.15) blur(2px)}
+#vignette{
+  position:absolute;inset:0;pointer-events:none;z-index:2;
   background:
-  radial-gradient(circle at top right, rgba(201,168,76,.15), transparent 40%),
-  radial-gradient(circle at bottom left, rgba(196,154,138,.18), transparent 40%),
-  #0f0d11;
+    radial-gradient(ellipse 85% 70% at 50% 52%,transparent 35%,rgba(0,0,0,.55) 100%),
+    linear-gradient(to bottom,rgba(0,0,0,.5) 0%,transparent 20%,transparent 70%,rgba(0,0,0,.7) 100%)
 }
 
-.hero h1{
-  font-family:'Cormorant Garamond',serif;
-  font-size:5rem;
-  font-weight:300;
+.proj-wrap{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  pointer-events:auto;
+  cursor:none;
+  z-index:6;
 }
 
-.hero p{
-  max-width:700px;
-  margin:auto;
-  line-height:1.8;
-  color:rgba(255,255,255,.7);
-}
-
-.content{
-  max-width:1200px;
-  margin:auto;
-  padding:6rem 2rem;
-}
-
-.section-title{
-  font-family:'Cormorant Garamond',serif;
-  font-size:3rem;
-}
-
-.project-image{
-  width:100%;
-  overflow:hidden;
-  border-radius:14px;
-  margin:3rem 0;
-}
-
-.project-image img{
-  width:100%;
+.proj-wrap img{
   display:block;
+  width:clamp(140px, 18vw, 320px);
+  height:auto;
+  object-fit:contain;
+  -webkit-user-drag:none;
+  user-select:none;
+  pointer-events:none;
+  filter:
+    drop-shadow(0 14px 28px rgba(0,0,0,.85))
+    drop-shadow(0 4px 8px rgba(0,0,0,.6))
+    brightness(.88);
+  transition:transform .4s cubic-bezier(.25,.46,.45,.94), filter .4s ease;
+  transform-origin:center center;
 }
 
-.back-btn{
-  position:fixed;
-  top:30px;
-  left:30px;
-  color:#C9A84C;
-  text-decoration:none;
-  letter-spacing:.3em;
-  text-transform:uppercase;
-  font-size:.7rem;
+.proj-dot{
+  position:absolute;
+  left:50%; top:50%;
+  width:11px;height:11px;
+  background:#C9A84C;border-radius:50%;
+  box-shadow:0 0 0 3px rgba(201,168,76,.18),0 0 14px rgba(201,168,76,.55);
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+  transition:box-shadow .28s;
+  z-index:3;
+}
+.proj-dot-ring{
+  position:absolute;
+  left:50%; top:50%;
+  width:40px;height:40px;
+  border:1px solid rgba(201,168,76,.4);
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+  animation:hs-pulse 2.6s ease-in-out infinite;
+  z-index:2;
+}
+@keyframes hs-pulse{
+  0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.4}
+  50%{transform:translate(-50%,-50%) scale(1.9);opacity:0}
 }
 
+.proj-wrap:hover img{
+  transform:scale(1.1);
+  filter:
+    drop-shadow(0 0 22px rgba(201,168,76,.38))
+    drop-shadow(0 18px 40px rgba(0,0,0,.85))
+    brightness(1.09);
+}
+.proj-wrap:hover .proj-dot{
+  box-shadow:0 0 0 6px rgba(201,168,76,.25),0 0 28px rgba(201,168,76,.8);
+}
+.proj-wrap.active img{
+  transform:scale(1.18);
+  filter:
+    drop-shadow(0 0 38px rgba(201,168,76,.55))
+    drop-shadow(0 0 75px rgba(201,168,76,.2))
+    drop-shadow(0 22px 55px rgba(0,0,0,.9))
+    brightness(1.12);
+}
+.proj-wrap.active .proj-dot{
+  box-shadow:0 0 0 8px rgba(201,168,76,.3),0 0 36px rgba(201,168,76,.9);
+}
+.proj-wrap.active .proj-dot-ring{
+  animation:none;opacity:.7;transform:translate(-50%,-50%) scale(1.3);
+}
+
+#wrap-p1{ left:19%; top:79%; } #wrap-p1 img{ width:clamp(110px,15vw,290px); }
+#wrap-p2{ left:17%; top:57%; } #wrap-p2 img{ width:clamp(120px,11vw,300px); }
+#wrap-p3{ left:71%; top:45%; } #wrap-p3 img{ width:clamp(100px,2vw,260px); }
+#wrap-p4{ left:50%; top:56%; } #wrap-p4 img{ width:clamp(150px,36vw,340px); }
+#wrap-p5{ left:82%; top:73%; } #wrap-p5 img{ width:clamp(200px,46vw,400px); }
+
+/* ── NAV ── */
+#nav{
+  position:absolute;top:0;left:0;right:0;z-index:30;
+  display:flex;align-items:center;justify-content:space-between;padding:26px 42px;
+  transition:opacity .4s,transform .4s;
+}
+body.panel-open #nav{opacity:0;pointer-events:none;transform:translateY(-8px)}
+.nav-back{display:flex;align-items:center;gap:10px;color:rgba(255,255,255,.5);
+  text-decoration:none;font-size:.57rem;letter-spacing:.45em;text-transform:uppercase;transition:color .3s}
+.nav-back::before{content:'';display:block;width:22px;height:1px;background:currentColor;transition:width .35s}
+.nav-back:hover{color:#fff}.nav-back:hover::before{width:38px}
+.nav-title{font-family:'Cormorant Garamond',serif;font-size:clamp(.9rem,1.5vw,1.15rem);
+  font-weight:200;color:rgba(255,255,255,.65);letter-spacing:.25em;text-transform:uppercase}
+.nav-hint{font-size:.52rem;letter-spacing:.4em;text-transform:uppercase;
+  color:rgba(255,255,255,.28);animation:pulse 3.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.28}50%{opacity:.65}}
+
+/* ── HOTSPOTS TOOLTIP ── */
+.hotspot{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  cursor:none;
+  z-index:35;
+  pointer-events:none;
+}
+#hs-p1{ left:19%; top:67%; }
+#hs-p2{ left:30%; top:52%; }
+#hs-p3{ left:70%; top:52%; }
+#hs-p4{ left:50%; top:60%; }
+#hs-p5{ left:85%; top:80%; }
+
+body.panel-open .hotspot{pointer-events:none}
+.hs-label{
+  position:absolute;
+  bottom:calc(100% + 18px);left:50%;
+  transform:translateX(-50%) translateY(8px);
+  background:rgba(5,4,4,.9);
+  border:1px solid rgba(255,255,255,.07);
+  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  padding:12px 20px 13px;min-width:168px;white-space:nowrap;text-align:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .22s,transform .22s,border-color .25s;
+  z-index:50;
+}
+.hotspot.show-label .hs-label{
+  opacity:1;transform:translateX(-50%) translateY(0);border-color:rgba(201,168,76,.3)
+}
+.hotspot.active-label .hs-label{
+  border-color:rgba(201,168,76,.7);opacity:1;transform:translateX(-50%) translateY(0)
+}
+.hs-label::after{
+  content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  border:5px solid transparent;border-top-color:rgba(201,168,76,.5);
+}
+.hs-ltag{font-size:.47rem;letter-spacing:.44em;text-transform:uppercase;color:#C9A84C;display:block;margin-bottom:5px}
+.hs-lname{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:300;color:#F0EFED;line-height:1.2;display:block}
+.hs-lyear{font-size:.44rem;color:rgba(240,239,237,.25);letter-spacing:.25em;margin-top:4px;display:block;text-transform:uppercase}
+
+/* ── BACKDROP ── */
+#backdrop{
+  display:none;position:fixed;inset:0;z-index:50;cursor:pointer;background:transparent;
+}
+body.panel-open #backdrop{display:block}
+
+/* ══════════════════════════════════════
+   PANELS
+══════════════════════════════════════ */
+#panel-right{
+  position:fixed;top:0;right:0;
+  width:min(760px,100vw);height:100vh;
+  z-index:100;display:flex;flex-direction:row;
+  transform:translateX(105%);
+  transition:transform .65s cubic-bezier(.76,0,.24,1);
+  pointer-events:none;
+}
+body.panel-open.open-right #panel-right{transform:translateX(0);pointer-events:auto}
+
+#panel-left{
+  position:fixed;top:0;left:0;
+  width:min(760px,100vw);height:100vh;
+  z-index:100;display:flex;flex-direction:row-reverse;
+  transform:translateX(-105%);
+  transition:transform .65s cubic-bezier(.76,0,.24,1);
+  pointer-events:none;
+}
+body.panel-open.open-left #panel-left{transform:translateX(0);pointer-events:auto}
+
+#panel-center-media{
+  position:fixed;top:0;left:0;
+  width:min(300px,30vw);height:100vh;
+  z-index:100;background:#0c0b0b;
+  transform:translateX(-105%);
+  transition:transform .65s cubic-bezier(.76,0,.24,1);
+  pointer-events:none;overflow:hidden;
+}
+body.panel-open.open-center #panel-center-media{transform:translateX(0);pointer-events:auto}
+
+#panel-center-text{
+  position:fixed;top:0;right:0;
+  width:min(360px,32vw);height:100vh;
+  z-index:100;background:#F0EFED;
+  transform:translateX(105%);
+  transition:transform .65s cubic-bezier(.76,0,.24,1);
+  pointer-events:none;
+  overflow-y:auto;scrollbar-width:none;
+}
+#panel-center-text::-webkit-scrollbar{display:none}
+body.panel-open.open-center #panel-center-text{transform:translateX(0);pointer-events:auto}
+
+.panel-media{flex-shrink:0;background:#0c0b0b;position:relative;overflow:hidden;}
+#panel-right .panel-media,#panel-left .panel-media{width:44%;height:100%}
+.panel-text{flex-shrink:0;background:#F0EFED;overflow-y:auto;scrollbar-width:none;position:relative;}
+#panel-right .panel-text,#panel-left .panel-text{width:56%;height:100%}
+.panel-text::-webkit-scrollbar{display:none}
+
+/* ── CAROUSEL ── */
+.carousel{position:absolute;inset:0}
+.car-slide{position:absolute;inset:0;opacity:0;transition:opacity .7s ease}
+.car-slide.active{opacity:1}
+.car-slide img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;-webkit-user-drag:none}
+.car-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#0e0d0d}
+.car-ph svg{width:44%;height:44%}
+.car-dots{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:5}
+.car-dot-btn{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.25);cursor:pointer;
+  transition:background .3s,transform .3s;border:none;padding:0}
+.car-dot-btn.active{background:#C9A84C;transform:scale(1.5)}
+.car-arrow{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:38px;height:38px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  color:#fff;font-size:.95rem;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;z-index:5;transition:background .3s,border-color .3s;
+}
+.car-arrow:hover{background:rgba(201,168,76,.2);border-color:rgba(201,168,76,.5)}
+.car-prev{left:12px}.car-next{right:12px}
+.car-count{position:absolute;top:14px;right:14px;font-size:.49rem;letter-spacing:.35em;color:rgba(255,255,255,.32)}
+
+/* ══════════════════════════════════════
+   CONTENU PANEL TEXTE
+══════════════════════════════════════ */
+.panel-inner{
+  padding:48px 40px 52px 36px;
+  min-height:100%;display:flex;flex-direction:column;position:relative;
+}
+.pt-bar{width:100%;height:3px;
+  background:linear-gradient(90deg,#C9A84C 0%,rgba(201,168,76,.12) 100%);
+  margin-bottom:36px;flex-shrink:0}
+.pt-number{
+  font-family:'Cormorant Garamond',serif;
+  font-size:5.5rem;font-weight:200;line-height:1;
+  color:rgba(201,168,76,.1);letter-spacing:-.04em;
+  position:absolute;top:28px;right:30px;
+  pointer-events:none;user-select:none;
+}
+.pt-tag{font-size:.46rem;letter-spacing:.52em;text-transform:uppercase;
+  color:#C9A84C;display:inline-block;margin-bottom:14px}
+.pt-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(1.5rem,2.4vw,2.4rem);
+  font-weight:200;line-height:1.0;letter-spacing:-.02em;color:#0f0d11;margin-bottom:4px;
+}
+.pt-title em{font-style:italic;color:rgba(15,13,17,.32)}
+.pt-meta{display:flex;align-items:center;gap:14px;margin-bottom:28px;margin-top:8px}
+.pt-year{font-size:.48rem;letter-spacing:.42em;color:rgba(15,13,17,.28);text-transform:uppercase}
+.pt-meta-line{flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,.45),transparent)}
+.pt-sections{flex:1}
+.pt-section{display:grid;grid-template-columns:2.2rem 1fr;gap:0 14px;margin-bottom:22px;align-items:start}
+.pt-section-num{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.8rem;font-weight:200;color:rgba(201,168,76,.22);
+  line-height:1;padding-top:2px;text-align:right;
+}
+.pt-heading{
+  font-family:'Cormorant Garamond',serif;
+  font-size:.9rem;font-weight:300;color:#0f0d11;
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;
+  display:flex;align-items:center;gap:10px;
+}
+.pt-heading::after{content:'';flex:0 0 18px;height:1px;background:rgba(201,168,76,.4)}
+.pt-body{font-size:.76rem;line-height:1.9;color:rgba(15,13,17,.5)}
+.pt-pills-wrap{margin-top:24px;padding-top:18px;border-top:1px solid rgba(15,13,17,.08)}
+.pt-pills-label{font-size:.42rem;letter-spacing:.5em;text-transform:uppercase;
+  color:rgba(15,13,17,.22);margin-bottom:10px;display:block}
+.pt-pills{display:flex;flex-wrap:wrap;gap:6px}
+.pt-pill{
+  padding:.2rem .72rem;border:1px solid rgba(15,13,17,.1);
+  font-size:.45rem;letter-spacing:.28em;text-transform:uppercase;color:rgba(15,13,17,.32);
+  transition:border-color .3s,color .3s,background .3s;cursor:default;
+}
+.pt-pill:hover{border-color:rgba(201,168,76,.5);color:#0f0d11;background:rgba(201,168,76,.06)}
+.panel-close{
+  position:absolute;top:16px;right:16px;
+  width:30px;height:30px;
+  background:none;border:1px solid rgba(15,13,17,.12);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:border-color .3s,background .3s;z-index:10;
+}
+.panel-close:hover{background:rgba(15,13,17,.06);border-color:rgba(15,13,17,.4)}
+.panel-close svg{width:10px;height:10px;stroke:#0f0d11;stroke-width:1.6;fill:none}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .proj-wrap img{width:clamp(100px,22vw,200px)}
+  #wrap-p1{ left:17%; top:65%; }
+  #wrap-p2{ left:31%; top:50%; }
+  #wrap-p3{ left:69%; top:50%; }
+  #wrap-p4{ left:50%; top:61%; }
+  #wrap-p5{ left:83%; top:65%; }
+  #hs-p1{ left:19%; top:67%; }
+  #hs-p2{ left:30%; top:52%; }
+  #hs-p3{ left:70%; top:52%; }
+  #hs-p4{ left:50%; top:60%; }
+  #hs-p5{ left:85%; top:80%; }
+
+  #panel-right,#panel-left{
+    width:100vw;height:78vh;top:auto;bottom:0;left:0;right:0;
+    flex-direction:column;
+    transform:translateY(105%)!important;
+    transition:transform .6s cubic-bezier(.76,0,.24,1);
+  }
+  body.panel-open.open-right #panel-right,
+  body.panel-open.open-left #panel-left{transform:translateY(0)!important;pointer-events:auto}
+  #panel-right .panel-media,#panel-left .panel-media{width:100%;height:46%}
+  #panel-right .panel-text,#panel-left .panel-text{width:100%;height:54%}
+  #panel-center-media{
+    width:100vw;height:40vh;top:auto;bottom:58vh;left:0;
+    transform:translateY(300%)!important;
+  }
+  #panel-center-text{
+    width:100vw;height:58vh;top:auto;bottom:0;left:0;right:auto;
+    transform:translateY(200%)!important;
+  }
+  body.panel-open.open-center #panel-center-media,
+  body.panel-open.open-center #panel-center-text{transform:translateY(0)!important;pointer-events:auto}
+  #nav{padding:16px 20px}.nav-hint{display:none}
+  .pt-number{font-size:3rem;top:12px;right:14px}
+  .panel-inner{padding:28px 22px 36px 20px}
+}
+
+#loader{position:fixed;inset:0;background:#0d0d0d;z-index:9000;pointer-events:none;transition:opacity 1.2s ease}
+#loader.done{opacity:0}
 </style>
 </head>
-
 <body>
 
-<a href="index_final_modifie.html" class="back-btn">Retour</a>
+<div id="cur-dot"></div>
+<div id="cur-ring"></div>
+<div id="loader"></div>
+<div id="backdrop" onclick="closePanel()"></div>
 
-<section class="hero">
-<div>
-<h1>Nom du Projet</h1>
-<p>
-Ajoute ici la présentation complète du projet.
-</p>
+<div id="scene">
+  <img id="bg" src="Images/fond_inge.png" alt="" draggable="false">
+  <div id="vignette"></div>
+
+  <!-- p1 — table basse gauche -->
+  <div class="proj-wrap" id="wrap-p1">
+    <img id="img-p1" src="Images/projet_1.png" alt="">
+    <div class="proj-dot-ring"></div>
+    <div class="proj-dot"></div>
+  </div>
+  <!-- p2 — étagère gauche -->
+  <div class="proj-wrap" id="wrap-p2">
+    <img id="img-p2" src="Images/projet_2.png" alt="">
+    <div class="proj-dot-ring"></div>
+    <div class="proj-dot"></div>
+  </div>
+  <!-- p3 — étagère droite -->
+  <div class="proj-wrap" id="wrap-p3">
+    <img id="img-p3" src="Images/projet_3.png" alt="">
+    <div class="proj-dot-ring"></div>
+    <div class="proj-dot"></div>
+  </div>
+  <!-- p4 — podium central -->
+  <div class="proj-wrap" id="wrap-p4">
+    <img id="img-p4" src="Images/projet_4.png" alt="">
+    <div class="proj-dot-ring"></div>
+    <div class="proj-dot"></div>
+  </div>
+  <!-- p5 — table basse droite -->
+  <div class="proj-wrap" id="wrap-p5">
+    <img id="img-p5" src="Images/projet_5.png" alt="">
+    <div class="proj-dot-ring"></div>
+    <div class="proj-dot"></div>
+  </div>
+
+  <nav id="nav">
+    <a href="index.html" class="nav-back">Retour au portfolio</a>
+    <span class="nav-title">Mes projets -- Ingénierie</span>
+  </nav>
+
+  <!-- HOTSPOTS -->
+  <div class="hotspot" id="hs-p1">
+    <div class="hs-label">
+      <span class="hs-ltag">TIPE · 2024</span>
+      <span class="hs-lname">Étude Modale<br>de plaques minces</span>
+      <span class="hs-lyear">Mécanique des structures</span>
+    </div>
+  </div>
+  <div class="hotspot" id="hs-p2">
+    <div class="hs-label">
+      <span class="hs-ltag">TIPE · 2023</span>
+      <span class="hs-lname">Hystérésis<br>dans un transformateur</span>
+      <span class="hs-lyear">Physique appliquée</span>
+    </div>
+  </div>
+  <div class="hotspot" id="hs-p4">
+    <div class="hs-label">
+      <span class="hs-ltag">Formula Student · 2026</span>
+      <span class="hs-lname">Monoplace<br>de notre équipe BFS</span>
+      <span class="hs-lyear">Association étudiante</span>
+    </div>
+  </div>
+  <div class="hotspot" id="hs-p3">
+    <div class="hs-label">
+      <span class="hs-ltag">STI2D · 2022</span>
+      <span class="hs-lname">Carrelet<br>motorisé</span>
+      <span class="hs-lyear">Projet terminal</span>
+    </div>
+  </div>
+  <div class="hotspot" id="hs-p5">
+    <div class="hs-label">
+      <span class="hs-ltag">ENSAM · 2025</span>
+      <span class="hs-lname">Convoyage<br>de Sable dans un ilot fonderie</span>
+      <span class="hs-lyear"> Projet ELF · Usine 4.0</span>
+    </div>
+  </div>
+
+</div><!-- /scene -->
+
+<!-- PANEL DROITE (p1, p2) -->
+<div id="panel-right" onclick="event.stopPropagation()">
+  <div class="panel-media">
+    <div class="carousel" id="carousel-right"></div>
+    <button class="car-arrow car-prev" onclick="carPrev()">&#8592;</button>
+    <button class="car-arrow car-next" onclick="carNext()">&#8594;</button>
+    <div class="car-dots" id="car-dots-right"></div>
+    <div class="car-count" id="car-count-right"></div>
+  </div>
+  <div class="panel-text" id="panel-text-right">
+    <div class="panel-inner"></div>
+  </div>
 </div>
-</section>
 
-<section class="content">
-
-<h2 class="section-title">Présentation</h2>
-<p>
-Lorem ipsum dolor sit amet.
-</p>
-
-<div class="project-image">
-<img src="Images/projet.jpg">
+<!-- PANEL GAUCHE (p3, p5) -->
+<div id="panel-left" onclick="event.stopPropagation()">
+  <div class="panel-media">
+    <div class="carousel" id="carousel-left"></div>
+    <button class="car-arrow car-prev" onclick="carPrev()">&#8592;</button>
+    <button class="car-arrow car-next" onclick="carNext()">&#8594;</button>
+    <div class="car-dots" id="car-dots-left"></div>
+    <div class="car-count" id="car-count-left"></div>
+  </div>
+  <div class="panel-text" id="panel-text-left">
+    <div class="panel-inner"></div>
+  </div>
 </div>
 
-<h2 class="section-title">Conception</h2>
-<p>
-Lorem ipsum dolor sit amet.
-</p>
+<!-- PANEL CENTRE MÉDIA (p4) -->
+<div id="panel-center-media" onclick="event.stopPropagation()">
+  <div class="carousel" id="carousel-center" style="position:absolute;inset:0"></div>
+  <button class="car-arrow car-prev" onclick="carPrev()">&#8592;</button>
+  <button class="car-arrow car-next" onclick="carNext()">&#8594;</button>
+  <div class="car-dots" id="car-dots-center"></div>
+  <div class="car-count" id="car-count-center"></div>
+</div>
 
-</section>
+<!-- PANEL CENTRE TEXTE (p4) -->
+<div id="panel-center-text" onclick="event.stopPropagation()">
+  <div class="panel-inner" id="panel-text-center-inner"></div>
+</div>
 
+<script>
+const SVG={
+  p1:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#C9A84C" stroke-width="1.1"><path d="M15 35 L65 35 L72 50 L22 50Z" fill="rgba(201,168,76,.07)" stroke-width="1.2"/><path d="M15 35 L15 25 L65 25 L65 35" fill="rgba(201,168,76,.05)"/><path d="M20 30 Q27 22 34 30 Q41 38 48 30 Q55 22 62 30" stroke="rgba(201,168,76,.7)" stroke-width=".9" fill="none"/></svg>`,
+  p2:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#C9A84C" stroke-width="1.1"><rect x="22" y="18" width="14" height="44" fill="rgba(201,168,76,.07)"/><rect x="44" y="18" width="14" height="44" fill="rgba(201,168,76,.07)"/><rect x="18" y="16" width="44" height="8" fill="rgba(201,168,76,.07)"/><rect x="18" y="56" width="44" height="8" fill="rgba(201,168,76,.07)"/><path d="M36 55 Q30 45 34 35 Q38 25 44 30 Q50 35 46 45 Q42 55 36 55Z" stroke="rgba(201,168,76,.6)" stroke-width=".8" fill="rgba(201,168,76,.04)"/></svg>`,
+  p3:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#C9A84C" stroke-width="1.1"><rect x="20" y="28" width="40" height="26" rx="1" fill="rgba(201,168,76,.06)" stroke-width="1.2"/><line x1="20" y1="28" x2="60" y2="54" stroke="rgba(201,168,76,.45)" stroke-width=".7" stroke-dasharray="2 2"/><line x1="60" y1="28" x2="20" y2="54" stroke="rgba(201,168,76,.45)" stroke-width=".7" stroke-dasharray="2 2"/><circle cx="40" cy="18" r="6" fill="rgba(201,168,76,.08)" stroke-width="1.2"/><line x1="40" y1="24" x2="40" y2="28"/><line x1="20" y1="28" x2="20" y2="18"/><line x1="20" y1="18" x2="34" y2="18"/><line x1="60" y1="28" x2="60" y2="18"/><line x1="60" y1="18" x2="46" y2="18"/><polyline points="14,68 14,62 18,62 18,68 22,68 22,62 26,62 26,68" stroke="rgba(201,168,76,.7)" stroke-width=".9" fill="none"/></svg>`,
+  p4:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#C9A84C" stroke-width="1.1"><path d="M12 48 Q18 30 30 26 L52 24 Q66 24 70 34 L70 48Z" fill="rgba(201,168,76,.08)" stroke-width="1.3"/><circle cx="22" cy="50" r="8" fill="rgba(201,168,76,.06)" stroke-width="1.3"/><circle cx="22" cy="50" r="4" fill="rgba(201,168,76,.1)" stroke-width=".8"/><circle cx="60" cy="50" r="8" fill="rgba(201,168,76,.06)" stroke-width="1.3"/><circle cx="60" cy="50" r="4" fill="rgba(201,168,76,.1)" stroke-width=".8"/><text x="40" y="44" text-anchor="middle" font-family="serif" font-size="10" fill="rgba(201,168,76,.7)" stroke="none">FS</text></svg>`,
+  p5:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#C9A84C" stroke-width="1.1"><line x1="12" y1="62" x2="68" y2="28" stroke-width="1.4"/><line x1="12" y1="56" x2="68" y2="22" stroke-width="1.4"/><circle cx="30" cy="52" r="2" fill="rgba(201,168,76,.35)"/><circle cx="40" cy="46" r="1.5" fill="rgba(201,168,76,.3)"/><circle cx="50" cy="40" r="2" fill="rgba(201,168,76,.35)"/></svg>`
+};
+
+const PROJECTS={
+  p1:{position:'right',number:'01',tag:'TIPE 2 · Mécanique des structures',title:'Étude Modale',titleEm:'Plaque de Faible Épaisseur',year:'2024',
+    images:['Images/projet_1.jpg','Images/projet_1b.jpg'],
+    sections:[
+      {h:'Problématique',t:`Analyse des modes propres de vibration d'une plaque rectangulaire mince en acier. Comparer les fréquences propres expérimentales aux prédictions analytiques (Kirchhoff) et numériques (EF).`},
+      {h:'Protocole',t:`Excitation par pot vibrant, mesure par accéléromètres triaxiaux et vélocimétrie laser (LDV). Modélisation éléments finis sous ANSYS Mechanical.`},
+      {h:'Résultats',t:`6 premiers modes identifiés avec un écart < 4 % entre mesure et simulation. Influence du rapport d'aspect sur la densité modale mise en évidence. Présenté aux oraux CPGE.`}
+    ],tags:['TIPE','Analyse modale','ANSYS','LDV','Kirchhoff','CPGE']},
+  p2:{position:'right',number:'02',tag:'TIPE 1 · Physique appliquée',title:'Pertes par Hystérésis',titleEm:'Transformateur de Cordeuse',year:'2023',
+    images:['Images/projet_2.jpg','Images/projet_2b.jpg'],
+    sections:[
+      {h:'Problématique',t:`TIPE portant sur la caractérisation des pertes fer par hystérésis dans le transformateur d'une cordeuse de raquette. Enjeu : quantifier ces pertes pour améliorer le rendement énergétique.`},
+      {h:'Méthode',t:`Traçage du cycle B-H par oscilloscope numérique, mesure des pertes de Foucault et par hystérésis via la méthode de Steinmetz. Comparaison avec un modèle numérique Python.`},
+      {h:'Résultats',t:`Pertes fer évaluées à 8 % de la puissance nominale. Proposition d'un matériau alternatif (ferrite nanocristalline) réduisant les pertes de 35 %. Oral CPGE validé.`}
+    ],tags:['TIPE','Électromagnétisme','Python','Oscilloscope','Steinmetz','CPGE']},
+  p3:{position:'left',number:'03',tag:'Projet Terminal · STI2D',title:'Carrelet de Pêche',titleEm:'Motorisé & Automatisé',year:'2022',
+    images:['Images/projet_3.jpg','Images/projet_3b.jpg'],
+    sections:[
+      {h:'Contexte',t:`Projet de terminale STI2D portant sur la motorisation et l'automatisation d'un carrelet de pêche traditionnel. L'objectif était de concevoir un système permettant la montée et la descente automatique du filet, en supprimant l'effort manuel de manivelle, tout en intégrant une gestion électronique embarquée.`},
+      {h:'Maquette & Partie mécanique',t:`Conception et réalisation d'une maquette fonctionnelle à l'échelle : structure porteuse en bois, système de treuil avec tambour d'enroulement du câble, transmission par courroie crantée. Modélisation 3D sous SolidWorks, fabrication en atelier (découpe, assemblage, câblage mécanique).`},
+      {h:'Partie électronique — Hacheur',t:`Conception d'une carte de commande pour le pilotage d'un moteur à courant continu par hacheur série (MLI). Le pont en H à MOSFET permet le contrôle du sens de rotation (montée/descente du filet) et de la vitesse via un signal PWM généré par microcontrôleur Arduino. Dimensionnement du hacheur, calcul des pertes en commutation, protection par diodes de roue libre.`}
+    ],tags:['STI2D','Hacheur MLI','Moteur CC','Arduino','SolidWorks','Électronique de puissance','Maquette']},
+  p4:{position:'center',number:'04',tag:"Formula Student · Projet d'équipe",title:"Construction d'une",titleEm:'Monoplace Formula Student',year:'2026',
+    images:['Images/projet_4.jpg','Images/projet_4b.jpg','Images/projet_4c.jpg'],
+    sections:[
+      {h:'Contexte',t:`Compétition Formula Student au sein d'une équipe de vingt étudiants. Conception et fabrication complète d'une monoplace thermique, de l'avant-projet à l'homologation.`},
+      {h:'Rôle',t:`Responsable du châssis tubulaire 25CrMo4 : analyse des charges, calcul de rigidité torsionnelle par EF (SolidWorks Simulation), optimisation masse/rigidité. Soudage TIG, assemblage général.`},
+      {h:'Résultats',t:`Monoplace homologuée et mise en piste. Top 15 des épreuves statiques (Business Plan, Engineering Design). Gestion de projet industriel en conditions réelles.`}
+    ],tags:['Formula Student','Châssis','SolidWorks','FEA','Soudage TIG','Gestion de projet']},
+  p5:{position:'left',number:'05',tag:'ELF · Usine 4.0 · ENSAM',title:'Système de Convoyage',titleEm:'de Sable',year:'2025',
+    images:['Images/projet_5.jpg','Images/projet_5b.jpg'],
+    sections:[
+      {h:'Contexte',t:`Projet industriel ELF (ENSAM). Concevoir un système de convoyage automatisé de sable de fonderie pour une ligne de moulage Usine 4.0.`},
+      {h:'Conception',t:`Dimensionnement d'un convoyeur à bande incliné (2 t/h, pente 20°), choix du motoréducteur et variateur, châssis soudé, intégration d'un API Schneider.`},
+      {h:'Résultats',t:`Dossier de conception complet : plans, nomenclature, note de calcul, programme API. Prototype 1/3 fabriqué en atelier. Projet évalué avec mention.`}
+    ],tags:['ENSAM','Usine 4.0','API Schneider','Convoyeur','Mécanique','Automatisme']}
+};
+
+let currentId=null,carIdx=0,carLen=0,currentCarouselEl=null,currentDotsEl=null,currentCountEl=null;
+
+/* ═══════ CURSEUR ═══════ */
+const curDot=document.getElementById('cur-dot');
+const curRing=document.getElementById('cur-ring');
+let mx=-200,my=-200,rx=-200,ry=-200;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+(function tick(){
+  curDot.style.left=mx+'px';curDot.style.top=my+'px';
+  rx+=(mx-rx)*.13;ry+=(my-ry)*.13;
+  curRing.style.left=rx+'px';curRing.style.top=ry+'px';
+  requestAnimationFrame(tick);
+})();
+const bgEl=document.getElementById('bg');
+bgEl.addEventListener('dragstart',e=>e.preventDefault());
+bgEl.addEventListener('mousedown',e=>e.preventDefault());
+
+/* ═══════ EVENTS WRAPS ═══════ */
+['p1','p2','p3','p4','p5'].forEach(id=>{
+  const wrap=document.getElementById('wrap-'+id);
+  const hs=document.getElementById('hs-'+id);
+  if(!wrap) return;
+  wrap.addEventListener('mouseenter',()=>{
+    document.body.classList.add('on-hs');
+    if(hs) hs.classList.add('show-label');
+  });
+  wrap.addEventListener('mouseleave',()=>{
+    document.body.classList.remove('on-hs');
+    if(hs) hs.classList.remove('show-label');
+  });
+  wrap.addEventListener('click',()=>openPanel(id));
+});
+
+/* ═══════ OPEN PANEL ═══════ */
+function openPanel(id){
+  const p=PROJECTS[id];if(!p)return;
+  if(currentId===id){closePanel();return;}
+  if(currentId)_closePanelState();
+  currentId=id;
+  document.querySelectorAll('.hotspot').forEach(h=>h.classList.remove('active-label'));
+  document.getElementById('hs-'+id)?.classList.add('active-label');
+  document.querySelectorAll('.proj-wrap').forEach(w=>w.classList.remove('active'));
+  document.getElementById('wrap-'+id)?.classList.add('active');
+  if(p.position==='right'){
+    currentCarouselEl=document.getElementById('carousel-right');
+    currentDotsEl=document.getElementById('car-dots-right');
+    currentCountEl=document.getElementById('car-count-right');
+    buildCarousel(id,p);
+    buildText(id,p,document.querySelector('#panel-text-right .panel-inner'));
+    document.body.classList.add('panel-open','open-right');
+  }else if(p.position==='left'){
+    currentCarouselEl=document.getElementById('carousel-left');
+    currentDotsEl=document.getElementById('car-dots-left');
+    currentCountEl=document.getElementById('car-count-left');
+    buildCarousel(id,p);
+    buildText(id,p,document.querySelector('#panel-text-left .panel-inner'));
+    document.body.classList.add('panel-open','open-left');
+  }else{
+    currentCarouselEl=document.getElementById('carousel-center');
+    currentDotsEl=document.getElementById('car-dots-center');
+    currentCountEl=document.getElementById('car-count-center');
+    buildCarousel(id,p);
+    buildText(id,p,document.getElementById('panel-text-center-inner'));
+    document.body.classList.add('panel-open','open-center');
+  }
+}
+
+function buildCarousel(id,p){
+  carIdx=0;const imgs=p.images||[];carLen=Math.max(imgs.length,1);
+  currentCarouselEl.innerHTML='';currentDotsEl.innerHTML='';
+  if(!imgs.length){
+    const s=document.createElement('div');s.className='car-slide active';
+    const ph=document.createElement('div');ph.className='car-ph';ph.innerHTML=SVG[id]||'';
+    s.appendChild(ph);currentCarouselEl.appendChild(s);
+  }else{
+    imgs.forEach((src,i)=>{
+      const s=document.createElement('div');s.className='car-slide'+(i===0?' active':'');
+      const im=document.createElement('img');im.src=src;im.alt=p.title+' '+(i+1);
+      im.loading=i===0?'eager':'lazy';im.setAttribute('draggable','false');
+      im.onerror=function(){this.remove();const ph=document.createElement('div');ph.className='car-ph';ph.innerHTML=SVG[id]||'';s.appendChild(ph);};
+      s.appendChild(im);currentCarouselEl.appendChild(s);
+      const d=document.createElement('button');d.className='car-dot-btn'+(i===0?' active':'');
+      d.setAttribute('aria-label','Slide '+(i+1));d.onclick=()=>goSlide(i);currentDotsEl.appendChild(d);
+    });
+  }
+  updateCount();
+  currentCarouselEl._tx0=0;
+  currentCarouselEl.addEventListener('touchstart',e=>{currentCarouselEl._tx0=e.touches[0].clientX;},{passive:true});
+  currentCarouselEl.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-currentCarouselEl._tx0;if(Math.abs(dx)>40)dx<0?carNext():carPrev();},{passive:true});
+}
+
+function buildText(id,p,container){
+  let s='';
+  p.sections.forEach((sec,i)=>{
+    s+=`<div class="pt-section"><span class="pt-section-num">0${i+1}</span><div><h3 class="pt-heading">${sec.h}</h3><p class="pt-body">${sec.t}</p></div></div>`;
+  });
+  container.innerHTML=`
+    <button class="panel-close" onclick="closePanel()"><svg viewBox="0 0 14 14"><line x1="1" y1="1" x2="13" y2="13"/><line x1="13" y1="1" x2="1" y2="13"/></svg></button>
+    <div class="pt-bar"></div>
+    <span class="pt-number">${p.number}</span>
+    <span class="pt-tag">${p.tag}</span>
+    <h2 class="pt-title">${p.title}${p.titleEm?'<br><em>'+p.titleEm+'</em>':''}</h2>
+    <div class="pt-meta"><span class="pt-year">${p.year}</span><div class="pt-meta-line"></div></div>
+    <div class="pt-sections">${s}</div>
+    <div class="pt-pills-wrap">
+      <span class="pt-pills-label">Technologies &amp; Compétences</span>
+      <div class="pt-pills">${p.tags.map(t=>`<span class="pt-pill">${t}</span>`).join('')}</div>
+    </div>`;
+  const scrollEl=container.closest('.panel-text')||container.closest('#panel-center-text');
+  if(scrollEl)scrollEl.scrollTop=0;
+}
+
+function _closePanelState(){
+  document.body.classList.remove('panel-open','open-right','open-left','open-center');
+  document.querySelectorAll('.hotspot').forEach(h=>h.classList.remove('active-label','show-label'));
+  document.querySelectorAll('.proj-wrap').forEach(w=>w.classList.remove('active'));
+  document.body.classList.remove('on-hs');
+  currentId=null;
+}
+function closePanel(){_closePanelState();}
+
+function goSlide(n){
+  const slides=currentCarouselEl.querySelectorAll('.car-slide');
+  const dots=currentDotsEl.querySelectorAll('.car-dot-btn');
+  slides[carIdx]?.classList.remove('active');dots[carIdx]?.classList.remove('active');
+  carIdx=((n%carLen)+carLen)%carLen;
+  slides[carIdx]?.classList.add('active');dots[carIdx]?.classList.add('active');
+  updateCount();
+}
+function carPrev(){goSlide(carIdx-1);}
+function carNext(){goSlide(carIdx+1);}
+function updateCount(){if(currentCountEl)currentCountEl.textContent=carLen>1?(carIdx+1)+' / '+carLen:'';}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closePanel();
+  if(currentId){if(e.key==='ArrowLeft')carPrev();if(e.key==='ArrowRight')carNext();}
+});
+
+document.addEventListener('mousemove',e=>{
+  if(document.body.classList.contains('panel-open'))return;
+  const dx=(e.clientX/window.innerWidth-.5)*1.8;
+  const dy=(e.clientY/window.innerHeight-.5)*1.1;
+  bgEl.style.transform=`scale(1.06) translate(${dx}%,${dy}%)`;
+},{passive:true});
+
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    const l=document.getElementById('loader');
+    l.classList.add('done');
+    setTimeout(()=>l.remove(),1400);
+  },120);
+});
+</script>
 </body>
 </html>
