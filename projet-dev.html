@@ -95,7 +95,6 @@ html, body {
   transform-origin: 50% 90%;
 }
 
-/* ── HOVER pixel-perfect — piloté par la classe .is-hovered ajoutée en JS ── */
 .hs.is-hovered .hs-img {
   opacity: 0.4 !important;
   transform: scale(1.06);
@@ -153,7 +152,6 @@ html, body {
   font-family:'Crimson Pro',serif; font-size:.78rem; font-style:italic;
   color:var(--parch-dk); display:block; margin-top:2px; text-align:center;
 }
-/* Banner visible uniquement quand .is-hovered */
 .hs.is-hovered .hs-banner { opacity:1; transform:translateX(-50%) translateY(0); }
 
 /* ── HUD TOP ── */
@@ -269,12 +267,12 @@ html, body {
 </head>
 <body>
 
-<!-- LOADING 
+<!-- LOADING -->
 <div id="loading">
   <div class="ld-crest">🏰</div>
   <div><div class="ld-title">Cité des Créateurs</div><div class="ld-sub">Initialisation du monde…</div></div>
   <div class="ld-bar"><div class="ld-fill"></div></div>
-</div>-->
+</div>
 
 <!-- WORLD plein écran -->
 <div id="world">
@@ -437,14 +435,12 @@ window.addEventListener('resize', resizeCanvases);
 
 /* ── HOTSPOT INTERACTIONS — pixel-perfect ── */
 const hsEls = Array.from(document.querySelectorAll('.hs'));
-
-/* Cache de canvas offscreen par hotspot : on lit le canal alpha à la position du curseur */
 const alphaCache = new Map();
 
 function loadAlphaCanvas(el) {
   if (alphaCache.has(el)) return alphaCache.get(el);
-  const img  = el.querySelector('.hs-img');
-  const cv   = document.createElement('canvas');
+  const img   = el.querySelector('.hs-img');
+  const cv    = document.createElement('canvas');
   const entry = { canvas: cv, ctx: cv.getContext('2d'), ready: false };
   alphaCache.set(el, entry);
   const image = new Image();
@@ -459,13 +455,11 @@ function loadAlphaCanvas(el) {
   return entry;
 }
 
-/* Pré-charger tous les hotspots dès le départ */
 hsEls.forEach(el => loadAlphaCanvas(el));
 
-/* Retourne l'alpha (0-255) du pixel sous le curseur dans l'image du hotspot */
 function getAlphaAt(el, clientX, clientY) {
   const entry = alphaCache.get(el);
-  if (!entry || !entry.ready) return 128; /* pas encore prêt → permissif */
+  if (!entry || !entry.ready) return 128;
   const rect = el.getBoundingClientRect();
   const rx = (clientX - rect.left)  / rect.width;
   const ry = (clientY - rect.top)   / rect.height;
@@ -475,49 +469,42 @@ function getAlphaAt(el, clientX, clientY) {
   return entry.ctx.getImageData(px, py, 1, 1).data[3];
 }
 
-/* Seuil : un pixel est "sur le bâtiment" si son alpha >= THRESHOLD */
 const THRESHOLD = 20;
 let currentHovered = null;
 
 document.addEventListener('mousemove', (e) => {
-  /* On parcourt les hotspots du plus haut z-index vers le bas */
+  /* Pas de hover quand le panel est ouvert */
+  if (panelOpen) return;
+
   let hit = null;
   for (const el of hsEls) {
     const rect = el.getBoundingClientRect();
-    /* Exclusion rapide si le curseur est hors du rectangle englobant */
     if (e.clientX < rect.left || e.clientX > rect.right ||
         e.clientY < rect.top  || e.clientY > rect.bottom) continue;
-    /* Test pixel-perfect */
-    if (getAlphaAt(el, e.clientX, e.clientY) >= THRESHOLD) {
-      hit = el;
-      break;
-    }
+    if (getAlphaAt(el, e.clientX, e.clientY) >= THRESHOLD) { hit = el; break; }
   }
 
   if (hit !== currentHovered) {
-    if (currentHovered) {
-      currentHovered.classList.remove('is-hovered');
-      currentHovered.style.zIndex = '5';
-    }
-    if (hit) {
-      hit.classList.add('is-hovered');
-      hit.style.zIndex = '8';
-    }
+    if (currentHovered) { currentHovered.classList.remove('is-hovered'); currentHovered.style.zIndex = '5'; }
+    if (hit)            { hit.classList.add('is-hovered'); hit.style.zIndex = '8'; }
     currentHovered = hit;
   }
 
   document.body.style.cursor = hit ? 'pointer' : '';
 });
 
-document.addEventListener('click', () => {
-  if (currentHovered) openPanel(currentHovered.dataset.id);
-});
-
 /* ── PANEL ── */
 const panel   = document.getElementById('panel');
 const overlay = document.getElementById('overlay');
 
+/* Deux verrous :
+   panelOpen   → panel actuellement visible, bloque le hover et le clic global
+   closingLock → panel en cours de fermeture (400ms), bloque la réouverture immédiate */
+let panelOpen   = false;
+let closingLock = false;
+
 function openPanel(id) {
+  if (panelOpen || closingLock) return;
   const d = BUILDINGS[id]; if (!d) return;
   document.getElementById('p-icon').textContent  = d.icon;
   document.getElementById('p-title').textContent = d.title;
@@ -538,16 +525,47 @@ function openPanel(id) {
   panel.scrollTop = 0;
   overlay.classList.add('on');
   panel.classList.add('on');
+  panelOpen = true;
 }
 
 function closePanel() {
+  if (!panelOpen) return;
   overlay.classList.remove('on');
   panel.classList.remove('on');
+  panelOpen   = false;
+  closingLock = true;
+  /* Durée du verrou = durée de la transition CSS du panel (≈ 380ms) + marge */
+  setTimeout(() => { closingLock = false; }, 450);
+
+  /* Nettoie immédiatement le hover résiduel */
+  if (currentHovered) {
+    currentHovered.classList.remove('is-hovered');
+    currentHovered.style.zIndex = '5';
+    currentHovered = null;
+  }
+  document.body.style.cursor = '';
 }
 
-document.getElementById('p-close').addEventListener('click', closePanel);
-overlay.addEventListener('click', closePanel);
-document.addEventListener('keydown', e => { if(e.key==='Escape') closePanel(); });
+/* Clic sur l'overlay → fermeture uniquement, stopPropagation pour ne pas déclencher le clic global */
+overlay.addEventListener('click', (e) => {
+  e.stopPropagation();
+  closePanel();
+});
+
+/* Clic sur le ✕ — idem */
+document.getElementById('p-close').addEventListener('click', (e) => {
+  e.stopPropagation();
+  closePanel();
+});
+
+/* Clic global → ouvre uniquement si panel fermé ET pas en transition de fermeture */
+document.addEventListener('click', (e) => {
+  if (panelOpen || closingLock) return;
+  if (currentHovered) openPanel(currentHovered.dataset.id);
+});
+
+/* Echap */
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
 
 /* ── AMBIENT PARTICLES ── */
 (function() {
