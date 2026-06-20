@@ -1,115 +1,1523 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Projet Premium</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Design Desk — Portfolio</title>
+  <!-- model-viewer pour les CAO 3D (.glb) -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+  <style>
+    :root {
+      --off-white:    #f5f3ef;
+      --ink:          #1a1814;
+      --warm-gray:    #c8c0b4;
+      --gold:         #b89a6a;
+      --ease:         cubic-bezier(.22,.61,.36,1);
+      --font-display: 'Georgia','Times New Roman',serif;
+      --font-body:    system-ui,-apple-system,'Segoe UI',sans-serif;
 
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
+      /* ════════════════════════════════════════════
+         BOUTON ARCHIVES — réglages faciles (en %)
+         top     : distance depuis le haut   (% vh)
+         right   : distance depuis la droite (% vw)
+         width   : largeur du bouton         (% vw)
+         opacity : transparence au repos     (0–1)
+         ratio   : hauteur/largeur image     (ex: 1.6 = portrait)
+         ════════════════════════════════════════════ */
+      --arc-btn-top:     12%;
+      --arc-btn-right:   2.5%;
+      --arc-btn-width:   7%;
+      --arc-btn-opacity: 0.85;
+      --arc-btn-ratio:   1.6;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{width:100%;height:100dvh;overflow:hidden;background:#14120e;
+      font-family:var(--font-body);color:var(--off-white);user-select:none;cursor:default}
 
-<style>
+    /* ── SCÈNE ── */
+    #scene{position:fixed;inset:0;overflow:hidden}
+    /* ── CORRECTIF BANDES NOIRES / IMAGE ENTIÈRE ──
+       object-fit:fill = l'image remplit exactement le cadre sans recadrage,
+       donc plus aucun détail coupé sur les bords (au prix d'un léger étirement
+       selon le ratio de la fenêtre). #bg garde un petit débord (-1.5%) pour que
+       le parallaxe (translate en JS) ne révèle jamais de bord blanc/noir au
+       mouvement de souris. */
+    #bg{position:absolute;inset:-1.5%;width:103%;height:103%;overflow:hidden;will-change:transform;}
+    #bg video{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;}
+    #bg::after{content:'';position:absolute;inset:0;pointer-events:none;
+      background:radial-gradient(ellipse 85% 75% at 50% 48%,transparent 50%,rgba(8,6,3,.46) 100%);}
+    #dim{position:absolute;inset:0;background:rgba(8,6,3,0);
+      transition:background 600ms var(--ease);pointer-events:none;z-index:5;}
+    body.drawing-open #dim,
+    body.archives-open #dim{background:rgba(8,6,3,.72);pointer-events:auto;}
 
-body{
-  margin:0;
-  background:#0f0d11;
-  color:white;
-  font-family:'Raleway',sans-serif;
-}
+    /* ── HEADER ──
+       Décalé vers le bas pour laisser la place au bouton #back-portfolio
+       juste au-dessus (même colonne gauche, left:44px). */
+    #header{position:fixed;top:78px;left:44px;z-index:50;pointer-events:none;
+      transition:opacity 500ms var(--ease);}
+    body.drawing-open #header,
+    body.archives-open #header{opacity:0}
+    #header .eyebrow{font-size:9px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;opacity:.85}
+    #header h1{font-family:var(--font-display);font-size:clamp(20px,2.8vw,32px);font-weight:400;letter-spacing:.03em;color:var(--off-white);line-height:1.15}
+    #header .sub{margin-top:5px;font-size:10px;letter-spacing:.14em;color:var(--warm-gray);opacity:.6}
 
-.hero{
-  min-height:85vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  padding:4rem;
-  background:
-  radial-gradient(circle at top right, rgba(201,168,76,.15), transparent 40%),
-  radial-gradient(circle at bottom left, rgba(196,154,138,.18), transparent 40%),
-  #0f0d11;
-}
+    /* ── HINT ── */
+    #hint{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+      font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--warm-gray);
+      opacity:0;animation:fadeIn 1s var(--ease) 1.8s forwards;
+      z-index:50;white-space:nowrap;pointer-events:none;transition:opacity 400ms;}
+    body.drawing-open #hint,
+    body.archives-open #hint{opacity:0!important}
+    @keyframes fadeIn{to{opacity:.4}}
 
-.hero h1{
-  font-family:'Cormorant Garamond',serif;
-  font-size:5rem;
-  font-weight:300;
-}
+    /* ══════════════════════════════════════
+       NAVIGATION — retour portfolio + sous-sections
+       Style cohérent avec #hint / #header : texte fin, letterspacing large,
+       discret au repos, doré au survol. Toujours masqués pendant qu'une
+       feuille ou le panel archives est ouvert, comme le reste du chrome UI.
+       ══════════════════════════════════════ */
 
-.hero p{
-  max-width:700px;
-  margin:auto;
-  line-height:1.8;
-  color:rgba(255,255,255,.7);
-}
+    /* ── BOUTON RETOUR PORTFOLIO ──
+       Placé en haut à gauche, juste au-dessus du titre, pour former une
+       vraie hiérarchie de lecture verticale : retour → eyebrow → titre.
+       Même colonne gauche que #header (left:44px), donc parfaitement aligné. */
+    #back-portfolio{
+      position:fixed;top:32px;left:44px;
+      z-index:50;
+      display:flex;align-items:center;gap:7px;
+      padding:9px 16px 9px 11px;
+      background:rgba(10,8,5,.3);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:30px;
+      backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+      font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+      color:var(--warm-gray);text-decoration:none;
+      opacity:0;animation:fadeInBtn 1s var(--ease) 1.6s forwards;
+      transition:opacity 400ms var(--ease),transform 280ms var(--ease),
+                 border-color 280ms,background 280ms,color 280ms;
+      cursor:pointer;
+    }
+    body.drawing-open #back-portfolio,
+    body.archives-open #back-portfolio{opacity:0!important;pointer-events:none;}
+    #back-portfolio svg{width:11px;height:11px;flex-shrink:0;stroke:currentColor;
+      stroke-width:1.8;fill:none;transition:transform 280ms var(--ease);}
+    #back-portfolio:hover{
+      color:var(--gold);border-color:rgba(184,154,106,.5);
+      background:rgba(10,8,5,.5);transform:translateY(-2px);
+    }
+    #back-portfolio:hover svg{transform:translateX(-3px);}
+    #back-portfolio:active{transform:translateY(0);}
 
-.content{
-  max-width:1200px;
-  margin:auto;
-  padding:6rem 2rem;
-}
+    /* ── BOUTONS SOUS-SECTIONS (prev / next) ──
+       Placés en bas, de part et d'autre du #hint central, pour ne pas
+       interférer avec lui. Forme circulaire assortie au close-btn des
+       feuilles (même langage visuel : rond clair, icône fine). */
+    .subsection-nav{
+      position:fixed;bottom:24px;
+      z-index:50;
+      display:flex;align-items:center;gap:10px;
+      opacity:0;animation:fadeInBtn 1s var(--ease) 2.1s forwards;
+      transition:opacity 400ms var(--ease);
+      text-decoration:none;cursor:pointer;
+    }
+    body.drawing-open .subsection-nav,
+    body.archives-open .subsection-nav{opacity:0!important;pointer-events:none;}
+    #nav-prev{left:36px;flex-direction:row;}
+    #nav-next{right:36px;flex-direction:row-reverse;}
 
-.section-title{
-  font-family:'Cormorant Garamond',serif;
-  font-size:3rem;
-}
+    .subsection-nav .nav-circle{
+      width:38px;height:38px;border-radius:50%;flex-shrink:0;
+      background:rgba(10,8,5,.38);
+      border:1px solid rgba(255,255,255,.14);
+      backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+      display:flex;align-items:center;justify-content:center;
+      transition:all 280ms var(--ease);
+      box-shadow:0 4px 16px rgba(0,0,0,.3);
+    }
+    .subsection-nav .nav-circle svg{
+      width:13px;height:13px;stroke:var(--off-white);stroke-width:1.8;
+      fill:none;opacity:.75;transition:all 280ms var(--ease);
+    }
+    .subsection-nav .nav-label{
+      display:flex;flex-direction:column;
+      max-width:0;overflow:hidden;white-space:nowrap;
+      opacity:0;transition:max-width 320ms var(--ease),opacity 240ms var(--ease);
+    }
+    #nav-prev .nav-label{align-items:flex-start;}
+    #nav-next .nav-label{align-items:flex-end;}
+    .subsection-nav .nav-eyebrow{
+      font-size:8px;letter-spacing:.2em;text-transform:uppercase;
+      color:var(--warm-gray);opacity:.55;margin-bottom:2px;
+    }
+    .subsection-nav .nav-title{
+      font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+      color:var(--off-white);
+    }
+    .subsection-nav:hover .nav-circle{
+      border-color:rgba(184,154,106,.55);background:rgba(10,8,5,.6);
+      transform:scale(1.07);
+    }
+    .subsection-nav:hover .nav-circle svg{stroke:var(--gold);opacity:1;}
+    .subsection-nav:hover .nav-label{max-width:160px;opacity:1;}
+    #nav-prev:hover .nav-circle{transform:scale(1.07) translateX(-2px);}
+    #nav-next:hover .nav-circle{transform:scale(1.07) translateX(2px);}
 
-.project-image{
-  width:100%;
-  overflow:hidden;
-  border-radius:14px;
-  margin:3rem 0;
-}
+    @media(max-width:700px){
+      #back-portfolio{top:18px;left:20px;padding:7px 11px 7px 9px;}
+      #back-portfolio span{display:none;} /* ne garde que l'icône sur mobile */
+      .subsection-nav .nav-label{display:none;}
+      #nav-prev{left:16px;}
+      #nav-next{right:16px;}
+    }
 
-.project-image img{
-  width:100%;
-  display:block;
-}
+    /* ── BOUTON ARCHIVES ── */
+    #archives-btn{
+      position:fixed;
+      top:var(--arc-btn-top);right:var(--arc-btn-right);
+      width:var(--arc-btn-width);
+      aspect-ratio:1/var(--arc-btn-ratio);
+      z-index:50;cursor:pointer;border:none;background:none;padding:0;
+      transition:transform 320ms var(--ease),opacity 400ms var(--ease);
+      opacity:0;animation:fadeInBtn 1s var(--ease) 2s forwards;
+    }
+    @keyframes fadeInBtn{to{opacity:var(--arc-btn-opacity);}}
+    body.drawing-open #archives-btn,
+    body.archives-open #archives-btn{opacity:0!important;pointer-events:none;}
+    #archives-btn img{
+      width:100%;height:100%;object-fit:contain;display:block;
+      opacity:var(--arc-btn-opacity);
+      filter:drop-shadow(0 4px 16px rgba(0,0,0,.5));
+      transition:filter 320ms var(--ease),opacity 320ms var(--ease);
+    }
+    #archives-btn:hover img{
+      opacity:1;
+      filter:drop-shadow(0 0 14px rgba(184,154,106,.8))
+             drop-shadow(0 0 28px rgba(184,154,106,.45))
+             drop-shadow(0 8px 24px rgba(0,0,0,.55))
+             brightness(1.18);
+    }
+    #archives-btn:hover{transform:scale(1.09) translateY(-3px);}
+    #archives-btn:active{transform:scale(1.04);}
 
-.back-btn{
-  position:fixed;
-  top:30px;
-  left:30px;
-  color:#C9A84C;
-  text-decoration:none;
-  letter-spacing:.3em;
-  text-transform:uppercase;
-  font-size:.7rem;
-}
+    /* ══════════════════════════════════════
+       PANEL ARCHIVES
+    ══════════════════════════════════════ */
+    #archives-panel{
+      position:fixed;inset:0;z-index:80;
+      display:flex;align-items:center;justify-content:center;
+      pointer-events:none;
+      /* Le fond du panel lui-même est transparent — le #dim gère l'obscurcissement */
+    }
+    #archives-panel.open{pointer-events:auto;}
 
-</style>
+    .arc-window{
+      width:min(92vw,1100px);height:min(88vh,740px);
+      background:#1e1c18;border:1px solid rgba(255,255,255,.08);border-radius:6px;
+      display:flex;flex-direction:column;overflow:hidden;
+      box-shadow:0 40px 100px rgba(0,0,0,.75),0 0 0 1px rgba(184,154,106,.12);
+      transform:scale(.94) translateY(20px);opacity:0;
+      transition:transform 380ms var(--ease),opacity 380ms var(--ease);
+    }
+    #archives-panel.open .arc-window{transform:scale(1) translateY(0);opacity:1;}
+
+    .arc-titlebar{
+      height:40px;min-height:40px;background:#161410;
+      border-bottom:1px solid rgba(255,255,255,.07);
+      display:flex;align-items:center;padding:0 16px;flex-shrink:0;
+    }
+    .arc-title{font-size:11px;letter-spacing:.14em;color:rgba(255,255,255,.45);flex:1;text-align:center;}
+    #arc-close-x{
+      width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.1);cursor:pointer;
+      display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.4);
+      transition:all 180ms;flex-shrink:0;
+    }
+    #arc-close-x:hover{background:rgba(224,82,82,.2);border-color:rgba(224,82,82,.4);color:rgba(224,82,82,.9);}
+    #arc-close-x svg{width:10px;height:10px;stroke:currentColor;stroke-width:2;fill:none;}
+
+    .arc-toolbar{
+      height:40px;min-height:40px;background:#1a1814;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      display:flex;align-items:center;gap:10px;padding:0 14px;flex-shrink:0;
+    }
+    .arc-search{
+      display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.09);border-radius:4px;padding:4px 10px;
+      flex:1;max-width:380px;
+    }
+    .arc-search svg{width:13px;height:13px;stroke:rgba(255,255,255,.3);flex-shrink:0;}
+    .arc-search input{background:none;border:none;outline:none;font-size:12px;color:var(--off-white);
+      width:100%;font-family:var(--font-body);cursor:text;}
+    .arc-search input::placeholder{color:rgba(255,255,255,.28);}
+    .arc-view-toggle{display:flex;gap:2px;margin-left:auto;}
+    .arc-view-btn{
+      width:26px;height:26px;border-radius:3px;border:1px solid rgba(255,255,255,.08);
+      background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+      color:rgba(255,255,255,.3);transition:all 180ms;
+    }
+    .arc-view-btn.active,.arc-view-btn:hover{color:var(--gold);border-color:rgba(184,154,106,.4);background:rgba(184,154,106,.07);}
+    .arc-view-btn svg{width:13px;height:13px;}
+    .arc-body{display:flex;flex:1;overflow:hidden;}
+    .arc-sidebar{
+      width:210px;min-width:210px;background:#181612;
+      border-right:1px solid rgba(255,255,255,.06);overflow-y:auto;padding:10px 0;flex-shrink:0;
+    }
+    .arc-sidebar::-webkit-scrollbar{width:4px;}
+    .arc-sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
+    .arc-tree-section{margin-bottom:4px;}
+    .arc-tree-header{
+      display:flex;align-items:center;gap:6px;padding:5px 12px;
+      font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+      color:rgba(255,255,255,.3);cursor:pointer;transition:color 150ms;user-select:none;
+    }
+    .arc-tree-header:hover{color:rgba(255,255,255,.55);}
+    .arc-tree-header svg{width:10px;height:10px;flex-shrink:0;transition:transform 200ms;}
+    .arc-tree-header.collapsed svg{transform:rotate(-90deg);}
+    .arc-tree-items{padding:0 0 4px 0;}
+    .arc-tree-item{
+      display:flex;align-items:center;gap:7px;padding:5px 14px 5px 22px;font-size:11px;
+      color:rgba(255,255,255,.5);cursor:pointer;border-left:2px solid transparent;transition:all 150ms;
+    }
+    .arc-tree-item:hover{color:rgba(255,255,255,.8);background:rgba(255,255,255,.04);}
+    .arc-tree-item.active{color:var(--gold);border-left-color:var(--gold);background:rgba(184,154,106,.08);}
+    .arc-tree-item svg{width:12px;height:12px;flex-shrink:0;opacity:.6;}
+    .arc-main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+    .arc-breadcrumb{
+      height:28px;min-height:28px;border-bottom:1px solid rgba(255,255,255,.05);
+      display:flex;align-items:center;gap:4px;padding:0 14px;font-size:10px;color:rgba(255,255,255,.3);flex-shrink:0;
+    }
+    .arc-breadcrumb span{color:rgba(255,255,255,.5);}
+    .arc-breadcrumb .sep{opacity:.3;}
+    .arc-grid{
+      flex:1;overflow-y:auto;padding:16px;display:grid;gap:12px;
+      grid-template-columns:repeat(auto-fill,minmax(140px,1fr));align-content:start;
+    }
+    .arc-grid.view-list{grid-template-columns:1fr;gap:2px;padding:8px;}
+    .arc-grid::-webkit-scrollbar{width:5px;}
+    .arc-grid::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
+    .arc-file{
+      background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+      border-radius:5px;padding:10px 8px 8px;cursor:pointer;transition:all 200ms;
+      display:flex;flex-direction:column;align-items:center;gap:7px;position:relative;
+    }
+    .arc-file:hover{background:rgba(184,154,106,.1);border-color:rgba(184,154,106,.35);
+      transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.35);}
+    .arc-file.selected{background:rgba(184,154,106,.15);border-color:rgba(184,154,106,.6);}
+    .arc-thumb{
+      width:100%;aspect-ratio:1.414/1;background:rgba(255,255,255,.06);border-radius:3px;
+      overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative;
+    }
+    .arc-thumb img{width:100%;height:100%;object-fit:contain;opacity:.85;transition:opacity 200ms;}
+    .arc-file:hover .arc-thumb img{opacity:1;}
+    .arc-thumb-icon{width:40%;opacity:.18;}
+    .arc-file-ext{
+      position:absolute;bottom:4px;right:5px;font-size:7px;letter-spacing:.1em;text-transform:uppercase;
+      color:var(--gold);opacity:.7;background:rgba(0,0,0,.5);padding:1px 4px;border-radius:2px;
+    }
+    .arc-file-name{font-size:10px;color:rgba(255,255,255,.75);text-align:center;line-height:1.3;
+      width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .arc-file-meta{font-size:8px;color:rgba(255,255,255,.3);white-space:nowrap;overflow:hidden;
+      text-overflow:ellipsis;width:100%;text-align:center;}
+    .arc-grid.view-list .arc-file{flex-direction:row;padding:6px 10px;gap:10px;align-items:center;border-radius:3px;}
+    .arc-grid.view-list .arc-thumb{width:36px;height:26px;flex-shrink:0;aspect-ratio:unset;}
+    .arc-grid.view-list .arc-thumb-icon{width:55%;}
+    .arc-grid.view-list .arc-file-name{text-align:left;flex:1;font-size:11px;}
+    .arc-grid.view-list .arc-file-meta{text-align:right;flex-shrink:0;font-size:9px;min-width:80px;}
+    .arc-grid.view-list .arc-file-ext{display:none;}
+    .arc-statusbar{
+      height:24px;min-height:24px;background:#131210;border-top:1px solid rgba(255,255,255,.05);
+      display:flex;align-items:center;padding:0 14px;gap:20px;flex-shrink:0;
+    }
+    .arc-status-item{font-size:9px;letter-spacing:.1em;color:rgba(255,255,255,.25);}
+    .arc-status-item span{color:rgba(255,255,255,.45);}
+
+    /* ══════════════════════════════════════
+       FEUILLES + CARROUSEL
+    ══════════════════════════════════════ */
+    #drawings-layer{position:fixed;inset:0;z-index:20;pointer-events:none;}
+
+    .drawing-sheet{
+      position:absolute;pointer-events:none;cursor:pointer;
+      transform-origin:center center;
+      transition:transform 350ms var(--ease),opacity 700ms var(--ease);
+      perspective:1200px;
+    }
+    .sheet-inner{
+      position:relative;width:100%;height:100%;
+      transform-style:preserve-3d;transition:transform 0ms;
+    }
+    .sheet-front{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+    .sheet-front img{
+      display:block;width:100%;height:100%;object-fit:contain;
+      pointer-events:auto; /* la hitbox réelle = pixels opaques de l'image, voir clip-path en JS */
+      filter:drop-shadow(0 4px 10px rgba(0,0,0,.45)) drop-shadow(0 1px 3px rgba(0,0,0,.3));
+      transition:filter 350ms var(--ease);
+    }
+
+    /* Le verso : flex row pour laisser place au carrousel */
+    .sheet-back{
+      position:absolute;inset:0;
+      backface-visibility:hidden;-webkit-backface-visibility:hidden;
+      transform:rotateY(180deg);
+      background:var(--off-white);border-radius:2px;
+      box-shadow:0 40px 80px rgba(0,0,0,.5),0 8px 20px rgba(0,0,0,.35);
+      overflow:hidden;
+      display:flex;flex-direction:row; /* ← rangé côte à côte */
+      pointer-events:auto;
+    }
+
+    /* Panneau texte gauche */
+    .back-text{
+      flex:0 0 48%;max-width:48%;
+      display:flex;flex-direction:column;
+      padding:clamp(16px,3.5%,44px);
+      border-right:1px solid rgba(26,24,20,.1);
+      overflow-y:auto;
+    }
+    .back-text::-webkit-scrollbar{width:3px;}
+    .back-text::-webkit-scrollbar-thumb{background:rgba(26,24,20,.15);border-radius:2px;}
+    .back-eyebrow{font-size:8px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+    .back-title{font-family:var(--font-display);font-size:clamp(16px,2.2vw,26px);font-weight:400;
+      color:var(--ink);line-height:1.2;margin-bottom:14px;
+      border-bottom:1px solid rgba(26,24,20,.12);padding-bottom:12px;}
+    .back-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+    .back-tag{font-size:8px;letter-spacing:.16em;text-transform:uppercase;
+      background:rgba(26,24,20,.07);color:var(--ink);padding:4px 10px;border-radius:20px;}
+    .back-body{font-size:clamp(10px,1.2vw,13px);line-height:1.72;color:rgba(26,24,20,.78);flex:1;overflow:auto;}
+    .back-body p+p{margin-top:.9em}
+    .back-footer{margin-top:14px;padding-top:10px;border-top:1px solid rgba(26,24,20,.1);
+      font-size:9px;letter-spacing:.14em;color:rgba(26,24,20,.45);}
+
+    /* Panneau carrousel droit */
+    .back-carousel{
+      flex:1;
+      display:flex;flex-direction:column;
+      background:#0f0e0b;
+      position:relative;overflow:hidden;
+    }
+
+    /* Zone média principale */
+    .carousel-stage{
+      flex:1;position:relative;overflow:hidden;
+      display:flex;align-items:center;justify-content:center;
+      background:#0a0907;
+    }
+    .carousel-item{
+      position:absolute;inset:0;
+      display:flex;align-items:center;justify-content:center;
+      opacity:0;transition:opacity 400ms var(--ease);pointer-events:none;
+    }
+    .carousel-item.active{opacity:1;pointer-events:auto;}
+
+    .carousel-item img{
+      max-width:100%;max-height:100%;object-fit:contain;
+      display:block;
+    }
+    .carousel-item video{
+      max-width:100%;max-height:100%;object-fit:contain;
+      display:block;outline:none;
+    }
+    .carousel-item model-viewer{
+      width:100%;height:100%;
+      --progress-bar-color:var(--gold);
+      background:transparent;
+    }
+
+    /* Type badge sur le media */
+    .carousel-type-badge{
+      position:absolute;top:8px;left:10px;
+      font-size:8px;letter-spacing:.18em;text-transform:uppercase;
+      color:var(--gold);background:rgba(0,0,0,.55);
+      padding:3px 8px;border-radius:3px;
+      pointer-events:none;z-index:2;
+    }
+
+    /* Barre de navigation miniatures */
+    .carousel-nav{
+      height:64px;min-height:64px;
+      background:#151310;
+      border-top:1px solid rgba(255,255,255,.07);
+      display:flex;align-items:center;gap:6px;
+      padding:0 10px;overflow-x:auto;flex-shrink:0;
+    }
+    .carousel-nav::-webkit-scrollbar{height:3px;}
+    .carousel-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:2px;}
+
+    .carousel-thumb{
+      width:48px;height:44px;flex-shrink:0;
+      border-radius:3px;overflow:hidden;cursor:pointer;
+      border:2px solid transparent;
+      background:rgba(255,255,255,.06);
+      display:flex;align-items:center;justify-content:center;
+      transition:border-color 200ms,opacity 200ms;
+      position:relative;
+    }
+    .carousel-thumb:hover{opacity:1;border-color:rgba(184,154,106,.4);}
+    .carousel-thumb.active{border-color:var(--gold);}
+    .carousel-thumb img{width:100%;height:100%;object-fit:cover;}
+    .carousel-thumb .ct-icon{
+      font-size:18px;line-height:1;
+      display:flex;align-items:center;justify-content:center;width:100%;height:100%;
+    }
+    /* flèches prev/next */
+    .carousel-arrow{
+      position:absolute;top:50%;transform:translateY(-50%);
+      width:28px;height:28px;border-radius:50%;
+      background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.15);
+      color:rgba(255,255,255,.7);cursor:pointer;z-index:3;
+      display:flex;align-items:center;justify-content:center;
+      transition:all 180ms;font-size:13px;
+      opacity:0;pointer-events:none;
+    }
+    .carousel-arrow:hover{background:rgba(184,154,106,.3);border-color:var(--gold);color:var(--gold);}
+    .carousel-arrow.prev{left:8px;}
+    .carousel-arrow.next{right:8px;}
+    .back-carousel:hover .carousel-arrow{opacity:1;pointer-events:auto;}
+    /* cacher flèches si un seul média */
+    .carousel-arrow.hidden{display:none;}
+
+    /* Message "pas de média" */
+    .carousel-empty{
+      flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+      color:rgba(255,255,255,.2);font-size:11px;letter-spacing:.1em;
+    }
+    .carousel-empty svg{width:36px;height:36px;opacity:.25;}
+
+    .drawing-sheet:not(.is-active):not(.is-pushed):hover .sheet-front img{
+      filter:drop-shadow(0 16px 28px rgba(0,0,0,.55)) drop-shadow(0 4px 8px rgba(0,0,0,.35)) brightness(1.07);
+    }
+    .drawing-sheet:not(.is-active):not(.is-pushed):hover{transform:var(--hover-lift)!important;}
+    .drawing-sheet.is-active{cursor:default;z-index:1000!important;}
+    .drawing-sheet.is-pushed{pointer-events:none;}
+    .drawing-sheet.is-pushed .sheet-front img{
+      filter:drop-shadow(0 2px 6px rgba(0,0,0,.3)) brightness(.62) blur(1.5px);
+    }
+    .close-btn{
+      position:absolute;top:-14px;right:-14px;
+      width:32px;height:32px;border-radius:50%;
+      background:rgba(245,243,239,.94);border:none;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 4px 16px rgba(0,0,0,.28);
+      opacity:0;pointer-events:none;
+      transition:opacity 300ms var(--ease) 250ms,background 180ms;z-index:70;
+    }
+    .close-btn svg{width:11px;height:11px;stroke:var(--ink);stroke-width:2;fill:none;}
+    .close-btn:hover{background:#fff;}
+    .drawing-sheet.is-active .close-btn{opacity:1;pointer-events:auto;}
+
+    /* ── POUSSIÈRE / GRAIN — overlay statique au-dessus de la scène ── */
+    #dust{
+      position:fixed;inset:0;z-index:6;pointer-events:none;
+      mix-blend-mode:overlay;
+      opacity:.5;
+    }
+    #dust.dust-soft{mix-blend-mode:soft-light;opacity:.65;}
+
+    /* ══════════════════════════════════════
+       POUSSIÈRE VOLATILE — particules en suspension
+       Couche distincte de #dust (qui reste le grain statique de fond).
+       Ici : vraies particules animées, plus denses/lumineuses dans les
+       zones de rayons de soleil de la scène, qui dérivent lentement
+       vers le haut et scintillent sans jamais boucler de façon visible.
+       ══════════════════════════════════════ */
+    #dust-motes{
+      position:fixed;inset:0;z-index:7;overflow:hidden;pointer-events:none;
+    }
+    .mote{
+      position:absolute;
+      top:var(--y);left:var(--x);
+      width:var(--s);height:var(--s);
+      border-radius:50%;
+      background:radial-gradient(circle,
+          rgba(255,244,222,var(--op)) 0%,
+          rgba(255,230,190,calc(var(--op) * .55)) 45%,
+          rgba(255,230,190,0) 75%);
+      filter:blur(var(--blur));
+      opacity:0;
+      animation:
+        mote-drift var(--dur) ease-in-out var(--delay) infinite,
+        mote-twinkle var(--tdur) ease-in-out var(--delay) infinite;
+    }
+    @keyframes mote-drift{
+      0%{   transform:translate(0,0); }
+      50%{  transform:translate(var(--dx),var(--dy)); }
+      100%{ transform:translate(calc(var(--dx) * -0.15), calc(var(--dy) * 2)); }
+    }
+    @keyframes mote-twinkle{
+      0%,100%{ opacity:0; }
+      8%{      opacity:var(--peak); }
+      50%{     opacity:calc(var(--peak) * .55); }
+      92%{     opacity:0; }
+    }
+    @media(prefers-reduced-motion:reduce){
+      .mote{animation:none!important;opacity:0!important;}
+    }
+
+    @media(max-width:700px){
+      #header{left:20px;top:58px;}
+      .back-text{flex:0 0 100%;max-width:100%;}
+      .back-carousel{display:none;}
+    }
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:60ms!important}}
+  </style>
 </head>
-
 <body>
 
-<a href="index_final_modifie.html" class="back-btn">Retour</a>
-
-<section class="hero">
-<div>
-<h1>Nom du Projet</h1>
-<p>
-Ajoute ici la présentation complète du projet.
-</p>
-</div>
-</section>
-
-<section class="content">
-
-<h2 class="section-title">Présentation</h2>
-<p>
-Lorem ipsum dolor sit amet.
-</p>
-
-<div class="project-image">
-<img src="Images/projet.jpg">
+<div id="scene">
+  <div id="bg">
+    <video id="bg-video" autoplay muted loop playsinline preload="auto" poster="Images/fond_cao3_vide.png">
+      <source src="Assets/fond_cao.webm" type="video/webm">
+    </video>
+  </div>
+  <div id="dim"></div>
 </div>
 
-<h2 class="section-title">Conception</h2>
-<p>
-Lorem ipsum dolor sit amet.
-</p>
+<!-- Poussière naturelle, superposée à la scène (image fixe, indépendante du cinémagraphe) -->
+<svg id="dust" class="dust-soft" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" viewBox="0 0 1000 1000">
+  <defs>
+    <filter id="dustGrain" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="noise"/>
+      <feColorMatrix in="noise" type="matrix"
+        values="0 0 0 0 0.92
+                0 0 0 0 0.88
+                0 0 0 0 0.78
+                0 0 0 0.9 0"/>
+      <feComponentTransfer>
+        <feFuncA type="gamma" amplitude="1" exponent="2.4" offset="0"/>
+      </feComponentTransfer>
+    </filter>
+    <radialGradient id="dustVignette" cx="50%" cy="46%" r="70%">
+      <stop offset="55%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity=".35"/>
+    </radialGradient>
+  </defs>
+  <rect width="1000" height="1000" filter="url(#dustGrain)"/>
+  <rect width="1000" height="1000" fill="url(#dustVignette)"/>
+</svg>
 
-</section>
+<!-- Poussière volatile — particules générées dynamiquement en JS, voir section 0 du script -->
+<div id="dust-motes"></div>
 
+<header id="header">
+  <p class="eyebrow">Portfolio · Ingénierie Conception Mécanique</p>
+  <h1>The Design Desk</h1>
+  <p class="sub">Survolez et cliquez sur les dessins pour les explorer</p>
+</header>
+
+<!-- ── RETOUR PORTFOLIO ── -->
+<a id="back-portfolio" href="index.html" aria-label="Retour au portfolio">
+  <svg viewBox="0 0 16 16"><path d="M10 3L4 8l6 5"/></svg>
+  <span>Retour au portfolio</span>
+</a>
+
+<!-- ── NAVIGATION SOUS-SECTIONS ── -->
+<a id="nav-prev" class="subsection-nav" href="projet-dev.html" aria-label="Section précédente : Projet Développement">
+  <span class="nav-circle"><svg viewBox="0 0 16 16"><path d="M10 3L4 8l6 5"/></svg></span>
+  <span class="nav-label">
+    <span class="nav-eyebrow">Précédent</span>
+    <span class="nav-title">Projet Dev</span>
+  </span>
+</a>
+<a id="nav-next" class="subsection-nav" href="projet-meca.html" aria-label="Section suivante : Projet Mécanique">
+  <span class="nav-circle"><svg viewBox="0 0 16 16"><path d="M6 3l6 5-6 5"/></svg></span>
+  <span class="nav-label">
+    <span class="nav-eyebrow">Suivant</span>
+    <span class="nav-title">Projet Méca</span>
+  </span>
+</a>
+
+<p id="hint">Cliquez sur un dessin · Échap pour fermer</p>
+
+<button id="archives-btn" aria-label="Ouvrir les archives CAO">
+  <img src="Images/archives.png" alt="Archives CAO"
+       onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+  <svg style="display:none;width:100%;height:100%;opacity:.6" viewBox="0 0 48 64" fill="none"
+       stroke="rgba(184,154,106,.8)" stroke-width="1.8" stroke-linecap="round">
+    <rect x="4" y="4" width="40" height="56" rx="3"/>
+    <line x1="4" y1="18" x2="44" y2="18"/><line x1="4" y1="32" x2="44" y2="32"/><line x1="4" y1="46" x2="44" y2="46"/>
+    <circle cx="14" cy="11" r="3"/><circle cx="24" cy="11" r="3"/><circle cx="34" cy="11" r="3"/>
+    <circle cx="14" cy="25" r="3"/><circle cx="24" cy="25" r="3"/><circle cx="34" cy="25" r="3"/>
+    <circle cx="14" cy="39" r="3"/><circle cx="24" cy="39" r="3"/><circle cx="34" cy="39" r="3"/>
+    <rect x="12" y="50" width="24" height="5" rx="1"/>
+  </svg>
+</button>
+
+<div id="drawings-layer"></div>
+
+<!-- PANEL ARCHIVES -->
+<div id="archives-panel" role="dialog" aria-label="Archives CAO" aria-modal="true">
+  <div class="arc-window">
+    <div class="arc-titlebar">
+      <span class="arc-title">The Design Desk · Archives CAO</span>
+      <button id="arc-close-x" aria-label="Fermer">
+        <svg viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9"/><line x1="9" y1="1" x2="1" y2="9"/></svg>
+      </button>
+    </div>
+    <div class="arc-toolbar">
+      <div class="arc-search">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="6.5" cy="6.5" r="4.5"/><line x1="10" y1="10" x2="14" y2="14"/>
+        </svg>
+        <input type="text" id="arc-search-input" placeholder="Rechercher un plan…" autocomplete="off">
+      </div>
+      <div class="arc-view-toggle">
+        <button class="arc-view-btn active" id="btn-view-grid" title="Grille">
+          <svg viewBox="0 0 16 16" fill="currentColor">
+            <rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/>
+            <rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/>
+          </svg>
+        </button>
+        <button class="arc-view-btn" id="btn-view-list" title="Liste">
+          <svg viewBox="0 0 16 16" fill="currentColor">
+            <rect x="1" y="2" width="14" height="2.5" rx="1"/>
+            <rect x="1" y="6.75" width="14" height="2.5" rx="1"/>
+            <rect x="1" y="11.5" width="14" height="2.5" rx="1"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="arc-body">
+      <nav class="arc-sidebar" id="arc-sidebar"></nav>
+      <div class="arc-main">
+        <div class="arc-breadcrumb">
+          <span>Archives</span><span class="sep"> › </span><span id="arc-bc-cat">Tous les projets</span>
+        </div>
+        <div class="arc-grid" id="arc-grid"></div>
+      </div>
+    </div>
+    <div class="arc-statusbar">
+      <div class="arc-status-item">Fichiers : <span id="arc-count">—</span></div>
+      <div class="arc-status-item">Catégorie : <span id="arc-status-cat">Tous</span></div>
+      <div class="arc-status-item" style="margin-left:auto">The Design Desk · Archives</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   ██  0. POUSSIÈRE VOLATILE — génération des particules  ██
+   Couche purement visuelle, indépendante du reste du script.
+   Zones "lumineuses" calquées sur la scène (rayons de soleil
+   entrant par la fenêtre, flaque de lumière au sol) → particules
+   plus denses et plus lumineuses à ces endroits, quasi invisibles
+   dans les zones d'ombre du bureau.
+═══════════════════════════════════════════════════════════ */
+(function(){
+  const field=document.getElementById("dust-motes");
+  if(!field)return;
+  const frag=document.createDocumentFragment();
+
+  function rand(min,max){return min+Math.random()*(max-min);}
+
+  /* ── Zones lumineuses calquées sur les vraies diagonales de la scène ──
+     La lumière entre par la fenêtre en haut-gauche et traverse la table
+     en bandes fines diagonales (effet stores/lattes), avec deux foyers
+     plus intenses : la fenêtre elle-même et la flaque de lumière chaude
+     en bas-gauche près de la tasse de café. */
+  const lightZones=[
+    {x:[0,14],  y:[0,38],   weight:2.2},   /* fenêtre haut-gauche, source directe */
+    {x:[0,32],  y:[60,100], weight:3.2},   /* flaque de lumière chaude bas-gauche (café/carnet) */
+    {x:[10,55], y:[0,45],   weight:2.6},   /* première bande de rayon, diagonale haute */
+    {x:[35,72], y:[20,60],  weight:1.9},   /* deuxième bande de rayon, vers le centre */
+    {x:[55,90], y:[10,45],  weight:1.3},   /* reflets sur les feuilles à droite */
+  ];
+  const AMBIENT_WEIGHT=0.3; /* densité de fond dans les zones d'ombre du bois */
+
+  function weightAt(xPct,yPct){
+    let w=AMBIENT_WEIGHT;
+    for(const z of lightZones){
+      if(xPct>=z.x[0]&&xPct<=z.x[1]&&yPct>=z.y[0]&&yPct<=z.y[1]){
+        w=Math.max(w,z.weight);
+      }
+    }
+    return w;
+  }
+
+  const TOTAL=190;
+  let placed=0,attempts=0;
+
+  while(placed<TOTAL && attempts<TOTAL*8){
+    attempts++;
+    const xPct=rand(0,100), yPct=rand(0,100);
+    const w=weightAt(xPct,yPct);
+    if(Math.random() > w/3.2) continue;
+
+    placed++;
+    const mote=document.createElement("div");
+    mote.className="mote";
+
+    const inLight = w>=1.2;
+    const size   = inLight ? rand(2.0,4.6) : rand(1.0,2.6);
+    const blur   = inLight ? rand(0.2,0.9) : rand(0.4,1.3);
+    const peak   = inLight ? rand(.50,.92) : rand(.10,.28);
+    const dur    = rand(13,32);
+    const tdur   = rand(4.5,10.5);
+    const delay  = rand(-30,0);
+    const dx     = rand(-55,55);
+    const dy     = rand(-85,-25);
+
+    mote.style.setProperty("--x",xPct+"%");
+    mote.style.setProperty("--y",yPct+"%");
+    mote.style.setProperty("--s",size+"px");
+    mote.style.setProperty("--blur",blur+"px");
+    mote.style.setProperty("--op",peak);
+    mote.style.setProperty("--peak",peak);
+    mote.style.setProperty("--dur",dur+"s");
+    mote.style.setProperty("--tdur",tdur+"s");
+    mote.style.setProperty("--delay",delay+"s");
+    mote.style.setProperty("--dx",dx+"px");
+    mote.style.setProperty("--dy",dy+"px");
+
+    frag.appendChild(mote);
+  }
+  field.appendChild(frag);
+})();
+
+/* ═══════════════════════════════════════════════════════════
+   ██  1. DONNÉES DES FEUILLES (portfolio principal)  ██
+
+   Médias associés à chaque projet (carrousel côté droit du verso) :
+   ─────────────────────────────────────────────────────────────────
+   • Images     : Assets/img_<id>_1.jpg, img_<id>_2.jpg, img_<id>_3.jpg…
+                  (autant que tu veux, numérotées à partir de 1)
+   • Vidéo      : Assets/video_cao_<id>.mp4  (une seule par projet)
+   • CAO 3D     : Assets/cao_<id>.glb        (format GLB — export depuis
+                  SolidWorks/Fusion/CATIA : Fichier → Enregistrer sous → .glb
+                  ou convertir avec https://products.aspose.app/3d/conversion)
+   Si un fichier est absent, il est simplement ignoré.
+═══════════════════════════════════════════════════════════ */
+const SHEETS_DATA = [
+  { id:1, src:"dessin1.png", x:28, y:48, w:23, rot:-7, depth:0.50, aspect:1.414,
+    label:"Formula Student — Châssis",
+    tags:["Structure tubulaire","Acier S355","FEA"],
+    desc:`<p>Conception du châssis principal de la monoplace Formula Student. Rigidité en torsion > 1 500 N·m/°, masse < 28 kg.</p><p>Dimensionnement FEA (Ansys), optimisation topologique, fabrication soudé TIG.</p>`,
+    footer:"2023 · Projet académique — FS-Germany",
+    imgs: 3,   /* nombre d'images Assets/img_1_1.jpg … img_1_3.jpg */
+    hasVideo: true,   /* Assets/video_cao_1.mp4 */
+    hasCao:   true }, /* Assets/cao_1.glb        */
+
+  { id:2, src:"dessin2.png", x:55, y:38, w:28, rot:4, depth:0.60, aspect:0.707,
+    label:"Vis Sans Fin — Réducteur",
+    tags:["Transmission","Bronze CuSn8","Rendement 85%"],
+    desc:`<p>Réducteur vis sans fin, i = 1/40, couple 320 N·m. Calcul Hertz, choix matière, lubrification bain d'huile.</p>`,
+    footer:"2022 · Projet industriel",
+    imgs:2, hasVideo:true, hasCao:true },
+
+  { id:3, src:"dessin3.png", x:46, y:66, w:21, rot:-3, depth:0.45, aspect:1.414,
+    label:"Esquisse Structure", tags:["Béton armé","Sismique","EC2"],
+    desc:`<p>Structure porteuse soumise à charges sismiques, conformité Eurocode 8. Voiles de contreventement, ferraillage estimatif.</p>`,
+    footer:"2023 · Bureau d'études",
+    imgs:2, hasVideo:false, hasCao:false },
+
+  { id:4, src:"dessin4.png", x:70, y:55, w:25, rot:9, depth:0.55, aspect:0.707,
+    label:"Plan d'assemblage", tags:["CATIA V5","ISO","GD&T"],
+    desc:`<p>Plan d'ensemble mécanisme à came et suiveur, 120 cycles/min. Jeux fonctionnels, chaînes de cotes, Monte-Carlo.</p>`,
+    footer:"2022 · Conception mécanique avancée",
+    imgs:2, hasVideo:true, hasCao:true },
+
+  { id:5, src:"dessin5.png", x:20, y:65, w:20, rot:5, depth:0.40, aspect:1.414,
+    label:"Étude de détail", tags:["Fatigue","100Cr6","Durée de vie"],
+    desc:`<p>Arbre de transmission, flexion rotative. Fatigue Dang Van, Kt. Durée de vie > 10⁷ cycles.</p>`,
+    footer:"2023 · RDM avancée",
+    imgs:1, hasVideo:false, hasCao:true },
+
+  { id:6, src:"dessin6.png", x:76, y:34, w:19, rot:-11, depth:0.35, aspect:1.414,
+    label:"Croquis conceptuel", tags:["Design thinking","Idéation","Ergonomie"],
+    desc:`<p>Outil de serrage ambidextre, F > 800 N, milieu contraint. 12 concepts, 3 retenus pour prototypage.</p>`,
+    footer:"2022 · Atelier design",
+    imgs:3, hasVideo:true, hasCao:false },
+];
+
+const FALLBACK_SRC = "Images/fond_cao3_vide.png";
+
+/* ═══════════════════════════════════════════════════════════
+   ██  2. DONNÉES ARCHIVES CAO  ██
+   FORMAT : { name, cat, ext, date, note }
+   • Images miniatures cherchées automatiquement : Images/CAO/<name>.png
+   • Catégories auto-créées/supprimées selon le contenu de cette liste
+═══════════════════════════════════════════════════════════ */
+const ARCHIVE_FILES = [
+  { name:"FS23_chassis_v1",       cat:"Formula Student",  ext:"SLDASM", date:"Jan 2023", note:"Première itération du châssis" },
+  { name:"FS23_chassis_v3_final", cat:"Formula Student",  ext:"SLDASM", date:"Mar 2023", note:"Version homologuée FS-Germany" },
+  { name:"FS23_suspension_AV",    cat:"Formula Student",  ext:"SLDPRT", date:"Fév 2023", note:"Triangles avant, géom. Ackermann" },
+  { name:"FS23_suspension_AR",    cat:"Formula Student",  ext:"SLDPRT", date:"Fév 2023", note:"Triangles arrière, anti-squat" },
+  { name:"FS23_plan_general",     cat:"Formula Student",  ext:"DWG",    date:"Mar 2023", note:"Plan de définition général" },
+  { name:"FS23_cotation_cadre",   cat:"Formula Student",  ext:"PDF",    date:"Mar 2023", note:"Fiche de cotation homologation" },
+  { name:"FS23_FEA_report",       cat:"Formula Student",  ext:"PDF",    date:"Mar 2023", note:"Rapport éléments finis Ansys" },
+  { name:"VSF_reducteur_v1",      cat:"Transmissions",    ext:"SLDASM", date:"Oct 2022", note:"Vis sans fin, i=1/40" },
+  { name:"VFS_carter_v2",         cat:"Transmissions",    ext:"SLDPRT", date:"Oct 2022", note:"Carter en fonte GJL-250" },
+  { name:"VFS_arbre_sortie",      cat:"Transmissions",    ext:"SLDPRT", date:"Oct 2022", note:"Arbre de sortie 42CrMo4" },
+  { name:"VFS_plan_asm",          cat:"Transmissions",    ext:"DWG",    date:"Nov 2022", note:"Plan d'ensemble coté" },
+  { name:"Planetaire_3eme_v1",    cat:"Transmissions",    ext:"SLDASM", date:"Jan 2022", note:"Engrenage planétaire 3 satellites" },
+  { name:"Couronne_dentee_v2",    cat:"Transmissions",    ext:"SLDPRT", date:"Jan 2022", note:"Couronne module 3, Z=60" },
+  { name:"Structure_EC2_v1",      cat:"Structures",       ext:"DWG",    date:"Avr 2023", note:"Voiles sismiques béton" },
+  { name:"Portique_acier_v1",     cat:"Structures",       ext:"SLDASM", date:"Sep 2022", note:"Portique HEA 200, EC3" },
+  { name:"Fondation_semelle",     cat:"Structures",       ext:"DWG",    date:"Avr 2023", note:"Semelle filante, 150kN" },
+  { name:"Came_suiveur_v2",       cat:"Assemblages",      ext:"SLDASM", date:"Nov 2022", note:"Mécanisme came 120 c/min" },
+  { name:"Came_suiveur_plan",     cat:"Assemblages",      ext:"DWG",    date:"Nov 2022", note:"Plan coté GD&T" },
+  { name:"Pince_serrage_v3",      cat:"Assemblages",      ext:"SLDASM", date:"Mai 2022", note:"Pince ambidextre F>800N" },
+  { name:"Mandrin_tour_v1",       cat:"Assemblages",      ext:"SLDASM", date:"Sep 2021", note:"Mandrin 3 mors auto-centrant" },
+  { name:"Glissiere_lineaire",    cat:"Assemblages",      ext:"SLDASM", date:"Oct 2021", note:"Guidage THK SRS15, 0.05mm" },
+  { name:"Arbre_fatigue_v1",      cat:"Études de détail", ext:"PDF",    date:"Mar 2023", note:"Fatigue Dang Van, 10⁷ cycles" },
+  { name:"Arbre_transmission",    cat:"Études de détail", ext:"SLDPRT", date:"Fév 2023", note:"100Cr6, traitement HRC 60" },
+  { name:"Roulement_SKF_6208",    cat:"Études de détail", ext:"STEP",   date:"Mar 2023", note:"Roulement import catalogue" },
+  { name:"Clavette_DIN6885",      cat:"Études de détail", ext:"SLDPRT", date:"Mar 2023", note:"Clavette normalisée 10x8x50" },
+  { name:"Vis_HRC_M12",           cat:"Études de détail", ext:"SLDPRT", date:"Nov 2021", note:"Vis CHc DIN912 classe 10.9" },
+  { name:"Esquisse_poignee_01",   cat:"Croquis & idées",  ext:"PDF",    date:"Avr 2022", note:"Études ergonomie poignée" },
+  { name:"Concept_chassis_alt",   cat:"Croquis & idées",  ext:"PDF",    date:"Sep 2022", note:"Alternatives châssis treillis" },
+  { name:"Mind_map_transmission", cat:"Croquis & idées",  ext:"PDF",    date:"Oct 2022", note:"Choix architecture réducteur" },
+  { name:"Nomenclature_FS23",     cat:"Divers",           ext:"XLSX",   date:"Mar 2023", note:"BOM complète 347 références" },
+  { name:"Rapport_projet_S5",     cat:"Divers",           ext:"PDF",    date:"Jan 2023", note:"Rapport semestre S5" },
+  { name:"Template_cartouche",    cat:"Divers",           ext:"DWG",    date:"Sep 2021", note:"Cartouche standard école" },
+];
+
+/* Icônes optionnelles pour catégories connues.
+   Les catégories absentes ici mais présentes dans ARCHIVE_FILES
+   sont créées automatiquement avec l'icône 📁 par défaut. */
+const ARCHIVE_CATS = {
+  "Formula Student" : { icon:"🏎" },
+  "Transmissions"   : { icon:"⚙️" },
+  "Structures"      : { icon:"🏗" },
+  "Assemblages"     : { icon:"🔩" },
+  "Études de détail": { icon:"📐" },
+  "Croquis & idées" : { icon:"✏️" },
+  "Divers"          : { icon:"📁" },
+};
+
+/* ═══════════════════════════════════════════════════════════
+   ██  3. CONFIG ANIMATION FLIP  ██
+═══════════════════════════════════════════════════════════ */
+const FLIP = {
+  travelMs:520, squeezeMs:220, flipMs:0, revealMs:260, squeezeMin:0.0,
+  targetWPct:0.80, targetWMax:1200,   /* plus large pour laisser place au carrousel */
+  travelEase:"cubic-bezier(.22,.61,.36,1)",
+};
+
+let activeId=null, flipping=false;
+let mx=0,my=0,cx=0,cy=0;
+const BG_MAX=16;
+const isMobile=()=>window.matchMedia("(max-width:768px)").matches||!window.matchMedia("(hover:hover)").matches;
+const lerp=(a,b,t)=>a+(b-a)*t;
+/* ── TAILLE DES FEUILLES — indépendante du ratio d'écran ──
+   AVANT : pw = innerWidth * w/100, donc la taille ne dépendait QUE de la
+   largeur de la fenêtre. Sur un écran avec un ratio largeur/hauteur très
+   différent (ex: ultra-wide, ou écran 2x plus grand), les feuilles
+   n'occupaient plus la même proportion visuelle de la scène — alors que
+   leur position (x%, y%) restait, elle, bien relative aux deux axes.
+   Résultat : tout semblait "décalé" en changeant d'écran.
+
+   FIX : on base la taille sur min(innerWidth, innerHeight) — l'équivalent
+   JS de l'unité CSS "vmin". Ainsi w:23 signifie toujours "23% de la plus
+   petite dimension de l'écran", peu importe le ratio. Combiné aux
+   positions x/y déjà en %, la scène entière (taille + position) scale
+   alors de façon parfaitement proportionnelle sur n'importe quel écran. */
+function vmin(){return Math.min(window.innerWidth,window.innerHeight);}
+function sheetSize(s){const pw=vmin()*s.w/100;return{pw,ph:pw/s.aspect};}
+function getAllSheets(){return Array.from(document.querySelectorAll(".drawing-sheet"));}
+
+/* ── Empilement / premier plan ──
+   Chaque feuille a un z-index de base dérivé de sa position Y (profondeur de scène).
+   Au focus (hover ou ouverture), on monte temporairement la feuille concernée
+   au-dessus de TOUTES les autres, sans jamais toucher au z-index de base des autres
+   tant qu'elles ne sont pas elles-mêmes survolées. Cela évite les conflits où une
+   feuille censée être "derrière" recouvre quand même une feuille "devant" au survol. */
+let topZCounter=200; /* toujours strictement au-dessus des z-index de base (max ~100) */
+function bringToFront(el){
+  topZCounter+=1;
+  el.style.zIndex=String(topZCounter);
+}
+
+document.addEventListener("mousemove",e=>{
+  if(isMobile()||activeId!==null)return;
+  mx=(e.clientX/window.innerWidth-.5)*2;
+  my=(e.clientY/window.innerHeight-.5)*2;
+},{passive:true});
+
+function applyParallax(){
+  if(activeId!==null)return;
+  cx=lerp(cx,mx,.06);cy=lerp(cy,my,.06);
+  document.getElementById("bg").style.transform=`translate(${-cx*BG_MAX}px,${-cy*BG_MAX}px)`;
+  getAllSheets().forEach(el=>{
+    if(el.classList.contains("is-active")||el.classList.contains("is-pushed"))return;
+    const depth=parseFloat(el.dataset.depth)||.5;
+    const dx=cx*BG_MAX*depth*.5,dy=cy*BG_MAX*depth*.5;
+    const rot=parseFloat(el.dataset.rot)||0;
+    if(!el.matches(":hover")){
+      el.style.transform=`rotate(${rot}deg) translate(${dx}px,${dy}px)`;
+      el.style.setProperty("--hover-lift",`rotate(${rot}deg) translate(${dx}px,calc(${dy}px - 9px)) scale(1.03)`);
+    }
+  });
+}
+(function rafLoop(){requestAnimationFrame(rafLoop);applyParallax()})();
+
+/* ─── Construction DOM feuilles ─── */
+const layer=document.getElementById("drawings-layer");
+SHEETS_DATA.forEach((s,i)=>{
+  const{pw,ph}=sheetSize(s);
+  const el=document.createElement("div");
+  el.className="drawing-sheet";
+  el.dataset.id=String(s.id);el.dataset.depth=s.depth;el.dataset.rot=s.rot;
+  el.dataset.baseZ=String(Math.round(s.y)); /* empilement de base selon profondeur Y */
+  el.tabIndex=0;el.setAttribute("role","button");el.setAttribute("aria-label",s.label);
+  el.style.cssText=`width:${pw}px;height:${ph}px;left:calc(${s.x}% - ${pw/2}px);top:calc(${s.y}% - ${ph/2}px);z-index:${Math.round(s.y)};transform:rotate(${s.rot}deg);opacity:0;`;
+  el.style.setProperty("--hover-lift",`rotate(${s.rot}deg) translateY(-9px) scale(1.03)`);
+  setTimeout(()=>{el.style.opacity="1";},80+i*130);
+
+  const inner=document.createElement("div");inner.className="sheet-inner";
+  const front=document.createElement("div");front.className="sheet-front";
+  const img=document.createElement("img");img.alt=s.label;img.src=s.src;
+  img.onerror=function(){this.onerror=null;this.src=FALLBACK_SRC;};
+  front.appendChild(img);inner.appendChild(front);
+
+  /* ── VERSO : texte + carrousel ── */
+  const back=document.createElement("div");back.className="sheet-back";
+
+  /* Panneau texte */
+  const textPane=document.createElement("div");textPane.className="back-text";
+  textPane.innerHTML=`
+    <p class="back-eyebrow">Projet · The Design Desk</p>
+    <h2 class="back-title">${s.label}</h2>
+    <div class="back-tags">${(s.tags||[]).map(t=>`<span class="back-tag">${t}</span>`).join("")}</div>
+    <div class="back-body">${s.desc||""}</div>
+    <p class="back-footer">${s.footer||""}</p>`;
+  back.appendChild(textPane);
+
+  /* Panneau carrousel */
+  back.appendChild(buildCarousel(s));
+
+  inner.appendChild(back);el.appendChild(inner);
+
+  const btn=document.createElement("button");btn.className="close-btn";btn.setAttribute("aria-label","Fermer");
+  btn.innerHTML=`<svg viewBox="0 0 11 11"><line x1="1" y1="1" x2="10" y2="10"/><line x1="10" y1="1" x2="1" y2="10"/></svg>`;
+  el.appendChild(btn);layer.appendChild(el);
+
+  /* ── HITBOX SUR SILHOUETTE ──
+     On calcule un clip-path à partir des pixels réellement opaques du PNG,
+     pour que le clic/hover ne réagisse que sur le dessin visible, pas sur
+     le rectangle transparent qui l'entoure (lequel chevauche les feuilles voisines). */
+  applySilhouetteHitbox(img, el);
+});
+
+/* ═══════════════════════════════════════════════════════════
+   ██  3bis. HITBOX SUR SILHOUETTE (clip-path depuis alpha du PNG)  ██
+   Lit les pixels de l'image, construit un masque binaire (opaque/transparent)
+   puis un polygone (clip-path) approximatif suivant le contour. Le fallback
+   (image sans alpha, erreur CORS, etc.) revient simplement au rectangle complet.
+═══════════════════════════════════════════════════════════ */
+function applySilhouetteHitbox(imgEl, sheetEl){
+  function compute(){
+    try{
+      const w=64; /* résolution d'analyse — suffisant pour un contour propre et rapide */
+      const h=Math.max(1,Math.round(w/(imgEl.naturalWidth/imgEl.naturalHeight||1)));
+      const canvas=document.createElement("canvas");
+      canvas.width=w;canvas.height=h;
+      const ctx=canvas.getContext("2d",{willReadFrequently:true});
+      ctx.clearRect(0,0,w,h);
+      ctx.drawImage(imgEl,0,0,w,h);
+      const data=ctx.getImageData(0,0,w,h).data;
+
+      const ALPHA_THRESH=18; /* seuil d'opacité considéré comme "matière" */
+      let anyOpaque=false,anyTransparent=false;
+      for(let p=3;p<data.length;p+=4){
+        if(data[p]>ALPHA_THRESH)anyOpaque=true;else anyTransparent=true;
+      }
+      /* Si l'image est entièrement opaque (pas de canal alpha exploitable)
+         ou entièrement transparente (erreur de lecture), on garde le rectangle. */
+      if(!anyOpaque||!anyTransparent)return;
+
+      /* Pour chaque colonne, trouver le 1er et dernier pixel opaque → contour haut/bas.
+         On construit un polygone "enveloppe" colonne par colonne (rapide, robuste,
+         suffisant pour des dessins/plans qui sont des formes globalement convexes
+         avec un contour irrégulier mais sans larges trous internes). */
+      const top=new Array(w).fill(null);
+      const bottom=new Array(w).fill(null);
+      for(let x=0;x<w;x++){
+        for(let y=0;y<h;y++){
+          const a=data[(y*w+x)*4+3];
+          if(a>ALPHA_THRESH){
+            if(top[x]===null)top[x]=y;
+            bottom[x]=y;
+          }
+        }
+      }
+      /* Combler les colonnes totalement vides en interpolant depuis les voisines,
+         pour éviter un polygone troué/dégénéré sur les bords arrondis. */
+      function fillGaps(arr,fallback){
+        let lastIdx=-1,lastVal=null;
+        for(let x=0;x<w;x++){
+          if(arr[x]!==null){
+            if(lastIdx!==-1&&lastIdx<x-1){
+              for(let k=lastIdx+1;k<x;k++){
+                const t=(k-lastIdx)/(x-lastIdx);
+                arr[k]=Math.round(lastVal+(arr[x]-lastVal)*t);
+              }
+            }
+            lastIdx=x;lastVal=arr[x];
+          }
+        }
+        for(let x=0;x<w;x++)if(arr[x]===null)arr[x]=lastVal!==null?lastVal:fallback;
+      }
+      fillGaps(top,0);fillGaps(bottom,h-1);
+
+      /* Marge de tolérance pour ne pas être trop strict au clic (en % de la dimension) */
+      const padX=1,padY=1;
+
+      const pts=[];
+      for(let x=0;x<w;x++){
+        const px=(x/(w-1))*100;
+        const py=Math.max(0,(top[x]/(h-1))*100-padY);
+        pts.push(`${px.toFixed(2)}% ${py.toFixed(2)}%`);
+      }
+      for(let x=w-1;x>=0;x--){
+        const px=(x/(w-1))*100;
+        const py=Math.min(100,(bottom[x]/(h-1))*100+padY);
+        pts.push(`${px.toFixed(2)}% ${py.toFixed(2)}%`);
+      }
+
+      const clip=`polygon(${pts.join(",")})`;
+      imgEl.style.clipPath=clip;
+      imgEl.style.webkitClipPath=clip;
+      /* Le close-btn doit rester cliquable même hors silhouette : il a son propre
+         pointer-events et n'est pas affecté par le clip-path de l'image. */
+    }catch(err){
+      /* CORS ou autre : on garde le rectangle complet, pas bloquant. */
+    }
+  }
+  if(imgEl.complete&&imgEl.naturalWidth>0){compute();}
+  else{imgEl.addEventListener("load",compute,{once:true});}
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ██  4. CARROUSEL  ██
+═══════════════════════════════════════════════════════════ */
+function buildCarousel(s){
+  const wrap=document.createElement("div");wrap.className="back-carousel";
+
+  /* Collecter les médias */
+  const medias=[];
+  for(let n=1;n<=(s.imgs||0);n++){
+    medias.push({type:"img",src:`Assets/img_${s.id}_${n}.jpg`,label:`Photo ${n}`});
+  }
+  if(s.hasVideo) medias.push({type:"video",src:`Assets/video_cao_${s.id}.mp4`,label:"Vidéo"});
+  if(s.hasCao)   medias.push({type:"cao",  src:`Assets/cao_${s.id}.glb`,      label:"CAO 3D"});
+
+  if(medias.length===0){
+    wrap.innerHTML=`<div class="carousel-empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <path d="M3 9h18M9 21V9"/>
+      </svg>
+      <span>Aucun média disponible</span>
+    </div>`;
+    return wrap;
+  }
+
+  let current=0;
+
+  /* Stage */
+  const stage=document.createElement("div");stage.className="carousel-stage";
+
+  /* Badge type */
+  const badge=document.createElement("div");badge.className="carousel-type-badge";
+  stage.appendChild(badge);
+
+  /* Items */
+  const itemEls=medias.map((m,idx)=>{
+    const item=document.createElement("div");
+    item.className="carousel-item"+(idx===0?" active":"");
+
+    if(m.type==="img"){
+      const im=document.createElement("img");im.src=m.src;im.alt=m.label;
+      im.onerror=()=>{item.style.display="none";};
+      item.appendChild(im);
+    } else if(m.type==="video"){
+      const v=document.createElement("video");
+      v.src=m.src;v.controls=true;v.loop=true;v.playsInline=true;
+      v.onerror=()=>{item.style.display="none";};
+      item.appendChild(v);
+    } else if(m.type==="cao"){
+      const mv=document.createElement("model-viewer");
+      mv.setAttribute("src",m.src);
+      mv.setAttribute("alt","CAO 3D interactive");
+      mv.setAttribute("camera-controls","");
+      mv.setAttribute("auto-rotate","");
+      mv.setAttribute("shadow-intensity","1");
+      mv.setAttribute("exposure","0.8");
+      mv.style.cssText="width:100%;height:100%;background:transparent;";
+      mv.onerror=()=>{item.style.display="none";};
+      item.appendChild(mv);
+    }
+    stage.appendChild(item);
+    return item;
+  });
+
+  /* Flèches */
+  const prev=document.createElement("button");prev.className="carousel-arrow prev";prev.innerHTML="‹";
+  const next=document.createElement("button");next.className="carousel-arrow next";next.innerHTML="›";
+  if(medias.length<=1){prev.classList.add("hidden");next.classList.add("hidden");}
+  stage.appendChild(prev);stage.appendChild(next);
+  wrap.appendChild(stage);
+
+  /* Barre miniatures */
+  const nav=document.createElement("div");nav.className="carousel-nav";
+  const thumbEls=medias.map((m,idx)=>{
+    const t=document.createElement("div");
+    t.className="carousel-thumb"+(idx===0?" active":"");
+    if(m.type==="img"){
+      const ti=document.createElement("img");ti.src=m.src;ti.alt="";
+      ti.onerror=()=>{ti.remove();t.innerHTML=`<span class="ct-icon">🖼</span>`;};
+      t.appendChild(ti);
+    } else if(m.type==="video"){
+      t.innerHTML=`<span class="ct-icon">▶</span>`;
+    } else {
+      t.innerHTML=`<span class="ct-icon">🔩</span>`;
+    }
+    t.addEventListener("click",()=>goTo(idx));
+    nav.appendChild(t);
+    return t;
+  });
+  wrap.appendChild(nav);
+
+  /* Navigation */
+  const typeLabels={img:"Photo",video:"Vidéo",cao:"CAO 3D"};
+  function goTo(idx){
+    /* Pause video du précédent */
+    const prevItem=itemEls[current];
+    const prevVid=prevItem.querySelector("video");
+    if(prevVid){prevVid.pause();}
+    /* Pause auto-rotate du précédent model-viewer */
+    const prevMv=prevItem.querySelector("model-viewer");
+    if(prevMv)prevMv.removeAttribute("auto-rotate");
+
+    itemEls[current].classList.remove("active");
+    thumbEls[current].classList.remove("active");
+    current=((idx%medias.length)+medias.length)%medias.length;
+    itemEls[current].classList.add("active");
+    thumbEls[current].classList.add("active");
+    badge.textContent=typeLabels[medias[current].type]||"";
+
+    /* Auto-rotate sur le model-viewer actif */
+    const curMv=itemEls[current].querySelector("model-viewer");
+    if(curMv)curMv.setAttribute("auto-rotate","");
+  }
+  prev.addEventListener("click",()=>goTo(current-1));
+  next.addEventListener("click",()=>goTo(current+1));
+  badge.textContent=typeLabels[medias[0].type]||"";
+
+  return wrap;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ██  5. FLIP ANIMATION  ██
+═══════════════════════════════════════════════════════════ */
+function openSheet(el){
+  if(activeId!==null||flipping)return;
+  flipping=true;activeId=el.dataset.id;
+  const vw=window.innerWidth,vh=window.innerHeight;
+  const targetW=Math.min(vw*FLIP.targetWPct,FLIP.targetWMax);
+  const aspect=parseFloat(el.style.height)/parseFloat(el.style.width);
+  const targetH=Math.min(targetW*aspect,vh*0.88);
+  mx=0;my=0;
+  const bg=document.getElementById("bg");
+  bg.style.transition=`transform ${FLIP.travelMs}ms ${FLIP.travelEase}`;
+  bg.style.transform="translate(0,0)";
+  setTimeout(()=>{bg.style.transition="";},FLIP.travelMs+60);
+  document.body.classList.add("drawing-open");
+  /* La feuille active passe inconditionnellement au-dessus de TOUT le reste */
+  bringToFront(el);
+  getAllSheets().forEach(sheet=>{
+    if(sheet===el)return;
+    sheet.classList.add("is-pushed");
+    const r=sheet.getBoundingClientRect();
+    const scx=r.left+r.width/2,scy=r.top+r.height/2;
+    const ddx=(scx-vw/2)*.20,ddy=(scy-vh/2)*.20;
+    const rot=parseFloat(sheet.dataset.rot)||0;
+    sheet.style.transition=`transform ${FLIP.travelMs}ms ${FLIP.travelEase}`;
+    sheet.style.transform=`rotate(${rot+(ddx>0?5:-5)}deg) translate(${ddx}px,${ddy}px) scale(.90)`;
+  });
+  el.classList.add("is-active");
+  const inner=el.querySelector(".sheet-inner");
+  el.style.transition=`transform ${FLIP.travelMs}ms ${FLIP.travelEase},width ${FLIP.travelMs}ms ${FLIP.travelEase},height ${FLIP.travelMs}ms ${FLIP.travelEase},left ${FLIP.travelMs}ms ${FLIP.travelEase},top ${FLIP.travelMs}ms ${FLIP.travelEase}`;
+  el.style.width=targetW+"px";el.style.height=targetH+"px";
+  el.style.left=(vw-targetW)/2+"px";el.style.top=(vh-targetH)/2+"px";
+  el.style.transform="rotate(0deg)";
+  /* z-index déjà géré par bringToFront() ci-dessus + .is-active (z-index:1000 en CSS) */
+  /* Le clip-path silhouette ne doit pas gêner l'ouverture/lecture du verso : on le retire
+     pendant que la feuille est active (la zone cliquable redevient le rectangle complet,
+     ce qui est correct puisqu'il n'y a alors qu'une seule feuille au premier plan). */
+  const frontImg=el.querySelector(".sheet-front img");
+  if(frontImg){frontImg.style.clipPath="none";frontImg.style.webkitClipPath="none";}
+  inner.style.transition="none";inner.style.transform="scaleX(1)";
+  setTimeout(()=>{
+    inner.style.transition=`transform ${FLIP.squeezeMs}ms cubic-bezier(.55,0,.45,1)`;
+    inner.style.transform=`scaleX(${FLIP.squeezeMin})`;
+    setTimeout(()=>{
+      inner.style.transition="none";
+      inner.style.transform=`rotateY(180deg) scaleX(${FLIP.squeezeMin})`;
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        inner.style.transition=`transform ${FLIP.revealMs}ms cubic-bezier(.25,1.4,.55,1)`;
+        inner.style.transform="rotateY(180deg) scaleX(1)";
+        setTimeout(()=>{flipping=false;},FLIP.revealMs);
+      }));
+    },FLIP.squeezeMs+FLIP.flipMs);
+  },FLIP.travelMs*0.35);
+}
+
+function closeSheet(){
+  if(activeId===null||flipping)return;
+  flipping=true;
+  const el=document.querySelector(`.drawing-sheet[data-id="${activeId}"]`);
+  const s=SHEETS_DATA.find(d=>String(d.id)===el?.dataset.id);
+  const inner=el?.querySelector(".sheet-inner");
+  /* Pause tous les médias */
+  el?.querySelectorAll("video").forEach(v=>v.pause());
+  activeId=null;document.body.classList.remove("drawing-open");
+  if(el&&inner&&s){
+    inner.style.transition=`transform ${FLIP.squeezeMs}ms cubic-bezier(.55,0,.45,1)`;
+    inner.style.transform="rotateY(180deg) scaleX(0)";
+    setTimeout(()=>{
+      inner.style.transition="none";inner.style.transform="scaleX(0)";
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        inner.style.transition=`transform ${FLIP.revealMs}ms cubic-bezier(.25,1.4,.55,1)`;
+        inner.style.transform="scaleX(1)";
+        const{pw,ph}=sheetSize(s);
+        const dur=FLIP.revealMs+FLIP.travelMs*0.6;
+        el.style.transition=`transform ${dur}ms ${FLIP.travelEase},width ${dur}ms ${FLIP.travelEase},height ${dur}ms ${FLIP.travelEase},left ${dur}ms ${FLIP.travelEase},top ${dur}ms ${FLIP.travelEase}`;
+        el.style.width=pw+"px";el.style.height=ph+"px";
+        el.style.left=`calc(${s.x}% - ${pw/2}px)`;
+        el.style.top=`calc(${s.y}% - ${ph/2}px)`;
+        el.style.transform=`rotate(${s.rot}deg)`;
+        /* Retour au z-index de base (profondeur de scène d'origine) */
+        el.style.zIndex=el.dataset.baseZ||String(Math.round(s.y));
+        el.classList.remove("is-active");
+        /* Restaurer la hitbox silhouette maintenant que la feuille reprend sa taille/place normales */
+        const frontImg=el.querySelector(".sheet-front img");
+        if(frontImg){applySilhouetteHitbox(frontImg, el);}
+        setTimeout(()=>{flipping=false;},dur);
+      }));
+    },FLIP.squeezeMs);
+  } else {flipping=false;}
+  getAllSheets().forEach(sheet=>{
+    if(sheet===el)return;
+    const sd=SHEETS_DATA.find(d=>String(d.id)===sheet.dataset.id);
+    sheet.classList.remove("is-pushed");
+    sheet.style.transition=`transform 600ms ${FLIP.travelEase}`;
+    sheet.style.transform=`rotate(${sd?sd.rot:0}deg)`;
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ██  6. INTERACTIONS FEUILLES  ██
+═══════════════════════════════════════════════════════════ */
+
+/* ── Premier plan au survol ──
+   Dès qu'une feuille (au repos, ni active ni poussée) est survolée, elle passe
+   devant toutes les autres. On utilise la délégation sur la couche pour capter
+   les survols même si une feuille est partiellement masquée par une voisine —
+   utile en bordure de silhouette où le clip-path laisse passer le hover vers
+   ce qu'il y a en dessous. */
+layer.addEventListener("pointerover",e=>{
+  const sheet=e.target.closest(".drawing-sheet");
+  if(!sheet||activeId!==null||flipping)return;
+  if(sheet.classList.contains("is-pushed"))return;
+  bringToFront(sheet);
+});
+
+layer.addEventListener("click",e=>{
+  const sheet=e.target.closest(".drawing-sheet");
+  if(!sheet)return;
+  if(e.target.closest(".close-btn")){closeSheet();return;}
+  /* Empêcher fermeture si clic sur carrousel */
+  if(e.target.closest(".back-carousel")){return;}
+  if(!sheet.classList.contains("is-active")&&activeId===null&&!flipping)openSheet(sheet);
+});
+layer.addEventListener("keydown",e=>{
+  if(e.key!=="Enter"&&e.key!==" ")return;
+  const sheet=e.target.closest(".drawing-sheet");
+  if(sheet&&!sheet.classList.contains("is-active")&&activeId===null&&!flipping)openSheet(sheet);
+});
+/* Le focus clavier (tab) doit aussi amener la feuille au premier plan */
+layer.addEventListener("focusin",e=>{
+  const sheet=e.target.closest(".drawing-sheet");
+  if(!sheet||activeId!==null||flipping)return;
+  if(sheet.classList.contains("is-pushed"))return;
+  bringToFront(sheet);
+});
+
+/* ── Fermeture au clic sur le dim ── */
+document.getElementById("dim").addEventListener("click",()=>{
+  if(activeId!==null&&!flipping)closeSheet();
+});
+
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Escape")return;
+  if(activeId!==null&&!flipping)closeSheet();
+  if(document.body.classList.contains("archives-open"))closeArchives();
+});
+
+window.addEventListener("resize",()=>{
+  if(activeId!==null)closeSheet();
+  getAllSheets().forEach(el=>{
+    const s=SHEETS_DATA.find(d=>String(d.id)===el.dataset.id);
+    if(!s)return;
+    const{pw,ph}=sheetSize(s);
+    el.style.width=pw+"px";el.style.height=ph+"px";
+    el.style.left=`calc(${s.x}% - ${pw/2}px)`;
+    el.style.top=`calc(${s.y}% - ${ph/2}px)`;
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════
+   ██  7. ARCHIVES PANEL  ██
+═══════════════════════════════════════════════════════════ */
+/* NB : toutes les variables et listeners sont déclarés ICI,
+   après le HTML — plus aucun problème d'ordre d'exécution. */
+const arcPanel   = document.getElementById("archives-panel");
+const arcGrid    = document.getElementById("arc-grid");
+const arcSidebar = document.getElementById("arc-sidebar");
+const arcSearch  = document.getElementById("arc-search-input");
+let arcActiveCat = "all";
+let arcView      = "grid";
+
+function openArchives(){
+  document.body.classList.add("archives-open");
+  arcPanel.classList.add("open");
+  arcSearch.focus();
+}
+function closeArchives(){
+  document.body.classList.remove("archives-open");
+  arcPanel.classList.remove("open");
+}
+
+document.getElementById("archives-btn").addEventListener("click",e=>{e.preventDefault();openArchives();});
+document.getElementById("arc-close-x").addEventListener("click",closeArchives);
+
+/* ── Clic sur le fond du panel (hors fenêtre) → fermer ──
+   La fenêtre appelle stopPropagation, le fond du panel (overlay) ferme. */
+arcPanel.addEventListener("click", e => {
+  /* Si le clic est atterri directement sur #archives-panel
+     (l'overlay transparent) et pas sur .arc-window → fermer */
+  if(e.target === arcPanel) closeArchives();
+});
+/* La fenêtre elle-même bloque la propagation pour ne pas fermer */
+document.querySelector(".arc-window").addEventListener("click", e => e.stopPropagation());
+
+/* ── Sidebar dynamique ── */
+function buildSidebar(){
+  arcSidebar.innerHTML="";
+  const allItem=document.createElement("div");
+  allItem.className="arc-tree-item active";allItem.dataset.cat="all";
+  allItem.innerHTML=`
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+      <rect x="2" y="2" width="12" height="12" rx="2"/>
+      <line x1="2" y1="7" x2="14" y2="7"/><line x1="2" y1="11" x2="14" y2="11"/>
+    </svg>Tous les projets`;
+  allItem.addEventListener("click",()=>setCategory("all",allItem));
+  arcSidebar.appendChild(allItem);
+
+  const sep=document.createElement("div");
+  sep.style.cssText="height:1px;background:rgba(255,255,255,.05);margin:6px 10px 8px;";
+  arcSidebar.appendChild(sep);
+
+  const secEl=document.createElement("div");secEl.className="arc-tree-section";
+  const header=document.createElement("div");header.className="arc-tree-header";
+  header.innerHTML=`<svg viewBox="0 0 10 10" fill="currentColor"><path d="M2 3l3 4 3-4"/></svg> Catégories`;
+  const items=document.createElement("div");items.className="arc-tree-items";
+
+  /* Comptage par catégorie */
+  const catCounts={};
+  ARCHIVE_FILES.forEach(f=>{catCounts[f.cat]=(catCounts[f.cat]||0)+1;});
+  /* Ordre : catégories connues d'abord, inconnues ensuite */
+  const knownCats=Object.keys(ARCHIVE_CATS).filter(c=>catCounts[c]>0);
+  const unknownCats=Object.keys(catCounts).filter(c=>!ARCHIVE_CATS[c]);
+
+  [...knownCats,...unknownCats].forEach(cat=>{
+    const count=catCounts[cat]||0;
+    if(count===0)return;
+    const info=ARCHIVE_CATS[cat]||{icon:"📁"};
+    const item=document.createElement("div");
+    item.className="arc-tree-item";item.dataset.cat=cat;
+    item.innerHTML=`
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M2 5a2 2 0 012-2h2l2 2h4a2 2 0 012 2v5a2 2 0 01-2 2H4a2 2 0 01-2-2V5z"/>
+      </svg>
+      <span style="flex:1">${info.icon} ${cat}</span>
+      <span style="font-size:9px;opacity:.4">${count}</span>`;
+    item.addEventListener("click",()=>setCategory(cat,item));
+    items.appendChild(item);
+  });
+
+  header.addEventListener("click",()=>{
+    header.classList.toggle("collapsed");
+    items.style.display=header.classList.contains("collapsed")?"none":"";
+  });
+  secEl.appendChild(header);secEl.appendChild(items);
+  arcSidebar.appendChild(secEl);
+}
+
+function setCategory(cat,clickedEl){
+  arcActiveCat=cat;
+  document.querySelectorAll(".arc-tree-item").forEach(i=>i.classList.remove("active"));
+  clickedEl.classList.add("active");
+  document.getElementById("arc-bc-cat").textContent=cat==="all"?"Tous les projets":cat;
+  document.getElementById("arc-status-cat").textContent=cat==="all"?"Tous":cat;
+  renderGrid();
+}
+
+const EXT_COLORS={SLDPRT:"#4a90d9",SLDASM:"#e07b39",DWG:"#e6b84a",PDF:"#e05252",STEP:"#7ac97a",XLSX:"#4caf78",default:"#888"};
+function extColor(ext){return EXT_COLORS[ext]||EXT_COLORS.default;}
+function fileIcon(ext){
+  return `<svg class="arc-thumb-icon" viewBox="0 0 32 40" fill="none">
+    <path d="M4 0h18l10 10v30H4z" fill="${extColor(ext)}22" stroke="${extColor(ext)}" stroke-width="1.2"/>
+    <path d="M22 0l10 10H22z" fill="${extColor(ext)}55"/>
+    <text x="16" y="28" text-anchor="middle" font-size="7" font-family="monospace" fill="${extColor(ext)}" font-weight="bold">${ext}</text>
+  </svg>`;
+}
+
+function renderGrid(){
+  const q=arcSearch.value.toLowerCase().trim();
+  const files=ARCHIVE_FILES.filter(f=>{
+    const mc=arcActiveCat==="all"||f.cat===arcActiveCat;
+    const mq=!q||(f.name.toLowerCase().includes(q)||f.cat.toLowerCase().includes(q)||(f.note||"").toLowerCase().includes(q));
+    return mc&&mq;
+  });
+  arcGrid.innerHTML="";
+  arcGrid.className="arc-grid"+(arcView==="list"?" view-list":"");
+  files.forEach(f=>{
+    const card=document.createElement("div");card.className="arc-file";card.title=f.note||f.name;
+    const thumb=document.createElement("div");thumb.className="arc-thumb";
+    const imgEl=document.createElement("img");imgEl.alt=f.name;imgEl.src=`Images/CAO/${f.name}.png`;imgEl.loading="lazy";
+    let fb=false;
+    imgEl.onerror=function(){if(fb)return;fb=true;this.remove();thumb.insertAdjacentHTML("afterbegin",fileIcon(f.ext));};
+    thumb.appendChild(imgEl);thumb.insertAdjacentHTML("beforeend",`<span class="arc-file-ext">${f.ext}</span>`);
+    const name=document.createElement("div");name.className="arc-file-name";
+    name.textContent=f.name+(arcView==="list"&&f.note?" — "+f.note:"");
+    const meta=document.createElement("div");meta.className="arc-file-meta";
+    meta.textContent=arcView==="list"?`${f.cat} · ${f.date}`:f.date;
+    card.appendChild(thumb);card.appendChild(name);card.appendChild(meta);
+    card.addEventListener("click",()=>{arcGrid.querySelectorAll(".arc-file").forEach(c=>c.classList.remove("selected"));card.classList.add("selected");});
+    arcGrid.appendChild(card);
+  });
+  document.getElementById("arc-count").textContent=files.length;
+}
+
+document.getElementById("btn-view-grid").addEventListener("click",()=>{
+  arcView="grid";
+  document.getElementById("btn-view-grid").classList.add("active");
+  document.getElementById("btn-view-list").classList.remove("active");
+  renderGrid();
+});
+document.getElementById("btn-view-list").addEventListener("click",()=>{
+  arcView="list";
+  document.getElementById("btn-view-list").classList.add("active");
+  document.getElementById("btn-view-grid").classList.remove("active");
+  renderGrid();
+});
+arcSearch.addEventListener("input",()=>renderGrid());
+
+buildSidebar();
+renderGrid();
+</script>
 </body>
 </html>
