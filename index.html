@@ -1193,6 +1193,9 @@ section { position:relative; overflow:hidden; }
 .swi-ico span { font-family:'Cormorant Garamond',serif; font-size:1.15rem; color:var(--gold); font-style:italic; }
 .swi-name { font-size:.58rem; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,255,255,.35); text-align:center; transition:color .4s; }
 .swi.active .swi-name { color:var(--gold-l); }
+.swi-stars { position:relative; display:inline-block; font-size:.62rem; letter-spacing:.15em; margin-top:.15rem; line-height:1; }
+.swi-stars .stars-off { color:rgba(201,168,76,.3); white-space:nowrap; }
+.swi-stars .stars-on { position:absolute; top:0; left:0; overflow:hidden; white-space:nowrap; color:var(--gold); }
 .car3d-nav { position:absolute; z-index:10; top:50%; transform:translateY(-50%); background:transparent; border:1px solid rgba(201,168,76,.3); width:42px; height:42px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:rgba(201,168,76,.6); font-size:1rem; transition:border-color .3s,color .3s,background .3s; }
 .car3d-nav:hover { border-color:var(--gold); color:var(--gold); background:rgba(201,168,76,.06); }
 .car3d-nav.prev { left:3rem; }
@@ -1268,6 +1271,9 @@ section { position:relative; overflow:hidden; }
   transition:color .3s;
 }
 .sw-sec-item:hover .sw-sec-name { color:rgba(201,168,76,.7); }
+.sw-sec-stars { position:relative; display:inline-block; font-size:.5rem; letter-spacing:.1em; margin-top:.1rem; line-height:1; }
+.sw-sec-stars .stars-off { color:rgba(201,168,76,.25); white-space:nowrap; }
+.sw-sec-stars .stars-on { position:absolute; top:0; left:0; overflow:hidden; white-space:nowrap; color:var(--gold); }
 /* ════════════════════════════════════════════════════════
    PAST PROJECTS — TETRIS PAGINÉ
 ════════════════════════════════════════════════════════ */
@@ -1663,8 +1669,6 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
     </svg>
 
     <div class="h-overlay">
-      <span class="h-sup">ENSAM · Portfolio</span>
-
       <!-- PORTF O LIO avec engrenage à la place du 2e O -->
       <div class="h-portfolio-wrap" aria-label="Portfolio">
         <!-- Gradient pour l'engrenage -->
@@ -1761,7 +1765,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
   <section id="feat">
     <div class="sh rv">
       <span class="sl">Projets</span>
-      <h2 class="st">Domaines de <em>compétences</em></h2>
+      <h2 class="st">Mes domaines d'<em>action</em></h2>
       <svg class="sh-orn" viewBox="0 0 440 32" width="340" height="32" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
         <g fill="none" stroke-width="1">
           <path d="M218,16 L222,10 L226,16 L222,22 Z" fill="#C9A84C" stroke="none"/>
@@ -1776,15 +1780,15 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
     <div class="fgrid">
       <div class="pc rv d1">
         <div class="pcm"><div class="phalo"></div><div class="pring"></div><img src="Images/projet1.png" alt="Modélisation & Simulation" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85;"></div>
-        <div class="pcb"><div class="pcat">Conception CAO · SolidWorks</div><h3 class="pn">Modélisation &amp; Simulation</h3><p class="pd">Conception de pièces et sous-ensembles mécaniques sous SolidWorks : modélisation paramétrique, assemblages contraints et simulations structurelles.</p><a href="projet-3d.html" class="pl">Voir les projets</a></div>
+        <div class="pcb"><div class="pcat">Conception CAO · SolidWorks · 3D Experience</div><h3 class="pn">Modélisation &amp; Simulation</h3><p class="pd">Conception de pièces et de sous-ensembles mécaniques sous SolidWorks, principalement, de la modélisation paramétrique aux simulations structurelles, dans le cadre de mes projets d'école et personnels.</p><a href="projet-3d.html" class="pl">Voir les modélisations</a></div>
       </div>
       <div class="pc rv d2">
         <div class="pcm"><div class="phalo"></div><div class="pring"></div><img src="Images/projet2.png" alt="Environnements & Rendu 3D" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85;"></div>
-        <div class="pcb"><div class="pcat">3D Temps Réel · Blender &amp; Unreal Engine 5</div><h3 class="pn">Environnements &amp; Rendu 3D</h3><p class="pd">Création d'environnements immersifs et expérimentation du rendu temps réel sous Unreal Engine 5 et Blender.</p><a href="projet-dev.html" class="pl">Voir le projet</a></div>
+        <div class="pcb"><div class="pcat">Visualisation 3D · Blender · Unreal Engine 5 · Sweet Home 3D · SketchUp</div><h3 class="pn">Visualisation 3D &amp; Architecture</h3><p class="pd">Exploration du rendu temps réel et de la modélisation d'environnements (Blender, Unreal Engine 5), ainsi que de la conception architecturale (Sweet Home 3D, SketchUp), en autodidacte.</p><a href="projet-dev.html" class="pl">Voir les créations</a></div>
       </div>
       <div class="pc rv d3">
         <div class="pcm"><div class="phalo"></div><div class="pring"></div><img src="Images/projet3.png" alt="Outils & Programmation" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85;"></div>
-        <div class="pcb"><div class="pcat">Développement technique</div><h3 class="pn">Outils &amp; Programmation</h3><p class="pd">Développement de scripts, outils numériques et interfaces d'ingénierie pour l'automatisation et la visualisation de données.</p><a href="projet-meca.html" class="pl">Voir le projet</a></div>
+        <div class="pcb"><div class="pcat">Projets techniques · École & personnels</div><h3 class="pn">Projets Ingénieurs</h3><p class="pd">Sélection de projets techniques menés au cours de ma formation ou en autonomie, entre conception mécanique, calculs et développement d'outils.</p><a href="projet-meca.html" class="pl">Voir les projet</a></div>
       </div>
     </div>
 
@@ -1869,7 +1873,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
       </div>
       <div>
         <span class="al rv">À propos</span>
-        <h2 class="ah2 rv">Étudiant-ingénieur<br><em>spécialisé</em> en conception mécanique et fabrication</h2>
+        <h2 class="ah2 rv">Futur ingénieur généraliste,<br><em>tourné vers</em> la conception mécanique et la visualisation 3D</h2>
         <svg class="aorn rv" viewBox="0 0 280 22" width="220" height="22" xmlns="http://www.w3.org/2000/svg" style="overflow:visible;display:block">
           <g fill="none" stroke-width="1">
             <line x1="0" y1="11" x2="18" y2="11" stroke="#C9A84C"/>
@@ -1879,12 +1883,13 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
             <line x1="166" y1="11" x2="200" y2="11" stroke="#C9A84C" opacity=".35"/>
           </g>
         </svg>
-        <p class="ap rv">Étudiant en école d'ingénieurs aux Arts et Métiers, je développe une expertise en conception mécanique, procédés de fabrication et visualisation numérique.</p>
-        <p class="ap rv d1">Je m'intéresse aussi bien aux procédés industriels — usinage, soudure, forgeage, métrologie — qu'aux outils numériques tels que SolidWorks, Blender, Unreal Engine 5 et Python.</p>
+        <p class="ap rv">Étudiant-ingénieur à l'École Nationale Supérieure des Arts et Métiers, je construis mon parcours autour de la conception mécanique, des procédés de fabrication et de la visualisation numérique.</p>
+        <p class="ap rv d1">Mon approche est autant terrain que numérique : je suis formé aux procédés industriels — usinage, soudure, forgeage, métrologie — et je complète cette base pratique par la maîtrise d'outils de conception et de rendu comme SolidWorks, Blender, Unreal Engine 5 ou Python.</p>
+		<p class="ap rv d1">Ce qui m'anime, c'est de comprendre un objet de bout en bout : de sa conception à sa fabrication, en passant par sa représentation visuelle. C'est cette curiosité qui m'a amené à m'investir dans une équipe de Formula Student, où je conçois et fabrique une monoplace électrique aux côtés de mon équipe BFS.</p>
         <div class="astats rv d2">
-          <div><span class="stn">3</span><span class="stl">Certifications officielles</span></div>
-          <div><span class="stn">6+</span><span class="stl">Procédés maîtrisés</span></div>
-          <div><span class="stn">3</span><span class="stl">Projets 3D en cours</span></div>
+          <div><span class="stn">3</span><span class="stl">Certifications</span></div>
+          <div><span class="stn">6+</span><span class="stl">Procédés pratiqués</span></div>
+          <div><span class="stn">1</span><span class="stl">An de formation ingénieur</span></div>
         </div>
       </div>
     </div>
@@ -2034,7 +2039,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
     </svg>
     <div class="sc-top rv">
       <p class="sc-eyebrow">Projet principal actuel</p>
-      <h2 class="sc-title">Participation à la Formula Student</h2>
+      <h2 class="sc-title">Conception d'une monoplace électrique — Formula Student</h2>
     </div>
     <svg class="sc-fio-l" style="display:none"></svg>
     <svg class="sc-fio-r" style="display:none"></svg>
@@ -2086,10 +2091,10 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
   <div class="tl-item rv">
     <div class="tl-left">
       <div class="tl-year">2022</div>
-      <div class="tl-sub">Baccalauréat</div>
+      <div class="tl-sub">Baccalauréat - Lycée Bernard Palissy</div>
       <div class="tl-title">Bac Technologique — Mention</div>
-      <div class="tl-desc">STI2D spécialité ITEC. Première approche de la conception mécanique et découverte de la modélisation 3D avec SolidWorks.</div>
-      <div class="tl-tags"><span class="tl-tag">Maths</span><span class="tl-tag">Physique</span><span class="tl-tag">Sciences de l'ingénieur</span></div>
+      <div class="tl-desc">Bac STI2D spécialité ITEC, avec une seconde approche de la conception mécanique et de la modélisation 3D sur SolidWorks, après une première approche en début de collège.</div>
+      <div class="tl-tags"><span class="tl-tag">Maths</span><span class="tl-tag">Physique</span><span class="tl-tag">Sciences de l'ingénieur</span><span class="tl-tag">SolidWorks</span></div>
     </div>
     <div class="tl-dot"><div class="tl-dot-inner"></div></div>
     <div class="tl-right tl-empty"></div>
@@ -2100,11 +2105,11 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
     <div class="tl-left tl-empty"></div>
     <div class="tl-dot"><div class="tl-dot-inner"></div></div>
     <div class="tl-right">
-      <div class="tl-year">2022–25</div>
-      <div class="tl-sub">Classes Préparatoires</div>
-      <div class="tl-title">TSI — Lycée Benjamin Franklin</div>
+      <div class="tl-year">2022–2025</div>
+      <div class="tl-sub">Classes Préparatoires aux Grandes Ecoles - Lycée Benjamin Franklin</div>
+      <div class="tl-title">CPGE TSI</div>
       <div class="tl-desc">Formation intensive en mathématiques, physique et sciences de l'ingénieur. Développement de la rigueur analytique et de la capacité à résoudre des problèmes complexes. Réalisation de deux TIPE et initiation autodidacte à Blender et Unreal Engine 5.</div>
-      <div class="tl-tags"><span class="tl-tag">Mathématiques</span><span class="tl-tag">Physique</span><span class="tl-tag">Sciences de l'ingénieur</span></div>
+      <div class="tl-tags"><span class="tl-tag">Mathématiques</span><span class="tl-tag">Physique</span><span class="tl-tag">Sciences de l'ingénieur</span><span class="tl-tag">Blender</span><span class="tl-tag">Unreal Engine 5</span></div>
     </div>
   </div>
 
@@ -2112,7 +2117,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
   <div class="tl-item rv d2">
     <div class="tl-left">
       <div class="tl-year">2025–2028</div>
-      <div class="tl-sub">Grande École d'Ingénieurs</div>
+      <div class="tl-sub">École d'Ingénieurs - ENSAM Angers</div>
       <div class="tl-title">École Nationale Supérieure des Arts et Métiers</div>
       <div class="tl-desc">Cursus ingénieur généraliste avec spécialisation progressive en conception mécanique et procédés industriels.</div>
       <div class="tl-tags"><span class="tl-tag">Génie mécanique</span><span class="tl-tag">Conception</span><span class="tl-tag">Fabrication</span></div>
@@ -2129,19 +2134,19 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
       <div class="tl-year">2026</div>
       <div class="tl-sub">Certifications officielles</div>
       <div class="tl-title">CSWA &amp; CSWP — SolidWorks</div>
-      <div class="tl-desc">Obtention des deux certifications Dassault Systèmes : Associate et Professional. Maîtrise de la CAO paramétrique, des assemblages complexes et des configurations avancées.</div>
-      <div class="tl-tags"><span class="tl-tag">SolidWorks</span><span class="tl-tag">CAO</span><span class="tl-tag">Certification</span></div>
+      <div class="tl-desc">Obtention des certifications Dassault Systèmes CSWA et CSWP, validant ma maîtrise de la CAO paramétrique, des assemblages complexes et des configurations avancées.</div>
+      <div class="tl-tags"><span class="tl-tag">SolidWorks</span></div>
     </div>
   </div>
 
   <!-- 5 — contenu GAUCHE -->
   <div class="tl-item rv d4">
     <div class="tl-left">
-      <div class="tl-year">2026–27</div>
+      <div class="tl-year">2026–2027</div>
       <div class="tl-sub">Projet étudiant</div>
       <div class="tl-title">Équipe BFS — Formula Student</div>
-      <div class="tl-desc">Conception, modélisation 3D et fabrication d'une monoplace électrique au sein de l'équipe BFS. Projet pluridisciplinaire alliant mécanique, gestion de partenariats industriels et travail d'équipe. Responsable du pôle mécanique.</div>
-      <div class="tl-tags"><span class="tl-tag">Formula Student</span><span class="tl-tag">Conception et assemblage 3D</span><span class="tl-tag">Travail d'équipe</span> <span class="tl-tag">Management</span></div>
+      <div class="tl-desc">Conception, modélisation 3D et fabrication d'une monoplace électrique au sein de l'équipe BFS, en tant que responsable du pôle mécanique. Un projet pluridisciplinaire mêlant technique, gestion de partenariats industriels et travail d'équipe.</div>
+      <div class="tl-tags"><span class="tl-tag">Conception et assemblage 3D</span><span class="tl-tag">Travail d'équipe</span> <span class="tl-tag">Management</span></div>
     </div>
     <div class="tl-dot"><div class="tl-dot-inner"></div></div>
     <div class="tl-right tl-empty"></div>
@@ -2152,11 +2157,11 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
     <div class="tl-left tl-empty"></div>
     <div class="tl-dot"><div class="tl-dot-inner"></div></div>
     <div class="tl-right">
-      <div class="tl-year">2026–</div>
+      <div class="tl-year">2026-...</div>
       <div class="tl-sub">En cours</div>
-      <div class="tl-title">Spécialisation &amp; Projets Numériques</div>
-      <div class="tl-desc">Approfondissement en visualisation 3D avec Blender et Unreal Engine 5, développement Python, et maîtrise des procédés de fabrication avancés (matériaux composites, fabrication additive).</div>
-      <div class="tl-tags"><span class="tl-tag">Blender</span><span class="tl-tag">Unreal Engine 5</span><span class="tl-tag">Python</span></div>
+      <div class="tl-title">Développement de mes compétences numériques</div>
+      <div class="tl-desc">Approfondissement de la visualisation 3D (Blender, Unreal Engine 5), du développement Python, et découverte des procédés de fabrication avancés : matériaux composites, fabrication additive, ...</div>
+      <div class="tl-tags"><span class="tl-tag">Blender</span><span class="tl-tag">Unreal Engine 5</span><span class="tl-tag">Python</span><span class="tl-tag">SketchUp</span></div>
     </div>
   </div>
 
@@ -2171,7 +2176,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
   <section id="software">
     <div class="sh rv" style="padding:0 3rem;">
       <span class="sl">Outils</span>
-      <h2 class="st">Environnements <em>logiciels</em></h2>
+      <h2 class="st">Environnements &amp; <em>logiciels</em></h2>
       <svg class="sh-orn" viewBox="0 0 440 32" width="320" height="32" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
         <g fill="none" stroke-width="1" opacity=".7">
           <path d="M218,16 L222,10 L226,16 L222,22 Z" fill="#C9A84C" stroke="none" opacity="1"/>
@@ -2183,6 +2188,8 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
 
     <!-- Logiciels PRINCIPAUX — carousel 3D -->
     <div class="sw-level-label rv">Outils principaux</div>
+	<Br>
+	<Br>
     <div class="car3d-outer rv">
       <button class="car3d-nav prev" id="cPrev" aria-label="Précédent">&#8592;</button>
       <div class="car3d-perspective">
@@ -2217,6 +2224,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
     <div class="sh rv">
       <span class="sl">Procédés &amp; Fabrication</span>
       <h2 class="st">Travaux pratiques <em>à Arts et Métiers</em></h2>
+<p style="max-width:560px;margin:1.5rem auto 0;font-size:1.8rem;line-height:1.8;color:var(--text-m);text-align:center;">Ces travaux pratiques, réalisés en atelier et en laboratoire, m'ont permis de me confronter concrètement aux procédés industriels enseignés à l'ENSAM.</p>
       <svg class="sh-orn" viewBox="0 0 440 32" width="320" height="32" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
         <g fill="none" stroke-width="1">
           <path d="M218,16 L222,10 L226,16 L222,22 Z" fill="#C49A8A" stroke="none"/>
@@ -2241,7 +2249,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         <div class="tp-border-hover"></div>
         <div class="tp-overlay">
           <div class="tp-title">Forgeage</div>
-          <div class="tp-cat">Mise en forme de pièces métalliques par déformation plastique à chaud</div>
+          <div class="tp-cat">Réalisation de pièces forgées à chaud : mise en forme par déformation plastique et contrôle des tolérances obtenues</div>
         </div>
       </div>
 
@@ -2256,7 +2264,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         <div class="tp-border-hover"></div>
         <div class="tp-overlay">
           <div class="tp-title">Soudage TIG / MIG</div>
-          <div class="tp-cat">Réalisation d'assemblages métalliques par procédés à l'arc</div>
+          <div class="tp-cat">Assemblages métalliques réalisés à l'arc, avec contrôle visuel et dimensionnel des cordons de soudure</div>
         </div>
       </div>
 
@@ -2286,7 +2294,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         <div class="tp-border-hover"></div>
         <div class="tp-overlay">
           <div class="tp-title">Fraisage CNC</div>
-          <div class="tp-cat">Usinage de pièces mécaniques sur centre d'usinage et contrôle dimensionnel</div>
+          <div class="tp-cat">Programmation et usinage de pièces mécaniques sur centre CNC</div>
         </div>
       </div>
 
@@ -2301,7 +2309,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         <div class="tp-border-hover"></div>
         <div class="tp-overlay">
           <div class="tp-title">Tournage</div>
-          <div class="tp-cat">Fabrication de pièces de révolution par tournage conventionnel et CN</div>
+          <div class="tp-cat">Fabrication de pièces de révolution sur tour à commande numérique</div>
         </div>
       </div>
 
@@ -2317,7 +2325,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         <div class="tp-border-hover"></div>
         <div class="tp-overlay">
           <div class="tp-title">Métrologie dimensionnelle</div>
-          <div class="tp-cat">Contrôle géométrique et validation de pièces mécaniques</div>
+          <div class="tp-cat">Contrôle géométrique, au marbre et à la MTT, de pièces usinées et validation par rapport aux spécifications du plan</div>
         </div>
       </div>
 
@@ -2332,7 +2340,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         <div class="tp-border-hover"></div>
         <div class="tp-overlay">
           <div class="tp-title">Sécurité industrielle</div>
-          <div class="tp-cat">Réglementation et bonnes pratiques de sécurité en atelier de fabrication</div>
+          <div class="tp-cat">Sensibilisation aux règles de sécurité et bonnes pratiques applicables en atelier de fabrication</div>
         </div>
       </div>
 
@@ -2352,7 +2360,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         <div class="tp-border-hover"></div>
         <div class="tp-overlay">
           <div class="tp-title">Impression 3D</div>
-          <div class="tp-cat">Fabrication de pièces techniques par impression 3D (FDM, SLA)</div>
+          <div class="tp-cat">Conception et fabrication de pièces techniques par impression 3D</div>
         </div>
       </div>
 
@@ -2368,7 +2376,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         <div class="tp-border-hover"></div>
         <div class="tp-overlay">
           <div class="tp-title">Structures composites</div>
-          <div class="tp-cat">Mise en œuvre et caractérisation des matériaux composites à fibres</div>
+          <div class="tp-cat">Mise en œuvre de matériaux composites à fibres et caractérisation de leurs propriétés mécaniques</div>
         </div>
       </div>
 
@@ -2383,7 +2391,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         <div class="tp-border-hover"></div>
         <div class="tp-overlay">
           <div class="tp-title">Matériaux polymères</div>
-          <div class="tp-cat">Comportement mécanique et thermique des polymères industriels</div>
+          <div class="tp-cat">Étude du comportement mécanique et thermique des polymères utilisés en industrie</div>
         </div>
       </div>
 
@@ -2430,7 +2438,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
         <div class="tp-border-hover"></div>
         <div class="tp-overlay">
           <div class="tp-title">Etude des matériaux</div>
-          <div class="tp-cat">Etude macroscopique et microscopique des matériaux</div>
+          <div class="tp-cat">Observation macroscopique et microscopique de la microstructure des matériaux</div>
         </div>
       </div>
 
@@ -2553,7 +2561,7 @@ footer p { font-size:.6rem; letter-spacing:.18em; color:rgba(255,255,255,.2); }
     </div>
 
     <p class="csub rv">
-      Disponible pour des opportunités en stage ou en mission, dans les domaines de la conception mécanique, des procédés de fabrication et de la visualisation 3D.
+      Ouvert aux opportunités de stage dans les domaines de la conception mécanique, de la fabrication et de la visualisation numérique.
     </p>
 
     <div class="cemail-wrap rv">
@@ -2805,23 +2813,34 @@ window.addEventListener('load', () => { initShowcase(); });
    Secondaires = défilement auto (petit)
 ═══════════════════════════════════════════════ */
 const SOFTS_MAIN = [
-  { name:'SolidWorks',    abbr:'SW', logo:'Images/logo_SW.png' },
-  { name:'Blender',       abbr:'BL', logo:'Images/logo_blender.png' },
-  { name:'Unreal Engine 5', abbr:'UE5', logo:'Images/logo_unreal.png' },
-  { name:'Python',        abbr:'Py', logo:'Images/logo_python.png' },
-  { name:'Abaqus',        abbr:'AB', logo:'Images/logo_abaqus.png' },
-  { name:'GitHub',        abbr:'GH', logo:'Images/logo_github.png' },
+  { name:'SolidWorks',    abbr:'SW', logo:'Images/logo_SW.png', stars:5 },
+  { name:'Blender',       abbr:'BL', logo:'Images/logo_blender.png', stars:3 },
+  { name:'Unreal Engine 5', abbr:'UE5', logo:'Images/logo_unreal.png', stars:2 },
+  { name:'Python',        abbr:'Py', logo:'Images/logo_python.png', stars:3.5 },
+  { name:'Scilab',        abbr:'SC',  logo:'Images/logo_scilab.png', stars:3 },
+  { name:'Excel',        abbr:'Ex', logo:'Images/logo_excel.png', stars:4 },
 ];
 
 const SOFTS_SEC = [
-  { name:'Sweet Home 3D',      abbr:'CV',  logo:'Images/logo_sweethome3d.png' },
-  { name:'3DEXPERIENCE',  abbr:'3DX', logo:'Images/logo_3dexp.png' },
-  { name:'Flexsim',       abbr:'FS',  logo:'Images/logo_flexsim.png' },
-  { name:'LaTeX',         abbr:'LX',  logo:'Images/logo_latex.png' },
-  { name:'Scilab',        abbr:'SC',  logo:'Images/logo_scilab.png' },
-  { name:'RDM Le Mans',   abbr:'RDM', logo:'Images/logo_rdm.png' },
-  { name:'Ansys Granta',  abbr:'GR',  logo:'Images/logo_edupack.png' },
+  { name:'Sweet Home 3D',      abbr:'SH',  logo:'Images/logo_sweethome3d.png', stars:3 },
+  { name:'3DEXPERIENCE',  abbr:'3DX', logo:'Images/logo_3dexp.png', stars:3 },
+  { name:'Flexsim',       abbr:'FS',  logo:'Images/logo_flexsim.png', stars:2 },
+  { name:'LaTeX',         abbr:'LX',  logo:'Images/logo_latex.png', stars:4.5 },
+  { name:'Abaqus',        abbr:'AB', logo:'Images/logo_abaqus.png', stars:1 },
+  { name:'RDM Le Mans',   abbr:'RDM', logo:'Images/logo_rdm.png', stars:3.5 },
+  { name:'Ansys Granta',  abbr:'GR',  logo:'Images/logo_edupack.png', stars:2.5 },
+  { name:'GitHub',        abbr:'GH', logo:'Images/logo_github.png', stars:3 },
+  { name:'Montage vidéo',        abbr:'MV', logo:'Images/logo_mont_vid.png', stars:3 },
+  { name:'Montage photo',        abbr:'MP', logo:'Images/logo_mont_pho.png', stars:3 },
+  { name:'Sketchup',        abbr:'Sk', logo:'Images/logo_sketchup.png', stars:1 },
+  { name:'Word',        abbr:'Wd', logo:'Images/logo_word.png', stars:4},
+  { name:'Suite LibreOffice',        abbr:'LO', logo:'Images/logo_libre_office.png', stars:4.5},
 ];
+
+function starsMarkup(n){
+  const pct = Math.max(0, Math.min(5, n||0)) / 5 * 100;
+  return `<span class="stars-off">★★★★★</span><span class="stars-on" style="width:${pct}%">★★★★★</span>`;
+}
 
 /* ════ 1. GEAR LOADER ════════════════════════════════ */
 function gPath(cx,cy,ro,ri,teeth){
@@ -2913,7 +2932,7 @@ function startCinematic(){
     function frame(now){
       if(done)return;
       const elapsed=now-T0;
-      let sweepX=W+200;
+      let sweepX=0;
       if(sweeping){ const sf=clamp((now-sweepStart)/SWEEP_DUR); sweepX=eio3(sf)*(W+80); }
 
       ctx.clearRect(0,0,W,H);
@@ -2921,9 +2940,8 @@ function startCinematic(){
 
       pts.forEach(p=>{
         if(p.x<sweepX-4)return;
-        ctx.save(); ctx.globalAlpha=p.a*.52; ctx.fillStyle=p.c;
-        ctx.shadowBlur=12; ctx.shadowColor=p.c;
-        ctx.beginPath(); ctx.arc(p.x,p.y,Math.max(0,p.r),0,Math.PI*2); ctx.fill(); ctx.restore();
+        ctx.save(); ctx.globalAlpha=p.a*.6; ctx.fillStyle=p.c;
+        ctx.beginPath(); ctx.arc(p.x,p.y,Math.max(0,p.r)*1.5,0,Math.PI*2); ctx.fill(); ctx.restore();
         p.x+=p.vx; p.y+=p.vy;
         if(p.y<-10){ p.y=H+10; p.x=Math.random()*W; }
       });
@@ -3212,11 +3230,15 @@ document.querySelectorAll('.sk-fg').forEach(el=>ioSk.observe(el));
       );
     }
 
-    const nm=document.createElement('div');
+	const nm=document.createElement('div');
     nm.className='swi-name';
     nm.textContent=s.name;
 
-    el.append(ico,nm);
+    const st=document.createElement('div');
+    st.className='swi-stars';
+    st.innerHTML=starsMarkup(s.stars||0);
+
+    el.append(ico,nm,st);
 
     el.addEventListener('click',()=>goTo(i));
 
@@ -3353,7 +3375,12 @@ document.querySelectorAll('.sk-fg').forEach(el=>ioSk.observe(el));
       const nm = document.createElement('div');
       nm.className = 'sw-sec-name';
       nm.textContent = soft.name;
-      el.append(ico, nm);
+
+      const st = document.createElement('div');
+      st.className = 'sw-sec-stars';
+      st.innerHTML = starsMarkup(soft.stars||0);
+
+      el.append(ico, nm, st);
       track.appendChild(el);
     });
   }
