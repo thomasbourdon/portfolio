@@ -117,6 +117,7 @@ body.panel-open #bg{filter:brightness(.15) blur(2px)}
 #wrap-p3{ left:71%; top:45%; } #wrap-p3 img{ width:clamp(100px,2vw,260px); }
 #wrap-p4{ left:50%; top:56%; } #wrap-p4 img{ width:clamp(150px,36vw,340px); }
 #wrap-p5{ left:82%; top:73%; } #wrap-p5 img{ width:clamp(200px,46vw,400px); }
+#wrap-p6{ left:61%; top:38%; } #wrap-p6 img{ width:clamp(110px,13vw,260px); }
 
 /* ── NAV ── */
 #nav{
@@ -148,6 +149,7 @@ body.panel-open #nav{opacity:0;pointer-events:none;transform:translateY(-8px)}
 #hs-p3{ left:70%; top:52%; }
 #hs-p4{ left:50%; top:60%; }
 #hs-p5{ left:85%; top:80%; }
+#hs-p6{ left:61%; top:38%; }
 
 body.panel-open .hotspot{pointer-events:none}
 .hs-label{
@@ -298,7 +300,17 @@ body.panel-open.open-center #panel-center-text{transform:translateX(0);pointer-e
   display:flex;align-items:center;gap:10px;
 }
 .pt-heading::after{content:'';flex:0 0 18px;height:1px;background:rgba(201,168,76,.4)}
-.pt-body{font-size:.76rem;line-height:1.9;color:rgba(15,13,17,.5)}
+.pt-body{font-size:.78rem;line-height:1.78;color:rgba(15,13,17,.60)}
+.pt-body strong{font-weight:500;color:rgba(15,13,17,.86)}
+.pt-lead{
+  margin:-2px 0 26px 3.1rem;padding:12px 14px 13px 15px;
+  border-left:2px solid rgba(201,168,76,.72);
+  background:linear-gradient(90deg,rgba(201,168,76,.08),rgba(201,168,76,.015));
+  font-size:.78rem;line-height:1.72;color:rgba(15,13,17,.64)
+}
+.pt-section{position:relative}
+.pt-section+.pt-section{padding-top:2px}
+.pt-pill{font-weight:400;color:rgba(116,89,25,.78)!important;border-color:rgba(201,168,76,.25)!important;background:rgba(201,168,76,.045)}
 .pt-pills-wrap{margin-top:24px;padding-top:18px;border-top:1px solid rgba(15,13,17,.08)}
 .pt-pills-label{font-size:.42rem;letter-spacing:.5em;text-transform:uppercase;
   color:rgba(15,13,17,.22);margin-bottom:10px;display:block}
@@ -327,11 +339,13 @@ body.panel-open.open-center #panel-center-text{transform:translateX(0);pointer-e
   #wrap-p3{ left:69%; top:50%; }
   #wrap-p4{ left:50%; top:61%; }
   #wrap-p5{ left:83%; top:65%; }
+  #wrap-p6{ left:62%; top:39%; }
   #hs-p1{ left:19%; top:67%; }
   #hs-p2{ left:30%; top:52%; }
   #hs-p3{ left:70%; top:52%; }
   #hs-p4{ left:50%; top:60%; }
   #hs-p5{ left:85%; top:80%; }
+  #hs-p6{ left:62%; top:39%; }
 
   #panel-right,#panel-left{
     width:100vw;height:78vh;top:auto;bottom:0;left:0;right:0;
@@ -403,6 +417,12 @@ body.panel-open.open-center #panel-center-text{transform:translateX(0);pointer-e
     <div class="proj-dot-ring"></div>
     <div class="proj-dot"></div>
   </div>
+  <!-- p6 — emplacement provisoire, à repositionner avec le nouveau fond -->
+  <div class="proj-wrap" id="wrap-p6">
+    <img id="img-p6" src="Images/projet_6.png" alt="">
+    <div class="proj-dot-ring"></div>
+    <div class="proj-dot"></div>
+  </div>
 
   <nav id="nav">
     <a href="index.html" class="nav-back">Retour au portfolio</a>
@@ -443,6 +463,13 @@ body.panel-open.open-center #panel-center-text{transform:translateX(0);pointer-e
       <span class="hs-ltag">ENSAM · 2025</span>
       <span class="hs-lname">Convoyage<br>de Sable dans un ilot fonderie</span>
       <span class="hs-lyear"> Projet ELF · Usine 4.0</span>
+    </div>
+  </div>
+  <div class="hotspot" id="hs-p6">
+    <div class="hs-label">
+      <span class="hs-ltag">Conception · 2026</span>
+      <span class="hs-lname">Préhenseur<br>robotisé</span>
+      <span class="hs-lyear">Étude de conception</span>
     </div>
   </div>
 
@@ -496,45 +523,66 @@ const SVG={
   p2:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#C9A84C" stroke-width="1.1"><rect x="22" y="18" width="14" height="44" fill="rgba(201,168,76,.07)"/><rect x="44" y="18" width="14" height="44" fill="rgba(201,168,76,.07)"/><rect x="18" y="16" width="44" height="8" fill="rgba(201,168,76,.07)"/><rect x="18" y="56" width="44" height="8" fill="rgba(201,168,76,.07)"/><path d="M36 55 Q30 45 34 35 Q38 25 44 30 Q50 35 46 45 Q42 55 36 55Z" stroke="rgba(201,168,76,.6)" stroke-width=".8" fill="rgba(201,168,76,.04)"/></svg>`,
   p3:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#C9A84C" stroke-width="1.1"><rect x="20" y="28" width="40" height="26" rx="1" fill="rgba(201,168,76,.06)" stroke-width="1.2"/><line x1="20" y1="28" x2="60" y2="54" stroke="rgba(201,168,76,.45)" stroke-width=".7" stroke-dasharray="2 2"/><line x1="60" y1="28" x2="20" y2="54" stroke="rgba(201,168,76,.45)" stroke-width=".7" stroke-dasharray="2 2"/><circle cx="40" cy="18" r="6" fill="rgba(201,168,76,.08)" stroke-width="1.2"/><line x1="40" y1="24" x2="40" y2="28"/><line x1="20" y1="28" x2="20" y2="18"/><line x1="20" y1="18" x2="34" y2="18"/><line x1="60" y1="28" x2="60" y2="18"/><line x1="60" y1="18" x2="46" y2="18"/><polyline points="14,68 14,62 18,62 18,68 22,68 22,62 26,62 26,68" stroke="rgba(201,168,76,.7)" stroke-width=".9" fill="none"/></svg>`,
   p4:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#C9A84C" stroke-width="1.1"><path d="M12 48 Q18 30 30 26 L52 24 Q66 24 70 34 L70 48Z" fill="rgba(201,168,76,.08)" stroke-width="1.3"/><circle cx="22" cy="50" r="8" fill="rgba(201,168,76,.06)" stroke-width="1.3"/><circle cx="22" cy="50" r="4" fill="rgba(201,168,76,.1)" stroke-width=".8"/><circle cx="60" cy="50" r="8" fill="rgba(201,168,76,.06)" stroke-width="1.3"/><circle cx="60" cy="50" r="4" fill="rgba(201,168,76,.1)" stroke-width=".8"/><text x="40" y="44" text-anchor="middle" font-family="serif" font-size="10" fill="rgba(201,168,76,.7)" stroke="none">FS</text></svg>`,
-  p5:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#C9A84C" stroke-width="1.1"><line x1="12" y1="62" x2="68" y2="28" stroke-width="1.4"/><line x1="12" y1="56" x2="68" y2="22" stroke-width="1.4"/><circle cx="30" cy="52" r="2" fill="rgba(201,168,76,.35)"/><circle cx="40" cy="46" r="1.5" fill="rgba(201,168,76,.3)"/><circle cx="50" cy="40" r="2" fill="rgba(201,168,76,.35)"/></svg>`
+  p5:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#C9A84C" stroke-width="1.1"><line x1="12" y1="62" x2="68" y2="28" stroke-width="1.4"/><line x1="12" y1="56" x2="68" y2="22" stroke-width="1.4"/><circle cx="30" cy="52" r="2" fill="rgba(201,168,76,.35)"/><circle cx="40" cy="46" r="1.5" fill="rgba(201,168,76,.3)"/><circle cx="50" cy="40" r="2" fill="rgba(201,168,76,.35)"/></svg>`,
+  p6:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#C9A84C" stroke-width="1.1"><rect x="28" y="14" width="24" height="10" rx="2" fill="rgba(201,168,76,.07)"/><line x1="40" y1="24" x2="40" y2="36"/><path d="M22 34 L32 34 L32 58 L22 58"/><path d="M58 34 L48 34 L48 58 L58 58"/><path d="M32 42 L48 42" stroke="rgba(201,168,76,.6)"/><path d="M36 58 Q40 64 44 58"/></svg>`
 };
 
 const PROJECTS={
   p1:{position:'right',number:'01',tag:'TIPE 2 · Mécanique des structures',title:'Étude Modale',titleEm:'Plaque de Faible Épaisseur',year:'2024',
+    intro:`Mon TIPE de deuxième année de CPGE s'est finalement concentré sur la <strong>flexion statique de plaques minces en aluminium</strong>. J'ai comparé trois approches — théorie, simulation et expérience — pour comprendre leurs écarts et les limites de chaque modèle.`,
     images:['Images/projet_1.jpg','Images/projet_1b.jpg'],
     sections:[
-      {h:'Problématique',t:`Analyse des modes propres de vibration d'une plaque rectangulaire mince en acier. Comparer les fréquences propres expérimentales aux prédictions analytiques (Kirchhoff) et numériques (EF).`},
-      {h:'Protocole',t:`Excitation par pot vibrant, mesure par accéléromètres triaxiaux et vélocimétrie laser (LDV). Modélisation éléments finis sous ANSYS Mechanical.`},
-      {h:'Résultats',t:`6 premiers modes identifiés avec un écart < 4 % entre mesure et simulation. Influence du rapport d'aspect sur la densité modale mise en évidence. Présenté aux oraux CPGE.`}
-    ],tags:['TIPE','Analyse modale','ANSYS','LDV','Kirchhoff','CPGE']},
+      {h:'Problématique',t:`J'ai étudié l'influence de <strong>l'épaisseur</strong>, de la <strong>charge</strong> et des <strong>conditions aux limites</strong> sur le déplacement d'une plaque mince. Quatre configurations ont été comparées : appui simple ou encastrement, sur deux ou quatre bords.`},
+      {h:'Démarche',t:`Je me suis appuyé sur la théorie de <strong>Kirchhoff-Love</strong>, puis j'ai développé les calculs sous Python et reproduit les différents cas sous <strong>SolidWorks Simulation</strong>. En parallèle, j'ai conçu et fabriqué un banc d'essai réversible pour tester des plaques d'aluminium de 40 × 40 cm sous charge répartie, avec mesure au comparateur mécanique.`},
+      {h:'Résultats & recul',t:`Les trois approches retrouvent les mêmes tendances générales : le déplacement augmente presque linéairement avec la charge et dépend très fortement de l'épaisseur. La théorie et la simulation donnent un comportement proche de <strong>1/h³</strong>, tandis que l'expérience s'en écarte davantage. Ce projet m'a surtout appris à critiquer les hypothèses d'un modèle, la qualité d'un encastrement réel et la construction d'un <strong>maillage EF progressif</strong>.`}
+    ],tags:['TIPE','Kirchhoff-Love','SolidWorks Simulation','Python','Éléments finis','Expérimentation']},
+
   p2:{position:'right',number:'02',tag:'TIPE 1 · Physique appliquée',title:'Pertes par Hystérésis',titleEm:'Transformateur de Cordeuse',year:'2023',
+    intro:`Pour mon premier TIPE de CPGE, j'ai utilisé le transformateur d'une cordeuse de raquette comme cas d'étude afin de comprendre l'influence du <strong>matériau ferromagnétique</strong> sur les pertes par hystérésis.`,
     images:['Images/projet_2.jpg','Images/projet_2b.jpg'],
     sections:[
-      {h:'Problématique',t:`TIPE portant sur la caractérisation des pertes fer par hystérésis dans le transformateur d'une cordeuse de raquette. Enjeu : quantifier ces pertes pour améliorer le rendement énergétique.`},
-      {h:'Méthode',t:`Traçage du cycle B-H par oscilloscope numérique, mesure des pertes de Foucault et par hystérésis via la méthode de Steinmetz. Comparaison avec un modèle numérique Python.`},
-      {h:'Résultats',t:`Pertes fer évaluées à 8 % de la puissance nominale. Proposition d'un matériau alternatif (ferrite nanocristalline) réduisant les pertes de 35 %. Oral CPGE validé.`}
-    ],tags:['TIPE','Électromagnétisme','Python','Oscilloscope','Steinmetz','CPGE']},
+      {h:'Objectif',t:`L'objectif était de reconstruire des cycles <strong>B-H</strong>, d'en interpréter l'aire et de comparer les pertes obtenues pour différents matériaux doux. L'étude portait principalement sur le <strong>fer</strong> et la <strong>ferrite</strong>, à 50 et 60 Hz.`},
+      {h:'Expérience',t:`J'ai monté une chaîne expérimentale avec GBF, conditionnement de mesure, transformateur, oscilloscope et acquisition sous <strong>LatisPro</strong>. Le champ H était déduit du courant primaire et le champ B de la tension secondaire intégrée ; l'affichage en mode XY permettait ensuite d'obtenir directement le cycle d'hystérésis.`},
+      {h:'Résultats & recul',t:`Les cycles mesurés ont montré une aire nettement plus faible pour la ferrite que pour le fer dans les conditions testées, donc des <strong>pertes d'hystérésis plus faibles</strong>. Ce TIPE m'a surtout apporté une première vraie expérience d'instrumentation, de traitement de mesures et d'analyse d'un phénomène magnétique non linéaire.`}
+    ],tags:['TIPE','Hystérésis','Ferromagnétisme','LatisPro','Oscilloscope','Instrumentation']},
+
   p3:{position:'left',number:'03',tag:'Projet Terminal · STI2D',title:'Carrelet de Pêche',titleEm:'Motorisé & Automatisé',year:'2022',
+    intro:`Ce projet de terminale est mon premier projet technique mené sur une année complète. L'objectif était de réaliser une <strong>maquette fonctionnelle de carrelet motorisé</strong>, capable de monter et descendre un filet sous charge à échelle réduite.`,
     images:['Images/projet_3.jpg','Images/projet_3b.jpg'],
     sections:[
-      {h:'Contexte',t:`Projet de terminale STI2D portant sur la motorisation et l'automatisation d'un carrelet de pêche traditionnel. L'objectif était de concevoir un système permettant la montée et la descente automatique du filet, en supprimant l'effort manuel de manivelle, tout en intégrant une gestion électronique embarquée.`},
-      {h:'Maquette & Partie mécanique',t:`Conception et réalisation d'une maquette fonctionnelle à l'échelle : structure porteuse en bois, système de treuil avec tambour d'enroulement du câble, transmission par courroie crantée. Modélisation 3D sous SolidWorks, fabrication en atelier (découpe, assemblage, câblage mécanique).`},
-      {h:'Partie électronique — Hacheur',t:`Conception d'une carte de commande pour le pilotage d'un moteur à courant continu par hacheur série (MLI). Le pont en H à MOSFET permet le contrôle du sens de rotation (montée/descente du filet) et de la vitesse via un signal PWM généré par microcontrôleur Arduino. Dimensionnement du hacheur, calcul des pertes en commutation, protection par diodes de roue libre.`}
-    ],tags:['STI2D','Hacheur MLI','Moteur CC','Arduino','SolidWorks','Électronique de puissance','Maquette']},
+      {h:'Ma contribution',t:`Au sein d'un groupe de cinq, j'ai principalement travaillé sur la conception du système, la motorisation, le câblage et la commande. Un moteur à courant continu entraînait un tambour d'enroulement ; le câble passait ensuite par une poulie pour lever le filet.`},
+      {h:'Commande & prototype',t:`La commande reposait sur un <strong>Arduino</strong> et un pont en H / shield moteur, avec un sélecteur trois positions pour la montée, l'arrêt et la descente. La maquette associait une structure en bois, une bobine issue de CAO, de la ficelle, l'électronique de commande ainsi qu'une alimentation comprenant batterie et panneau solaire. Le prototype était fonctionnel en fin de projet.`},
+      {h:'Ce que j’en retiens',t:`Le pilotage du moteur a été la principale difficulté et m'a occupé une grande partie du projet. C'est surtout là que j'ai compris l'intérêt de commencer par une <strong>recherche technique</strong> et un schéma clair du système avant de passer directement au montage.`}
+    ],tags:['STI2D','Arduino','Moteur CC','Pont en H','SolidWorks','Prototypage']},
+
   p4:{position:'center',number:'04',tag:"Formula Student · Projet d'équipe",title:"Construction d'une",titleEm:'Monoplace Formula Student',year:'2026',
+    intro:`Je participe à la création de la monoplace <strong>électrique</strong> de Boquette Formula Student. Depuis novembre 2025, je suis <strong>responsable du pôle mécanique</strong> : je coordonne actuellement cinq membres tout en restant directement impliqué dans les choix et études techniques.`,
     images:['Images/projet_4.jpg','Images/projet_4b.jpg','Images/projet_4c.jpg'],
     sections:[
-      {h:'Contexte',t:`Compétition Formula Student au sein d'une équipe de vingt étudiants. Conception et fabrication complète d'une monoplace thermique, de l'avant-projet à l'homologation.`},
-      {h:'Rôle',t:`Responsable du châssis tubulaire 25CrMo4 : analyse des charges, calcul de rigidité torsionnelle par EF (SolidWorks Simulation), optimisation masse/rigidité. Soudage TIG, assemblage général.`},
-      {h:'Résultats',t:`Monoplace homologuée et mise en piste. Top 15 des épreuves statiques (Business Plan, Engineering Design). Gestion de projet industriel en conditions réelles.`}
-    ],tags:['Formula Student','Châssis','SolidWorks','FEA','Soudage TIG','Gestion de projet']},
+      {h:'Châssis & fabrication',t:`J'ai repris et finalisé la CAO du châssis, effectué plusieurs corrections et assuré une partie des échanges avec l'entreprise chargée de sa fabrication. Je travaille également, avec un membre du pôle, sur la conception du <strong>gabarit de soudage</strong> afin de garantir un positionnement précis tout en restant simple, rapide et économique à fabriquer.`},
+      {h:'Transmission & pneumatiques',t:`J'ai étudié une transmission par courroies <strong>HTD 8M sur deux étages</strong> et structuré les choix associés. Pour les pneumatiques, j'ai exploité des données TTC et <strong>AgileTire</strong> afin de comparer plusieurs références Hoosier, puis approfondi la caractérisation du pneu retenu avec un ajustement de type <strong>Pacejka</strong>.`},
+      {h:'Responsabilité de pôle',t:`Mon rôle comprend aussi l'organisation des réunions, la répartition des tâches, le suivi du planning et du budget, la documentation technique, les échanges fournisseurs et la priorisation des achats. À ce stade, le projet est encore en développement : le châssis, une jante et le moteur existent physiquement, tandis que les autres sous-ensembles continuent d'être conçus et dimensionnés.`}
+    ],tags:['Formula Student','Responsable mécanique','SolidWorks','AgileTire','Pacejka','Gestion de projet']},
+
   p5:{position:'left',number:'05',tag:'ELF · Usine 4.0 · ENSAM',title:'Système de Convoyage',titleEm:'de Sable',year:'2025',
+    intro:`Dans le cadre d'un PJT de première année à l'ENSAM, notre groupe de trois a étudié l'automatisation du <strong>transfert de sable à vert</strong> entre un malaxeur et une machine à mouler de l'îlot fonderie.`,
     images:['Images/projet_5.jpg','Images/projet_5b.jpg'],
     sections:[
-      {h:'Contexte',t:`Projet industriel ELF (ENSAM). Concevoir un système de convoyage automatisé de sable de fonderie pour une ligne de moulage Usine 4.0.`},
-      {h:'Conception',t:`Dimensionnement d'un convoyeur à bande incliné (2 t/h, pente 20°), choix du motoréducteur et variateur, châssis soudé, intégration d'un API Schneider.`},
-      {h:'Résultats',t:`Dossier de conception complet : plans, nomenclature, note de calcul, programme API. Prototype 1/3 fabriqué en atelier. Projet évalué avec mention.`}
-    ],tags:['ENSAM','Usine 4.0','API Schneider','Convoyeur','Mécanique','Automatisme']}
+      {h:'Besoin',t:`La solution devait respecter plusieurs contraintes d'intégration : encombrement limité, sécurité, maintenabilité, coût, récupération du sable excédentaire et limitation du compactage du matériau. Les rendez-vous avec les utilisateurs de l'atelier ont aussi permis de recentrer le besoin sur le transfert entre les deux machines.`},
+      {h:'Mon rôle',t:`J'étais principalement chargé de la <strong>conception CAO et de l'intégration</strong> de la solution dans l'atelier. J'ai modélisé la trémie, le convoyeur et le système de sortie flexible sous SolidWorks / 3DEXPERIENCE, tout en assurant le rôle de chef de projet et la rédaction finale du livrable. Les autres membres se concentraient davantage sur le dimensionnement théorique et la fabricabilité.`},
+      {h:'Solution retenue',t:`La proposition finale associe une trémie avec dosage par vis, un <strong>convoyeur à bande incliné</strong> et un entonnoir relié à un tube flexible permettant d'orienter le flux vers la machine ou vers une zone de récupération. La CAO paramétrique a surtout servi à vérifier les interfaces, les encombrements et l'accessibilité pour la maintenance.`},
+      {h:'État du projet',t:`Le projet est resté au stade de <strong>conception et d'intégration numérique</strong> : aucun prototype physique n'a été fabriqué. Cette étude m'a surtout appris à revenir vers les utilisateurs lorsqu'une exigence est ambiguë et à ajuster une solution au contexte réel de l'atelier.`}
+    ],tags:['ENSAM','PJT','SolidWorks','3DEXPERIENCE','Conception mécanique','Intégration']},
+
+  p6:{position:'left',number:'06',tag:'Conception · Robotique',title:'Préhenseur Robotisé',titleEm:'Étude de Conception',year:'2026',
+    intro:`J'ai développé une étude de conception autour d'un <strong>préhenseur robotisé pour charges planes emballées</strong>. Pour préserver la confidentialité du besoin d'origine, cette fiche ne reprend volontairement ni le client, ni le produit exact, ni les dimensions ou performances imposées.`,
+    images:['Images/projet_6.jpg','Images/projet_6b.jpg'],
+    sections:[
+      {h:'Objectif',t:`Le travail consistait à imaginer une architecture légère, compacte, symétrique et compatible avec un robot collaboratif, tout en assurant une prise fiable sans détériorer le produit. J'ai comparé plusieurs principes de préhension : aspiration, serrage latéral, maintien inférieur et solutions hybrides.`},
+      {h:'Concept retenu',t:`Le concept que j'ai développé repose sur <strong>deux pinces latérales complétées par un appui supérieur</strong>. La cinématique utilise un mécanisme de bras et de biellettes afin d'obtenir un mouvement coordonné et de limiter l'encombrement autour de la charge.`},
+      {h:'Conception CAO',t:`J'ai réalisé la conception sous <strong>SolidWorks</strong> en travaillant notamment sur la masse, le centre de gravité, l'interface mécanique, l'accessibilité, la géométrie des éléments de contact et la fabricabilité. L'étude devait ensuite être prolongée par du dimensionnement, du prototypage et des essais.`},
+      {h:'État du projet',t:`Cette étude est restée au stade de <strong>concept et de CAO</strong> : elle n'a pas donné lieu à une mission de fabrication ni à des essais sur robot. Je la présente donc ici comme un exercice personnel de conception mécanique, et non comme un système industriel finalisé.`}
+    ],tags:['Conception mécanique','Préhenseur robotisé','SolidWorks','Cinématique','DFM','Robotique']}
 };
 
 let currentId=null,carIdx=0,carLen=0,currentCarouselEl=null,currentDotsEl=null,currentCountEl=null;
@@ -555,7 +603,7 @@ bgEl.addEventListener('dragstart',e=>e.preventDefault());
 bgEl.addEventListener('mousedown',e=>e.preventDefault());
 
 /* ═══════ EVENTS WRAPS ═══════ */
-['p1','p2','p3','p4','p5'].forEach(id=>{
+['p1','p2','p3','p4','p5','p6'].forEach(id=>{
   const wrap=document.getElementById('wrap-'+id);
   const hs=document.getElementById('hs-'+id);
   if(!wrap) return;
@@ -640,6 +688,7 @@ function buildText(id,p,container){
     <span class="pt-tag">${p.tag}</span>
     <h2 class="pt-title">${p.title}${p.titleEm?'<br><em>'+p.titleEm+'</em>':''}</h2>
     <div class="pt-meta"><span class="pt-year">${p.year}</span><div class="pt-meta-line"></div></div>
+    ${p.intro?`<div class="pt-lead">${p.intro}</div>`:''}
     <div class="pt-sections">${s}</div>
     <div class="pt-pills-wrap">
       <span class="pt-pills-label">Technologies &amp; Compétences</span>
